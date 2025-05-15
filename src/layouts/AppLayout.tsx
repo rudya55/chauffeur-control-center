@@ -28,7 +28,7 @@ const AppLayout = () => {
 
   return (
     <SidebarProvider>
-      <div className={cn("flex flex-col h-screen w-full", theme === 'dark' ? 'dark' : '')}>
+      <div className={cn("flex flex-col h-screen w-full max-w-full", theme === 'dark' ? 'dark' : '')}>
         {isMobile ? (
           <MobileHeader 
             isOpen={sidebarOpen} 

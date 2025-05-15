@@ -1,3 +1,4 @@
+
 import { useEffect, useRef, useState } from 'react';
 import { cn } from '@/lib/utils';
 import { useTheme } from '@/hooks/use-theme';
@@ -44,13 +45,13 @@ const Map = ({
       if (mapRef.current && window.google) {
         // Set map styles based on theme
         const darkMapStyles = [
-          { elementType: 'geometry', stylers: [{ color: '#242f3e' }] },
-          { elementType: 'labels.text.stroke', stylers: [{ color: '#242f3e' }] },
-          { elementType: 'labels.text.fill', stylers: [{ color: '#746855' }] },
+          { elementType: 'geometry', stylers: [{ color: '#1a2639' }] }, // Darker blue background
+          { elementType: 'labels.text.stroke', stylers: [{ color: '#1a2639' }] },
+          { elementType: 'labels.text.fill', stylers: [{ color: '#d4af37' }] }, // Gold text
           {
             featureType: 'administrative.locality',
             elementType: 'labels.text.fill',
-            stylers: [{ color: '#d59563' }]
+            stylers: [{ color: '#d4af37' }] // Gold for localities
           },
           {
             featureType: 'poi',
@@ -60,27 +61,27 @@ const Map = ({
           {
             featureType: 'road',
             elementType: 'geometry',
-            stylers: [{ color: '#38414e' }]
+            stylers: [{ color: '#4a6491' }] // Lighter blue for roads
           },
           {
             featureType: 'road',
             elementType: 'geometry.stroke',
-            stylers: [{ color: '#212a37' }]
+            stylers: [{ color: '#6a84b1' }] // Even lighter blue for road strokes
           },
           {
             featureType: 'road',
             elementType: 'labels.text.fill',
-            stylers: [{ color: '#9ca5b3' }]
+            stylers: [{ color: '#d4af37' }] // Gold text for roads
           },
           {
             featureType: 'road.highway',
             elementType: 'geometry',
-            stylers: [{ color: '#746855' }]
+            stylers: [{ color: '#5d7bb0' }] // Light blue for highways
           },
           {
             featureType: 'road.highway',
             elementType: 'geometry.stroke',
-            stylers: [{ color: '#1f2835' }]
+            stylers: [{ color: '#8fa8d5' }] // Even lighter blue for highway strokes
           },
           {
             featureType: 'transit',
@@ -90,7 +91,7 @@ const Map = ({
           {
             featureType: 'water',
             elementType: 'geometry',
-            stylers: [{ color: '#17263c' }]
+            stylers: [{ color: '#0e1626' }] // Darker blue for water
           },
           {
             featureType: 'water',
@@ -185,15 +186,67 @@ const Map = ({
 
     // Update map when theme changes
     if (mapInstanceRef.current) {
-      const styles = theme === 'dark' ? [
-        { elementType: 'geometry', stylers: [{ color: '#242f3e' }] },
-        { elementType: 'labels.text.stroke', stylers: [{ color: '#242f3e' }] },
-        { elementType: 'labels.text.fill', stylers: [{ color: '#746855' }] },
-        { featureType: 'poi', elementType: 'labels', stylers: [{ visibility: 'off' }] },
-        // ... other dark styles
-      ] : [
+      const darkMapStyles = [
+        { elementType: 'geometry', stylers: [{ color: '#1a2639' }] }, // Darker blue background
+        { elementType: 'labels.text.stroke', stylers: [{ color: '#1a2639' }] },
+        { elementType: 'labels.text.fill', stylers: [{ color: '#d4af37' }] }, // Gold text
+        {
+          featureType: 'administrative.locality',
+          elementType: 'labels.text.fill',
+          stylers: [{ color: '#d4af37' }] // Gold for localities
+        },
+        {
+          featureType: 'poi',
+          elementType: 'labels',
+          stylers: [{ visibility: 'off' }]
+        },
+        {
+          featureType: 'road',
+          elementType: 'geometry',
+          stylers: [{ color: '#4a6491' }] // Lighter blue for roads
+        },
+        {
+          featureType: 'road',
+          elementType: 'geometry.stroke',
+          stylers: [{ color: '#6a84b1' }] // Even lighter blue for road strokes
+        },
+        {
+          featureType: 'road',
+          elementType: 'labels.text.fill',
+          stylers: [{ color: '#d4af37' }] // Gold text for roads
+        },
+        {
+          featureType: 'road.highway',
+          elementType: 'geometry',
+          stylers: [{ color: '#5d7bb0' }] // Light blue for highways
+        },
+        {
+          featureType: 'road.highway',
+          elementType: 'geometry.stroke',
+          stylers: [{ color: '#8fa8d5' }] // Even lighter blue for highway strokes
+        },
+        {
+          featureType: 'transit',
+          elementType: 'geometry',
+          stylers: [{ color: '#2f3948' }]
+        },
+        {
+          featureType: 'water',
+          elementType: 'geometry',
+          stylers: [{ color: '#0e1626' }] // Darker blue for water
+        },
+        {
+          featureType: 'water',
+          elementType: 'labels.text.fill',
+          stylers: [{ color: '#515c6d' }]
+        }
+      ];
+      
+      const lightMapStyles = [
         { featureType: "poi", elementType: "labels", stylers: [{ visibility: "off" }] }
       ];
+      
+      const styles = theme === 'dark' ? darkMapStyles : lightMapStyles;
       
       mapInstanceRef.current.setOptions({ styles });
       
@@ -229,8 +282,12 @@ const Map = ({
 
   // Handle menu toggle click
   const handleMenuToggle = () => {
-    const event = new CustomEvent('toggle-sidebar');
-    window.dispatchEvent(event);
+    if (onMenuToggle) {
+      onMenuToggle();
+    } else {
+      const event = new CustomEvent('toggle-sidebar');
+      window.dispatchEvent(event);
+    }
   };
 
   return (
@@ -243,6 +300,7 @@ const Map = ({
       <button 
         className="absolute top-4 left-4 z-50 bg-white/80 dark:bg-background/80 p-2 rounded-md shadow-md"
         onClick={handleMenuToggle}
+        aria-label="Toggle menu"
       >
         <Menu className="h-5 w-5 text-gray-700 dark:text-primary" />
       </button>
