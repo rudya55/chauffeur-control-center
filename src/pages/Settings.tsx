@@ -176,6 +176,7 @@ const Settings = () => {
           <TabsTrigger value="notifications">Notifications</TabsTrigger>
         </TabsList>
         
+        
         <TabsContent value="profile" className="mt-4 space-y-4">
           <Card>
             <CardHeader>
@@ -755,15 +756,6 @@ const Settings = () => {
         </TabsContent>
       </Tabs>
     </div>
-  );
-};
-
-// Helper component for the Security tab
-const Label = ({ htmlFor, children }: { htmlFor: string, children: React.ReactNode }) => {
-  return (
-    <label htmlFor={htmlFor} className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
-      {children}
-    </label>
   );
 };
 
