@@ -155,7 +155,7 @@ const Reservations = () => {
     
     if (reservation) {
       // Mettre à jour le statut et déplacer vers mes réservations
-      const updatedReservation = { ...reservation, status: 'accepted' };
+      const updatedReservation: ReservationType = { ...reservation, status: 'accepted' };
       setMyReservations(prev => [...prev, updatedReservation]);
       
       // Retirer de la liste des réservations à venir
@@ -208,19 +208,18 @@ const Reservations = () => {
     ];
 
     // Ajouter aux réservations terminées avec les données supplémentaires
-    setCompletedReservations(prev => [
-      ...prev, 
-      { 
-        ...reservationToComplete,
-        status: 'completed',
-        dropoffTime: new Date().toISOString(),
-        distance: "12.5 km", // Ces données seraient calculées dans une vraie application
-        duration: "35 min",
-        rating,
-        comment,
-        route: simulatedRoute
-      }
-    ]);
+    const completedReservation: ReservationType = { 
+      ...reservationToComplete,
+      status: 'completed',
+      dropoffTime: new Date().toISOString(),
+      distance: "12.5 km", // Ces données seraient calculées dans une vraie application
+      duration: "35 min",
+      rating,
+      comment,
+      route: simulatedRoute
+    };
+    
+    setCompletedReservations(prev => [...prev, completedReservation]);
   };
   
   // Ouvrir le chat avec un dispatcher
@@ -367,3 +366,4 @@ const Reservations = () => {
 };
 
 export default Reservations;
+
