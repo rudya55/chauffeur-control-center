@@ -1,10 +1,11 @@
 
 import OnlineStatusToggle from "@/components/OnlineStatusToggle";
 import Map from "@/components/Map";
-import { Check, X, MapPin, Users, Luggage, CarFront, Euro, CreditCard, DollarSign, Banknote } from "lucide-react";
+import { Check, X, MapPin, Plane, ArrowRight, DollarSign } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
 import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 
 interface Reservation {
   id: string;
@@ -24,6 +25,7 @@ interface Reservation {
 
 const Home = () => {
   const { toast } = useToast();
+  const navigate = useNavigate();
   const [incomingReservation, setIncomingReservation] = useState<Reservation | null>(null);
   const [sidebarOpen, setSidebarOpen] = useState(false);
 
@@ -32,58 +34,22 @@ const Home = () => {
     const timer = setTimeout(() => {
       setIncomingReservation({
         id: '123',
-        pickupAddress: 'Aéroport Charles de Gaulle, Terminal 2E',
-        destination: '23 Rue de Rivoli, Paris',
-        date: '2025-05-17',
-        time: '14:30',
+        pickupAddress: 'CDG',
+        destination: 'Sofitel Le Scribe Paris Opéra',
+        date: '2025-05-16',
+        time: '11:25',
         passengers: 2,
         luggage: 3,
-        driverAmount: '45.00',
+        driverAmount: '101.73',
         paymentType: 'card',
         vehicleType: 'berline'
       });
     }, 3000);
-    
-    // Notification system
-    const checkUpcomingReservations = () => {
-      const now = new Date();
-      // Simulate a reservation tomorrow
-      const reservationDate = new Date('2025-05-16T10:15:00');
-      const hoursDiff = Math.floor((reservationDate.getTime() - now.getTime()) / (1000 * 60 * 60));
-      
-      if (hoursDiff === 24) {
-        toast({
-          title: "Rappel de réservation",
-          description: "Vous avez une course prévue demain à 10:15"
-        });
-      } else if (hoursDiff === 12) {
-        toast({
-          title: "Rappel de réservation",
-          description: "Vous avez une course prévue dans 12 heures"
-        });
-      } else if (hoursDiff === 2) {
-        toast({
-          title: "Rappel de réservation",
-          description: "Vous avez une course prévue dans 2 heures"
-        });
-      } else if (hoursDiff === 1) {
-        toast({
-          title: "Attention",
-          description: "Vous avez une course dans 1 heure et vous n'avez pas démarré",
-          variant: "destructive"
-        });
-      }
-    };
-
-    // Check for notifications every minute
-    const notificationInterval = setInterval(checkUpcomingReservations, 60000);
-    checkUpcomingReservations(); // Check immediately too
 
     return () => {
       clearTimeout(timer);
-      clearInterval(notificationInterval);
     };
-  }, [toast]);
+  }, []);
 
   const handleAcceptReservation = () => {
     toast({
@@ -91,6 +57,7 @@ const Home = () => {
       description: "La réservation a été ajoutée à votre calendrier",
     });
     setIncomingReservation(null);
+    navigate("/reservations");
   };
 
   const handleRejectReservation = () => {
@@ -107,20 +74,19 @@ const Home = () => {
     window.dispatchEvent(event);
   };
 
-  // Function to render payment type icon
-  const renderPaymentIcon = (type?: 'cash' | 'card' | 'transfer' | 'paypal') => {
-    switch(type) {
-      case 'cash':
-        return <Euro className="h-4 w-4 text-green-500" />;
-      case 'card':
-        return <CreditCard className="h-4 w-4 text-blue-500" />;
-      case 'transfer':
-        return <Banknote className="h-4 w-4 text-purple-500" />; // Changed from Bank to Banknote
-      case 'paypal':
-        return <DollarSign className="h-4 w-4 text-blue-600" />; 
-      default:
-        return <DollarSign className="h-4 w-4 text-gray-500" />;
-    }
+  const handleCardClick = () => {
+    navigate("/reservations");
+  };
+
+  const formatDate = (date: string, time: string) => {
+    const options: Intl.DateTimeFormatOptions = { 
+      day: 'numeric', 
+      month: 'long'
+    };
+    
+    const dateObj = new Date(`${date}T${time}`);
+    const formattedDate = dateObj.toLocaleDateString('fr-FR', options);
+    return `${formattedDate} ${time}`;
   };
 
   return (
@@ -135,101 +101,65 @@ const Home = () => {
         <OnlineStatusToggle />
       </div>
 
-      {/* Incoming Reservation card */}
-      {incomingReservation && (
-        <div className="absolute top-20 left-1/2 transform -translate-x-1/2 z-10 w-11/12 max-w-md">
-          <div className="bg-white dark:bg-card rounded-lg shadow-lg p-4">
-            <div className="flex items-center justify-between mb-2">
-              <span className="text-base font-medium dark:text-primary">Nouvelle demande de réservation</span>
-            </div>
-            <div className="space-y-2 mb-4">
-              <div>
-                <p className="text-sm font-medium dark:text-primary">Départ:</p>
-                <div className="flex items-center">
-                  <MapPin className="h-4 w-4 mr-1 text-primary" />
-                  <p className="text-sm">{incomingReservation.pickupAddress}</p>
-                </div>
-              </div>
-              <div>
-                <p className="text-sm font-medium dark:text-primary">Destination:</p>
-                <div className="flex items-center">
-                  <MapPin className="h-4 w-4 mr-1 text-destructive" />
-                  <p className="text-sm">{incomingReservation.destination}</p>
-                </div>
-              </div>
-              <div className="flex justify-between">
-                <div>
-                  <p className="text-sm font-medium dark:text-primary">Date & Heure:</p>
-                  <p className="text-sm">{incomingReservation.date} à {incomingReservation.time}</p>
-                </div>
-                <div>
-                  <div className="flex items-center">
-                    <Users className="h-4 w-4 mr-1 text-gray-500" />
-                    <p className="text-sm">Passagers: {incomingReservation.passengers}</p>
-                    <Luggage className="h-4 w-4 ml-2 mr-1 text-gray-500" />
-                    <p className="text-sm">Bagages: {incomingReservation.luggage}</p>
-                  </div>
-                </div>
-              </div>
-              <div>
-                <p className="text-sm font-medium dark:text-primary">Type de véhicule:</p>
-                <div className="flex items-center">
-                  <CarFront className="h-4 w-4 mr-1 text-gray-500" />
-                  <p className="text-sm capitalize">{incomingReservation.vehicleType === 'first-class' ? 'First Class' : incomingReservation.vehicleType}</p>
-                </div>
-              </div>
-              <div>
-                <p className="text-sm font-medium dark:text-primary">Type de paiement:</p>
-                <div className="flex items-center">
-                  {renderPaymentIcon(incomingReservation.paymentType)}
-                  <p className="text-sm ml-1">
-                    {incomingReservation.paymentType === 'cash' && "Espèces"}
-                    {incomingReservation.paymentType === 'card' && "Carte bleue"}
-                    {incomingReservation.paymentType === 'transfer' && "Virement"}
-                    {incomingReservation.paymentType === 'paypal' && "PayPal"}
-                  </p>
-                </div>
-              </div>
-              <div>
-                <p className="text-sm font-medium dark:text-primary">Prix net chauffeur:</p>
-                <div className="flex items-center">
-                  <DollarSign className="h-4 w-4 mr-1 text-green-500" />
-                  <p className="text-sm">{incomingReservation.driverAmount}€</p>
-                </div>
-              </div>
-            </div>
-            <div className="flex justify-between gap-2">
-              <Button 
-                variant="outline" 
-                className="flex-1 bg-red-50 hover:bg-red-100 border-red-200 text-red-600 dark:bg-red-900/20 dark:border-red-800 dark:text-red-400 dark:hover:bg-red-900/30"
-                onClick={handleRejectReservation}
-              >
-                <X className="mr-1 h-4 w-4" /> Refuser
-              </Button>
-              <Button 
-                className="flex-1 bg-green-600 hover:bg-green-700 dark:bg-green-700 dark:hover:bg-green-800"
-                onClick={handleAcceptReservation}
-              >
-                <Check className="mr-1 h-4 w-4" /> Accepter
-              </Button>
-            </div>
+      {/* Reservation card */}
+      <div className="absolute top-20 left-1/2 transform -translate-x-1/2 z-10 w-11/12 max-w-md">
+        <div className="bg-white dark:bg-card rounded-lg shadow-lg overflow-hidden">
+          {/* Header */}
+          <div className="flex items-center gap-3 px-4 py-3 border-b border-gray-200">
+            <Plane className="h-5 w-5" />
+            <h3 className="text-lg font-medium">Demandes de réservations en cours</h3>
           </div>
-        </div>
-      )}
-
-      {/* No reservation message */}
-      {!incomingReservation && (
-        <div className="absolute top-20 left-1/2 transform -translate-x-1/2 z-10 w-11/12 max-w-md">
-          <div className="bg-white dark:bg-card rounded-lg shadow-lg p-4">
-            <div className="flex items-center mb-2">
-              <span className="text-base font-medium dark:text-primary">Demandes de réservations en cours</span>
+          
+          {/* Content */}
+          {incomingReservation ? (
+            <div 
+              className="p-4 hover:bg-slate-50 cursor-pointer transition-colors"
+              onClick={handleCardClick}
+            >
+              <div className="flex items-center justify-between mb-2">
+                <div className="flex items-center">
+                  <div className="h-2 w-2 bg-black rounded-full mr-2"></div>
+                  <div className="text-base">{formatDate(incomingReservation.date, incomingReservation.time)}</div>
+                </div>
+                <div className="font-bold">≈ {incomingReservation.driverAmount} € (NET)</div>
+              </div>
+              
+              <div className="flex items-center justify-between">
+                <div className="font-bold">{incomingReservation.pickupAddress}</div>
+                <ArrowRight className="mx-2" />
+                <div className="font-bold text-right">{incomingReservation.destination}</div>
+              </div>
+              
+              <div className="mt-4 flex justify-between gap-2">
+                <Button 
+                  variant="outline" 
+                  className="flex-1 bg-red-50 hover:bg-red-100 border-red-200 text-red-600 dark:bg-red-900/20 dark:border-red-800 dark:text-red-400 dark:hover:bg-red-900/30"
+                  onClick={handleRejectReservation}
+                >
+                  <X className="mr-1 h-4 w-4" /> Refuser
+                </Button>
+                <Button 
+                  className="flex-1 bg-green-600 hover:bg-green-700 dark:bg-green-700 dark:hover:bg-green-800"
+                  onClick={handleAcceptReservation}
+                >
+                  <Check className="mr-1 h-4 w-4" /> Accepter
+                </Button>
+              </div>
             </div>
-            <div className="text-sm text-gray-500 dark:text-gray-400 text-center py-3">
+          ) : (
+            <div className="text-sm text-gray-500 dark:text-gray-400 text-center py-6 px-4">
               Toutes les nouvelles réservations apparaîtront ici
             </div>
+          )}
+          
+          {/* Footer */}
+          <div className="bg-gray-50 dark:bg-gray-800/50 py-3 px-4 text-right border-t border-gray-200">
+            <a href="/reservations" className="text-blue-600 font-medium">
+              Toutes les réservations &gt;
+            </a>
           </div>
         </div>
-      )}
+      </div>
     </div>
   );
 };

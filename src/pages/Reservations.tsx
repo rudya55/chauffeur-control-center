@@ -1,5 +1,4 @@
-
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
 import ReservationCard from "@/components/ReservationCard";
@@ -158,6 +157,14 @@ const Reservations = () => {
       ...prev, 
       { ...reservationToAccept, status: 'accepted' }
     ]);
+    
+    // Save to localStorage to sync with Home page
+    const updatedMyReservations = [...myReservations, { ...reservationToAccept, status: 'accepted' }];
+    localStorage.setItem('myReservations', JSON.stringify(updatedMyReservations));
+    
+    // Update upcoming reservations in localStorage
+    const updatedUpcomingReservations = upcomingReservations.filter(res => res.id !== id);
+    localStorage.setItem('upcomingReservations', JSON.stringify(updatedUpcomingReservations));
   };
 
   // Gérer le refus d'une réservation
@@ -224,6 +231,20 @@ const Reservations = () => {
     setCurrentDispatcher(dispatcher);
     setShowChat(true);
   };
+
+  // Load reservations from localStorage on initial load
+  useEffect(() => {
+    const storedMyReservations = localStorage.getItem('myReservations');
+    const storedUpcomingReservations = localStorage.getItem('upcomingReservations');
+    
+    if (storedMyReservations) {
+      setMyReservations(JSON.parse(storedMyReservations));
+    }
+    
+    if (storedUpcomingReservations) {
+      setUpcomingReservations(JSON.parse(storedUpcomingReservations));
+    }
+  }, []);
 
   return (
     <div className="space-y-4 p-4">
