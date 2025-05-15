@@ -19,11 +19,13 @@ import { Switch } from "@/components/ui/switch";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { toast } from "@/hooks/use-toast";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
-import { Plus, Car, Download, Shield, Bell, Trash2, CreditCard, Banknote } from "lucide-react";
+import { Plus, Car, Download, Shield, Bell, Trash2, CreditCard, Banknote, Languages } from "lucide-react";
 import { Collapsible, CollapsibleContent } from "@/components/ui/collapsible";
 import { Label } from "@/components/ui/label";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { useLanguage } from "@/hooks/use-language";
+import { LanguageCard } from "@/components/LanguageCard";
 
 const profileFormSchema = z.object({
   name: z.string().min(2, {
@@ -170,6 +172,7 @@ const Settings = () => {
   const [deleteAccountDialog, setDeleteAccountDialog] = useState(false);
   const [expanded, setExpanded] = useState<string | null>(null);
   const [paymentMethod, setPaymentMethod] = useState<"card" | "bank">("card");
+  const { t } = useLanguage();
 
   const form = useForm<ProfileFormValues>({
     resolver: zodResolver(profileFormSchema),
@@ -275,15 +278,16 @@ const Settings = () => {
 
   return (
     <div className="space-y-4">
-      <h1 className="text-2xl font-bold tracking-tight">Paramètres</h1>
+      <h1 className="text-2xl font-bold tracking-tight">{t("settings.title")}</h1>
       
       <Tabs defaultValue="profile" className="w-full">
         <TabsList className="w-full md:w-auto">
-          <TabsTrigger value="profile">Profil</TabsTrigger>
-          <TabsTrigger value="documents">Documents</TabsTrigger>
-          <TabsTrigger value="payments">Paiements</TabsTrigger>
-          <TabsTrigger value="security">Sécurité</TabsTrigger>
-          <TabsTrigger value="notifications">Notifications</TabsTrigger>
+          <TabsTrigger value="profile">{t("settings.tabs.profile")}</TabsTrigger>
+          <TabsTrigger value="documents">{t("settings.tabs.documents")}</TabsTrigger>
+          <TabsTrigger value="payments">{t("settings.tabs.payments")}</TabsTrigger>
+          <TabsTrigger value="security">{t("settings.tabs.security")}</TabsTrigger>
+          <TabsTrigger value="notifications">{t("settings.tabs.notifications")}</TabsTrigger>
+          <TabsTrigger value="language">{t("settings.tabs.language")}</TabsTrigger>
         </TabsList>
         
         <TabsContent value="profile" className="mt-4 space-y-4">
@@ -1203,6 +1207,10 @@ const Settings = () => {
               </Form>
             </CardContent>
           </Card>
+        </TabsContent>
+        
+        <TabsContent value="language" className="mt-4 space-y-4">
+          <LanguageCard />
         </TabsContent>
       </Tabs>
     </div>
