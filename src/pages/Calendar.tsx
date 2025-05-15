@@ -7,6 +7,7 @@ import { fr } from "date-fns/locale";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { cn } from "@/lib/utils";
+import { DayContentProps } from "react-day-picker";
 
 interface Event {
   id: string;
@@ -222,11 +223,12 @@ const Calendar = () => {
           onSelect={(newDate) => newDate && setDate(newDate)}
           className="border rounded-lg pointer-events-auto"
           components={{
-            DayContent: ({ day }) => {
-              const dayEvents = getEventsForDay(day);
+            DayContent: (props: DayContentProps) => {
+              // Fix: access the date through the props.date instead of props.day
+              const dayEvents = getEventsForDay(props.date);
               return (
                 <div className="flex flex-col items-center justify-center h-full">
-                  <span>{format(day, 'd')}</span>
+                  <span>{format(props.date, 'd')}</span>
                   {dayEvents.length > 0 && (
                     <div className="w-full flex justify-center gap-1 mt-1">
                       {dayEvents.slice(0, 3).map((event, i) => (
