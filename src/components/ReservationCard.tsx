@@ -2,9 +2,11 @@
 import { useState, useEffect } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Check, X, MapPin, Phone, Plane, Star, Navigation, Clock, Users, Luggage } from "lucide-react";
+import { Check, X, MapPin, Phone, Plane, Star, Navigation, Clock, Users, Luggage, Flag, MessageSquare } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
+import { toast } from "@/hooks/use-toast";
+import Map from "@/components/Map";
 
 type ReservationType = {
   id: string;
@@ -15,6 +17,7 @@ type ReservationType = {
   phone: string;
   flightNumber?: string;
   dispatcher: string;
+  dispatcherLogo?: string;
   passengers?: number;
   luggage?: number;
   status?: 'pending' | 'accepted' | 'started' | 'arrived' | 'onBoard' | 'completed';
@@ -25,6 +28,7 @@ type ReservationType = {
   amount?: string;
   rating?: number;
   comment?: string;
+  route?: {lat: number, lng: number}[];
 };
 
 interface ReservationCardProps {
@@ -36,6 +40,7 @@ interface ReservationCardProps {
   onArrived?: (id: string) => void;
   onClientBoarded?: (id: string) => void;
   onComplete?: (id: string, rating: number, comment: string) => void;
+  onChatWithDispatcher?: (dispatcher: string) => void;
 }
 
 const ReservationCard = ({ 
@@ -46,7 +51,8 @@ const ReservationCard = ({
   onStartRide,
   onArrived,
   onClientBoarded,
-  onComplete
+  onComplete,
+  onChatWithDispatcher
 }: ReservationCardProps) => {
   const [showRatingDialog, setShowRatingDialog] = useState(false);
   const [rating, setRating] = useState(0);
@@ -54,6 +60,9 @@ const ReservationCard = ({
   const [showNavigationOptions, setShowNavigationOptions] = useState(false);
   const [timeUntilRide, setTimeUntilRide] = useState<string>("");
   const [canStartNow, setCanStartNow] = useState(false);
+  const [navigationAddress, setNavigationAddress] = useState("");
+  const [showPassengerDialog, setShowPassengerDialog] = useState(false);
+  const [showFlightDialog, setShowFlightDialog] = useState(false);
 
   const formattedDate = new Date(reservation.date).toLocaleString('fr-FR', {
     weekday: 'short',
@@ -64,27 +73,26 @@ const ReservationCard = ({
   });
 
   useEffect(() => {
-    // Update the timer for accepted reservations
+    // Update the timer for accepted reservations - RACCOURCI à 4 secondes pour les tests
     if (reservation.status === 'accepted') {
       const rideTime = new Date(reservation.date).getTime();
-      const twoHoursBeforeMs = rideTime - (2 * 60 * 60 * 1000);
+      // 4 secondes avant l'heure au lieu de 2 heures
+      const testTimeBeforeMs = rideTime - (4 * 1000);
       
       const updateTimer = () => {
         const now = new Date().getTime();
-        const canStartTime = Math.max(twoHoursBeforeMs - now, 0);
+        const canStartTime = Math.max(testTimeBeforeMs - now, 0);
         
-        if (now >= twoHoursBeforeMs) {
+        if (now >= testTimeBeforeMs) {
           setCanStartNow(true);
           setTimeUntilRide("Disponible maintenant");
         } else {
           setCanStartNow(false);
           
           // Calculate remaining time
-          const hours = Math.floor(canStartTime / (1000 * 60 * 60));
-          const minutes = Math.floor((canStartTime % (1000 * 60 * 60)) / (1000 * 60));
-          const seconds = Math.floor((canStartTime % (1000 * 60)) / 1000);
+          const seconds = Math.floor(canStartTime / 1000);
           
-          setTimeUntilRide(`${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`);
+          setTimeUntilRide(`00:00:${seconds.toString().padStart(2, '0')}`);
         }
       };
       
@@ -96,20 +104,25 @@ const ReservationCard = ({
   }, [reservation.date, reservation.status]);
 
   const handleShowPassenger = (name: string) => {
-    alert(`Affichage pancarte pour: ${name}`);
+    if (!name) return;
+    setShowPassengerDialog(true);
   };
 
   const handleCheckFlight = (flight: string) => {
     if (!flight) return;
-    alert(`Vérification du vol: ${flight}`);
+    setShowFlightDialog(true);
   };
 
   const handleNavigationChoice = (app: string, address: string) => {
-    alert(`Navigation vers ${address} avec ${app}`);
+    toast({
+      title: "Navigation lancée",
+      description: `Vers ${address} avec ${app}`,
+    });
     setShowNavigationOptions(false);
   };
 
   const handleStartNavigation = (address: string) => {
+    setNavigationAddress(address);
     setShowNavigationOptions(true);
   };
 
@@ -123,12 +136,17 @@ const ReservationCard = ({
   };
 
   const canStartRide = () => {
-    // Vérification de la contrainte de 2 heures
+    // Test de 4 secondes au lieu de 2 heures
     const rideTime = new Date(reservation.date).getTime();
     const now = new Date().getTime();
-    const twoHoursInMs = 2 * 60 * 60 * 1000;
+    const testTimeInMs = 4 * 1000; // 4 secondes pour les tests
     
-    return now >= (rideTime - twoHoursInMs);
+    return now >= (rideTime - testTimeInMs);
+  };
+
+  // Pour discuter avec le dispatcher
+  const handleChatWithDispatcher = () => {
+    onChatWithDispatcher?.(reservation.dispatcher);
   };
 
   return (
@@ -137,17 +155,41 @@ const ReservationCard = ({
         <CardContent className="pt-6">
           <div className="flex justify-between items-start mb-2">
             <div>
-              <h3 
-                className="text-lg font-semibold cursor-pointer hover:text-primary"
-                onClick={() => handleShowPassenger(reservation.clientName)}
-              >
-                {reservation.clientName}
-              </h3>
+              {reservation.clientName ? (
+                <h3 
+                  className="text-lg font-semibold cursor-pointer hover:text-primary flex items-center"
+                  onClick={() => handleShowPassenger(reservation.clientName)}
+                >
+                  {reservation.clientName}
+                  {reservation.dispatcherLogo && (
+                    <span className="ml-2 text-lg" title={reservation.dispatcher}>
+                      {reservation.dispatcherLogo}
+                    </span>
+                  )}
+                </h3>
+              ) : null}
               <div className="text-sm text-gray-500">
                 {formattedDate}
               </div>
             </div>
-            <Badge>{reservation.dispatcher}</Badge>
+            <div className="flex items-center gap-2">
+              <Badge className="flex items-center gap-1">
+                <Flag className="h-3 w-3" />
+                {reservation.dispatcher}
+              </Badge>
+              
+              {/* Bouton de chat avec le dispatcher */}
+              {(type === 'current' || type === 'upcoming') && onChatWithDispatcher && (
+                <Button 
+                  variant="ghost" 
+                  size="icon" 
+                  className="h-8 w-8" 
+                  onClick={handleChatWithDispatcher}
+                >
+                  <MessageSquare className="h-4 w-4" />
+                </Button>
+              )}
+            </div>
           </div>
 
           <div className="mt-4 space-y-2">
@@ -252,7 +294,7 @@ const ReservationCard = ({
                     <Clock className="mr-2 h-4 w-4" />
                     {canStartRide() 
                       ? "Démarrer la course" 
-                      : "Disponible 2h avant le départ"}
+                      : "Disponible après le chrono"}
                   </Button>
                 </>
               )}
@@ -328,26 +370,39 @@ const ReservationCard = ({
                   <p className="italic">"{reservation.comment}"</p>
                 </div>
               )}
+              
+              {/* Carte avec l'itinéraire pour les courses terminées */}
+              {reservation.route && (
+                <div className="mt-3 h-40 rounded-md overflow-hidden">
+                  <Map 
+                    className="w-full h-full" 
+                    center={reservation.route[0]}
+                    zoom={14}
+                    route={reservation.route}
+                  />
+                </div>
+              )}
             </div>
           )}
         </CardContent>
       </Card>
 
+      {/* Dialog d'options de navigation */}
       <Dialog open={showNavigationOptions} onOpenChange={setShowNavigationOptions}>
         <DialogContent>
           <DialogHeader>
             <DialogTitle>Choisir une application de navigation</DialogTitle>
           </DialogHeader>
           <div className="grid gap-4 py-4">
-            <Button onClick={() => handleNavigationChoice("Google Maps", reservation.status === 'started' ? reservation.pickupAddress : reservation.destination)} className="flex items-center justify-center">
+            <Button onClick={() => handleNavigationChoice("Google Maps", navigationAddress)} className="flex items-center justify-center">
               <Navigation className="mr-2 h-4 w-4" />
               Google Maps
             </Button>
-            <Button onClick={() => handleNavigationChoice("Waze", reservation.status === 'started' ? reservation.pickupAddress : reservation.destination)} className="flex items-center justify-center">
+            <Button onClick={() => handleNavigationChoice("Waze", navigationAddress)} className="flex items-center justify-center">
               <Navigation className="mr-2 h-4 w-4" />
               Waze
             </Button>
-            <Button onClick={() => handleNavigationChoice("Plans", reservation.status === 'started' ? reservation.pickupAddress : reservation.destination)} className="flex items-center justify-center">
+            <Button onClick={() => handleNavigationChoice("Plans", navigationAddress)} className="flex items-center justify-center">
               <Navigation className="mr-2 h-4 w-4" />
               Apple Plans
             </Button>
@@ -355,6 +410,7 @@ const ReservationCard = ({
         </DialogContent>
       </Dialog>
 
+      {/* Dialog notation client */}
       <Dialog open={showRatingDialog} onOpenChange={setShowRatingDialog}>
         <DialogContent>
           <DialogHeader>
@@ -380,6 +436,62 @@ const ReservationCard = ({
           </div>
           <DialogFooter>
             <Button onClick={handleSubmitRating}>Soumettre</Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Dialog affichage pancarte passager */}
+      <Dialog open={showPassengerDialog} onOpenChange={setShowPassengerDialog}>
+        <DialogContent className="max-w-md">
+          <DialogHeader>
+            <DialogTitle>Pancarte passager</DialogTitle>
+          </DialogHeader>
+          <div className="p-10 flex flex-col items-center justify-center bg-slate-100 rounded-lg">
+            <div className="text-4xl mb-4">{reservation.dispatcherLogo}</div>
+            <div className="text-3xl font-bold text-center">{reservation.clientName}</div>
+            <div className="text-sm text-gray-500 mt-2 text-center">{reservation.dispatcher}</div>
+          </div>
+          <DialogFooter>
+            <Button onClick={() => setShowPassengerDialog(false)}>Fermer</Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Dialog suivi de vol */}
+      <Dialog open={showFlightDialog} onOpenChange={setShowFlightDialog}>
+        <DialogContent className="max-w-md">
+          <DialogHeader>
+            <DialogTitle>
+              <div className="flex items-center">
+                <Plane className="mr-2 h-5 w-5" />
+                Suivi du vol {reservation.flightNumber}
+              </div>
+            </DialogTitle>
+          </DialogHeader>
+          <div className="p-4 space-y-4">
+            <div className="flex justify-between p-2 bg-slate-50 rounded-md">
+              <div className="font-medium">Statut</div>
+              <div className="text-green-600">À l'heure</div>
+            </div>
+            <div className="flex justify-between p-2 bg-slate-50 rounded-md">
+              <div className="font-medium">Départ prévu</div>
+              <div>10:30</div>
+            </div>
+            <div className="flex justify-between p-2 bg-slate-50 rounded-md">
+              <div className="font-medium">Arrivée prévue</div>
+              <div>12:15</div>
+            </div>
+            <div className="flex justify-between p-2 bg-slate-50 rounded-md">
+              <div className="font-medium">Terminal</div>
+              <div>2E</div>
+            </div>
+            <div className="flex justify-between p-2 bg-slate-50 rounded-md">
+              <div className="font-medium">Porte</div>
+              <div>K45</div>
+            </div>
+          </div>
+          <DialogFooter>
+            <Button onClick={() => setShowFlightDialog(false)}>Fermer</Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>

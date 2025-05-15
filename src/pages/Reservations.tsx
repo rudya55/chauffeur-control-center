@@ -6,6 +6,7 @@ import ReservationCard from "@/components/ReservationCard";
 import { Menu } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
+import { ChatDialog } from "@/components/ChatDialog";
 
 // Type de réservation
 type ReservationType = {
@@ -17,6 +18,7 @@ type ReservationType = {
   phone: string;
   flightNumber?: string;
   dispatcher: string;
+  dispatcherLogo?: string;
   passengers?: number;
   luggage?: number;
   status?: 'pending' | 'accepted' | 'started' | 'arrived' | 'onBoard' | 'completed';
@@ -27,32 +29,35 @@ type ReservationType = {
   amount?: string;
   rating?: number;
   comment?: string;
+  route?: {lat: number, lng: number}[];
 };
 
 // Données de réservations (simulations)
 const initialUpcomingReservations: ReservationType[] = [
   {
     id: "1",
-    clientName: "Jean Dupont",
+    clientName: "Client 1", // Masqué jusqu'à l'acceptation
     pickupAddress: "Aéroport Charles de Gaulle, Terminal 2E",
     destination: "23 Rue de Rivoli, Paris",
     date: "2025-05-16T14:30:00",
     phone: "+33612345678",
     flightNumber: "AF1234",
     dispatcher: "TaxiCorp",
+    dispatcherLogo: "🚕",
     passengers: 2,
     luggage: 3,
     status: 'pending'
   },
   {
     id: "2",
-    clientName: "Marie Martin",
+    clientName: "Client 2", // Masqué jusqu'à l'acceptation
     pickupAddress: "Gare de Lyon, Paris",
     destination: "45 Avenue des Champs-Élysées, Paris",
     date: "2025-05-17T09:15:00",
     phone: "+33687654321",
     flightNumber: "",
     dispatcher: "VTCService",
+    dispatcherLogo: "🚘",
     passengers: 1,
     luggage: 1,
     status: 'pending'
@@ -69,6 +74,7 @@ const initialMyReservations: ReservationType[] = [
     phone: "+33698765432",
     flightNumber: "",
     dispatcher: "LuxDrive",
+    dispatcherLogo: "✨",
     passengers: 3,
     luggage: 4,
     status: 'accepted'
@@ -89,12 +95,19 @@ const initialCompletedReservations: ReservationType[] = [
     phone: "+33654321987",
     flightNumber: "",
     dispatcher: "TaxiCorp",
+    dispatcherLogo: "🚕",
     passengers: 2,
     luggage: 2,
     amount: "25.50",
     rating: 4,
     comment: "Très bon chauffeur, ponctuel et professionnel.",
-    status: 'completed'
+    status: 'completed',
+    route: [
+      {lat: 48.869, lng: 2.332},
+      {lat: 48.865, lng: 2.330},
+      {lat: 48.861, lng: 2.335},
+      {lat: 48.860, lng: 2.337}
+    ]
   }
 ];
 
@@ -104,6 +117,8 @@ const Reservations = () => {
   const [myReservations, setMyReservations] = useState<ReservationType[]>(initialMyReservations);
   const [completedReservations, setCompletedReservations] = useState<ReservationType[]>(initialCompletedReservations);
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+  const [showChat, setShowChat] = useState(false);
+  const [currentDispatcher, setCurrentDispatcher] = useState("");
 
   // Gérer l'acceptation d'une réservation
   const handleAcceptReservation = (id: string) => {
@@ -156,6 +171,14 @@ const Reservations = () => {
     // Supprimer de la liste des réservations en cours
     setMyReservations(prev => prev.filter(res => res.id !== id));
 
+    // Générer un itinéraire simulé (dans un cas réel, ce serait l'historique du trajet GPS)
+    const simulatedRoute = [
+      {lat: 48.870, lng: 2.330}, // Point de départ
+      {lat: 48.865, lng: 2.334},
+      {lat: 48.862, lng: 2.338},
+      {lat: 48.858, lng: 2.340} // Destination
+    ];
+
     // Ajouter aux réservations terminées avec les données supplémentaires
     setCompletedReservations(prev => [
       ...prev, 
@@ -167,9 +190,16 @@ const Reservations = () => {
         duration: "35 min",
         amount: "32.00",
         rating,
-        comment
+        comment,
+        route: simulatedRoute
       }
     ]);
+  };
+  
+  // Ouvrir le chat avec un dispatcher
+  const openChatWithDispatcher = (dispatcher: string) => {
+    setCurrentDispatcher(dispatcher);
+    setShowChat(true);
   };
 
   return (
@@ -234,10 +264,11 @@ const Reservations = () => {
             upcomingReservations.map(reservation => (
               <ReservationCard 
                 key={reservation.id} 
-                reservation={reservation} 
+                reservation={{...reservation, clientName: ""}} // Masquer le nom client 
                 type="upcoming"
                 onAccept={handleAcceptReservation}
                 onReject={handleRejectReservation}
+                onChatWithDispatcher={openChatWithDispatcher}
               />
             ))
           ) : (
@@ -258,6 +289,7 @@ const Reservations = () => {
                 onArrived={handleArrived}
                 onClientBoarded={handleClientBoarded}
                 onComplete={handleCompleteRide}
+                onChatWithDispatcher={openChatWithDispatcher}
               />
             ))
           ) : (
@@ -283,6 +315,13 @@ const Reservations = () => {
           )}
         </TabsContent>
       </Tabs>
+
+      {/* Dialog de chat avec traduction */}
+      <ChatDialog 
+        open={showChat} 
+        onOpenChange={setShowChat} 
+        dispatcher={currentDispatcher}
+      />
     </div>
   );
 };

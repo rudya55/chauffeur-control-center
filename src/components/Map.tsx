@@ -6,12 +6,14 @@ interface MapProps {
   className?: string;
   center?: { lat: number; lng: number };
   zoom?: number;
+  route?: { lat: number; lng: number }[];
 }
 
-const Map = ({ className, center = { lat: 48.8566, lng: 2.3522 }, zoom = 14 }: MapProps) => {
+const Map = ({ className, center = { lat: 48.8566, lng: 2.3522 }, zoom = 14, route = [] }: MapProps) => {
   const mapRef = useRef<HTMLDivElement>(null);
   const mapInstanceRef = useRef<any>(null);
   const markerRef = useRef<any>(null);
+  const polylineRef = useRef<any>(null);
 
   useEffect(() => {
     // Load Google Maps API script
@@ -64,27 +66,49 @@ const Map = ({ className, center = { lat: 48.8566, lng: 2.3522 }, zoom = 14 }: M
             strokeColor: '#ffffff',
             strokeWeight: 2,
           },
-          title: "Votre position"
+          title: "Position"
         });
 
-        // Try to get user's location
-        if (navigator.geolocation) {
-          navigator.geolocation.getCurrentPosition(
-            (position) => {
-              const userLocation = {
-                lat: position.coords.latitude,
-                lng: position.coords.longitude
-              };
-              
-              if (mapInstanceRef.current && markerRef.current) {
-                mapInstanceRef.current.setCenter(userLocation);
-                markerRef.current.setPosition(userLocation);
+        // Si nous avons un itinéraire, on affiche une polyline
+        if (route && route.length > 1) {
+          const path = route.map(point => ({ lat: point.lat, lng: point.lng }));
+          
+          // @ts-ignore
+          polylineRef.current = new window.google.maps.Polyline({
+            path: path,
+            geodesic: true,
+            strokeColor: '#FF0000',
+            strokeOpacity: 1.0,
+            strokeWeight: 3
+          });
+          
+          polylineRef.current.setMap(mapInstanceRef.current);
+          
+          // Ajuster la vue pour inclure tout l'itinéraire
+          // @ts-ignore
+          const bounds = new window.google.maps.LatLngBounds();
+          path.forEach(point => bounds.extend(point));
+          mapInstanceRef.current.fitBounds(bounds);
+        } else {
+          // Try to get user's location
+          if (navigator.geolocation) {
+            navigator.geolocation.getCurrentPosition(
+              (position) => {
+                const userLocation = {
+                  lat: position.coords.latitude,
+                  lng: position.coords.longitude
+                };
+                
+                if (mapInstanceRef.current && markerRef.current) {
+                  mapInstanceRef.current.setCenter(userLocation);
+                  markerRef.current.setPosition(userLocation);
+                }
+              },
+              () => {
+                console.log("Error: The Geolocation service failed.");
               }
-            },
-            () => {
-              console.log("Error: The Geolocation service failed.");
-            }
-          );
+            );
+          }
         }
       }
     };
@@ -93,10 +117,14 @@ const Map = ({ className, center = { lat: 48.8566, lng: 2.3522 }, zoom = 14 }: M
 
     return () => {
       // Cleanup
+      if (polylineRef.current) {
+        polylineRef.current.setMap(null);
+      }
       mapInstanceRef.current = null;
       markerRef.current = null;
+      polylineRef.current = null;
     };
-  }, [center, zoom]);
+  }, [center, zoom, route]);
 
   return (
     <div 
