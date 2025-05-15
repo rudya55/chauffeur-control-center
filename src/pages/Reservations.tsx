@@ -9,6 +9,9 @@ import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { ChatDialog } from "@/components/ChatDialog";
 
 // Type de réservation
+type VehicleType = 'standard' | 'berline' | 'van' | 'mini-bus' | 'first-class';
+type PaymentType = 'cash' | 'card' | 'transfer' | 'paypal';
+
 type ReservationType = {
   id: string;
   clientName: string;
@@ -27,6 +30,10 @@ type ReservationType = {
   distance?: string;
   duration?: string;
   amount?: string;
+  driverAmount?: string;
+  commission?: string;
+  vehicleType?: VehicleType;
+  paymentType?: PaymentType;
   rating?: number;
   comment?: string;
   route?: {lat: number, lng: number}[];
@@ -46,7 +53,12 @@ const initialUpcomingReservations: ReservationType[] = [
     dispatcherLogo: "🚕",
     passengers: 2,
     luggage: 3,
-    status: 'pending'
+    status: 'pending',
+    driverAmount: "45.00",
+    amount: "55.00",
+    commission: "10.00",
+    paymentType: 'card',
+    vehicleType: 'berline'
   },
   {
     id: "2",
@@ -60,7 +72,10 @@ const initialUpcomingReservations: ReservationType[] = [
     dispatcherLogo: "🚘",
     passengers: 1,
     luggage: 1,
-    status: 'pending'
+    status: 'pending',
+    driverAmount: "38.00",
+    paymentType: 'transfer',
+    vehicleType: 'standard'
   }
 ];
 
@@ -77,7 +92,12 @@ const initialMyReservations: ReservationType[] = [
     dispatcherLogo: "✨",
     passengers: 3,
     luggage: 4,
-    status: 'accepted'
+    status: 'accepted',
+    amount: "120.00",
+    driverAmount: "96.00",
+    commission: "24.00",
+    paymentType: 'cash',
+    vehicleType: 'first-class'
   }
 ];
 
@@ -99,6 +119,10 @@ const initialCompletedReservations: ReservationType[] = [
     passengers: 2,
     luggage: 2,
     amount: "25.50",
+    driverAmount: "20.40",
+    commission: "5.10",
+    paymentType: 'card',
+    vehicleType: 'standard',
     rating: 4,
     comment: "Très bon chauffeur, ponctuel et professionnel.",
     status: 'completed',
@@ -188,7 +212,6 @@ const Reservations = () => {
         dropoffTime: new Date().toISOString(),
         distance: "12.5 km", // Ces données seraient calculées dans une vraie application
         duration: "35 min",
-        amount: "32.00",
         rating,
         comment,
         route: simulatedRoute

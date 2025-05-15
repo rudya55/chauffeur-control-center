@@ -1,12 +1,20 @@
+
 import { useState, useEffect } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Check, X, MapPin, Plane, Star, Navigation, Clock, Users, Luggage, Flag, MessageSquare } from "lucide-react";
+import { 
+  Check, X, MapPin, Plane, Star, Navigation, Clock, Users, 
+  Luggage, Flag, MessageSquare, CarFront, DollarSign, CreditCard, 
+  Euro, Virement, Paypal
+} from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
 import { toast } from "@/hooks/use-toast";
 import Map from "@/components/Map";
 import CircularTimer from "@/components/CircularTimer";
+
+type VehicleType = 'standard' | 'berline' | 'van' | 'mini-bus' | 'first-class';
+type PaymentType = 'cash' | 'card' | 'transfer' | 'paypal';
 
 type ReservationType = {
   id: string;
@@ -26,6 +34,10 @@ type ReservationType = {
   distance?: string;
   duration?: string;
   amount?: string;
+  driverAmount?: string;
+  commission?: string;
+  vehicleType?: VehicleType;
+  paymentType?: PaymentType;
   rating?: number;
   comment?: string;
   route?: {lat: number, lng: number}[];
@@ -63,6 +75,27 @@ const ReservationCard = ({
   const [showPassengerDialog, setShowPassengerDialog] = useState(false);
   const [showFlightDialog, setShowFlightDialog] = useState(false);
   const [targetTime, setTargetTime] = useState<Date | null>(null);
+
+  // Function to render payment type icon
+  const renderPaymentIcon = (type?: PaymentType) => {
+    switch(type) {
+      case 'cash':
+        return <Euro className="h-4 w-4 text-green-500" />;
+      case 'card':
+        return <CreditCard className="h-4 w-4 text-blue-500" />;
+      case 'transfer':
+        return <Virement className="h-4 w-4 text-purple-500" />;
+      case 'paypal':
+        return <Paypal className="h-4 w-4 text-blue-600" />;
+      default:
+        return <DollarSign className="h-4 w-4 text-gray-500" />;
+    }
+  };
+
+  // Function to render vehicle type icon
+  const renderVehicleIcon = (type?: VehicleType) => {
+    return <CarFront className="h-4 w-4 text-gray-500" />;
+  };
 
   const formattedDate = new Date(reservation.date).toLocaleString('fr-FR', {
     weekday: 'short',
@@ -203,6 +236,39 @@ const ReservationCard = ({
           </div>
 
           <div className="mt-4 space-y-2">
+            {/* Payment and price information */}
+            {reservation.driverAmount && (
+              <div className="flex items-center gap-2">
+                {renderPaymentIcon(reservation.paymentType)}
+                <span className="text-sm">
+                  {reservation.paymentType === 'cash' && "Espèces"}
+                  {reservation.paymentType === 'card' && "Carte bleue"}
+                  {reservation.paymentType === 'transfer' && "Virement"}
+                  {reservation.paymentType === 'paypal' && "PayPal"}
+                  {!reservation.paymentType && "Paiement"} - 
+                  {type === 'upcoming' ? (
+                    <span className="font-medium"> {reservation.driverAmount}€ net chauffeur</span>
+                  ) : (
+                    reservation.paymentType === 'cash' || reservation.paymentType === 'card' ? (
+                      <span> {reservation.amount}€ client / {reservation.commission}€ commission / <span className="font-medium">{reservation.driverAmount}€ net</span></span>
+                    ) : (
+                      <span className="font-medium"> {reservation.driverAmount}€ net chauffeur</span>
+                    )
+                  )}
+                </span>
+              </div>
+            )}
+
+            {/* Vehicle type */}
+            {reservation.vehicleType && (
+              <div className="flex items-center gap-2">
+                <CarFront className="h-4 w-4 text-gray-500" />
+                <span className="text-sm capitalize">
+                  {reservation.vehicleType === 'first-class' ? 'First Class' : reservation.vehicleType}
+                </span>
+              </div>
+            )}
+
             {reservation.flightNumber && (
               <div 
                 className="flex items-center gap-2 cursor-pointer hover:text-primary"

@@ -15,6 +15,11 @@ interface Reservation {
   clientName?: string;
   passengers?: number;
   luggage?: number;
+  amount?: string;
+  driverAmount?: string;
+  commission?: string;
+  vehicleType?: 'standard' | 'berline' | 'van' | 'mini-bus' | 'first-class';
+  paymentType?: 'cash' | 'card' | 'transfer' | 'paypal';
 }
 
 const Home = () => {
@@ -33,7 +38,10 @@ const Home = () => {
         date: '2025-05-17',
         time: '14:30',
         passengers: 2,
-        luggage: 3
+        luggage: 3,
+        driverAmount: '45.00',
+        paymentType: 'card',
+        vehicleType: 'berline'
       });
     }, 3000);
     
@@ -46,7 +54,12 @@ const Home = () => {
       time: '10:15',
       clientName: 'Marie Dubois',
       passengers: 1,
-      luggage: 1
+      luggage: 1,
+      amount: '35.00',
+      driverAmount: '28.00',
+      commission: '7.00',
+      paymentType: 'cash',
+      vehicleType: 'standard'
     });
 
     // Notification system
@@ -161,6 +174,23 @@ const Home = () => {
                   <p className="text-sm font-medium dark:text-primary">Bagages: {incomingReservation.luggage}</p>
                 </div>
               </div>
+              <div>
+                <p className="text-sm font-medium dark:text-primary">Type de véhicule:</p>
+                <p className="text-sm capitalize">{incomingReservation.vehicleType === 'first-class' ? 'First Class' : incomingReservation.vehicleType}</p>
+              </div>
+              <div>
+                <p className="text-sm font-medium dark:text-primary">Type de paiement:</p>
+                <p className="text-sm">
+                  {incomingReservation.paymentType === 'cash' && "Espèces"}
+                  {incomingReservation.paymentType === 'card' && "Carte bleue"}
+                  {incomingReservation.paymentType === 'transfer' && "Virement"}
+                  {incomingReservation.paymentType === 'paypal' && "PayPal"}
+                </p>
+              </div>
+              <div>
+                <p className="text-sm font-medium dark:text-primary">Prix net chauffeur:</p>
+                <p className="text-sm">{incomingReservation.driverAmount}€</p>
+              </div>
             </div>
             <div className="flex justify-between gap-2">
               <Button 
@@ -217,6 +247,28 @@ const Home = () => {
               <div>
                 <p className="text-sm font-medium dark:text-primary">Destination:</p>
                 <p className="text-sm">{upcomingReservation.destination}</p>
+              </div>
+              <div>
+                <p className="text-sm font-medium dark:text-primary">Type de véhicule:</p>
+                <p className="text-sm capitalize">{upcomingReservation.vehicleType === 'first-class' ? 'First Class' : upcomingReservation.vehicleType}</p>
+              </div>
+              <div>
+                <p className="text-sm font-medium dark:text-primary">Type de paiement:</p>
+                <p className="text-sm">
+                  {upcomingReservation.paymentType === 'cash' && "Espèces"}
+                  {upcomingReservation.paymentType === 'card' && "Carte bleue"}
+                  {upcomingReservation.paymentType === 'transfer' && "Virement"}
+                  {upcomingReservation.paymentType === 'paypal' && "PayPal"}
+                </p>
+              </div>
+              <div>
+                <p className="text-sm font-medium dark:text-primary">Prix:</p>
+                <p className="text-sm">
+                  {(upcomingReservation.paymentType === 'cash' || upcomingReservation.paymentType === 'card') ? 
+                    `${upcomingReservation.amount}€ client / ${upcomingReservation.commission}€ commission / ${upcomingReservation.driverAmount}€ net` : 
+                    `${upcomingReservation.driverAmount}€ net chauffeur`
+                  }
+                </p>
               </div>
             </div>
           </div>
