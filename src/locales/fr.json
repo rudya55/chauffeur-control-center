@@ -30,7 +30,9 @@
     "es": "Espagnol",
     "de": "Allemand",
     "it": "Italien",
-    "select": "Sélectionner la langue"
+    "select": "Sélectionner la langue",
+    "save": "Enregistrer la langue",
+    "description": "Choisissez votre langue préférée"
   },
   "settings_section": {
     "title": "Paramètres",
