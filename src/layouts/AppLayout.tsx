@@ -5,8 +5,6 @@ import AppSidebar from "@/components/AppSidebar";
 import MobileHeader from "@/components/MobileHeader";
 import { SidebarProvider } from "@/components/ui/sidebar";
 import { useIsMobile } from "@/hooks/use-mobile";
-import { Menu } from "lucide-react";
-import { Button } from "@/components/ui/button";
 import { useTheme } from "@/hooks/use-theme";
 import ThemeToggle from "@/components/ThemeToggle";
 import { cn } from "@/lib/utils";
@@ -37,18 +35,7 @@ const AppLayout = () => {
             onToggle={() => setSidebarOpen(!sidebarOpen)}
           />
         ) : (
-          <div className="h-16 border-b bg-background flex items-center px-4 justify-between">
-            <div className="flex items-center">
-              <Button 
-                variant="ghost" 
-                size="icon" 
-                onClick={() => setSidebarOpen(!sidebarOpen)}
-                className="mr-2"
-              >
-                <Menu className="h-5 w-5" />
-                <span className="sr-only">Toggle menu</span>
-              </Button>
-            </div>
+          <div className="h-16 border-b bg-background flex items-center px-4 justify-end">
             <ThemeToggle />
           </div>
         )}

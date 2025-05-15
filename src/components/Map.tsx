@@ -1,5 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { cn } from '@/lib/utils';
+import { useTheme } from '@/hooks/use-theme';
+import { Menu } from 'lucide-react';
 
 interface MapProps {
   className?: string;
@@ -20,6 +22,7 @@ const Map = ({
   const mapInstanceRef = useRef<any>(null);
   const markerRef = useRef<any>(null);
   const polylineRef = useRef<any>(null);
+  const { theme } = useTheme();
 
   useEffect(() => {
     // Load Google Maps API script
@@ -39,6 +42,71 @@ const Map = ({
     // Initialize the map
     const initMap = () => {
       if (mapRef.current && window.google) {
+        // Set map styles based on theme
+        const darkMapStyles = [
+          { elementType: 'geometry', stylers: [{ color: '#242f3e' }] },
+          { elementType: 'labels.text.stroke', stylers: [{ color: '#242f3e' }] },
+          { elementType: 'labels.text.fill', stylers: [{ color: '#746855' }] },
+          {
+            featureType: 'administrative.locality',
+            elementType: 'labels.text.fill',
+            stylers: [{ color: '#d59563' }]
+          },
+          {
+            featureType: 'poi',
+            elementType: 'labels',
+            stylers: [{ visibility: 'off' }]
+          },
+          {
+            featureType: 'road',
+            elementType: 'geometry',
+            stylers: [{ color: '#38414e' }]
+          },
+          {
+            featureType: 'road',
+            elementType: 'geometry.stroke',
+            stylers: [{ color: '#212a37' }]
+          },
+          {
+            featureType: 'road',
+            elementType: 'labels.text.fill',
+            stylers: [{ color: '#9ca5b3' }]
+          },
+          {
+            featureType: 'road.highway',
+            elementType: 'geometry',
+            stylers: [{ color: '#746855' }]
+          },
+          {
+            featureType: 'road.highway',
+            elementType: 'geometry.stroke',
+            stylers: [{ color: '#1f2835' }]
+          },
+          {
+            featureType: 'transit',
+            elementType: 'geometry',
+            stylers: [{ color: '#2f3948' }]
+          },
+          {
+            featureType: 'water',
+            elementType: 'geometry',
+            stylers: [{ color: '#17263c' }]
+          },
+          {
+            featureType: 'water',
+            elementType: 'labels.text.fill',
+            stylers: [{ color: '#515c6d' }]
+          }
+        ];
+        
+        const lightMapStyles = [
+          {
+            featureType: "poi",
+            elementType: "labels",
+            stylers: [{ visibility: "off" }]
+          }
+        ];
+
         const mapOptions = {
           center: center,
           zoom: zoom,
@@ -46,13 +114,7 @@ const Map = ({
           zoomControl: true,
           mapTypeControl: false,
           streetViewControl: false,
-          styles: [
-            {
-              featureType: "poi",
-              elementType: "labels",
-              stylers: [{ visibility: "off" }]
-            }
-          ]
+          styles: theme === 'dark' ? darkMapStyles : lightMapStyles
         };
 
         // @ts-ignore
@@ -67,7 +129,7 @@ const Map = ({
             // @ts-ignore
             path: window.google.maps.SymbolPath.CIRCLE,
             scale: 10,
-            fillColor: '#1a73e8',
+            fillColor: theme === 'dark' ? '#d4af37' : '#1a73e8', // Gold in dark mode, blue in light mode
             fillOpacity: 1,
             strokeColor: '#ffffff',
             strokeWeight: 2,
@@ -83,7 +145,7 @@ const Map = ({
           polylineRef.current = new window.google.maps.Polyline({
             path: path,
             geodesic: true,
-            strokeColor: '#FF0000',
+            strokeColor: theme === 'dark' ? '#d4af37' : '#FF0000', // Gold in dark mode, red in light mode
             strokeOpacity: 1.0,
             strokeWeight: 3
           });
@@ -121,6 +183,39 @@ const Map = ({
 
     loadMap();
 
+    // Update map when theme changes
+    if (mapInstanceRef.current) {
+      const styles = theme === 'dark' ? [
+        { elementType: 'geometry', stylers: [{ color: '#242f3e' }] },
+        { elementType: 'labels.text.stroke', stylers: [{ color: '#242f3e' }] },
+        { elementType: 'labels.text.fill', stylers: [{ color: '#746855' }] },
+        { featureType: 'poi', elementType: 'labels', stylers: [{ visibility: 'off' }] },
+        // ... other dark styles
+      ] : [
+        { featureType: "poi", elementType: "labels", stylers: [{ visibility: "off" }] }
+      ];
+      
+      mapInstanceRef.current.setOptions({ styles });
+      
+      if (markerRef.current) {
+        markerRef.current.setIcon({
+          // @ts-ignore
+          path: window.google.maps.SymbolPath.CIRCLE,
+          scale: 10,
+          fillColor: theme === 'dark' ? '#d4af37' : '#1a73e8', // Gold in dark mode, blue in light mode
+          fillOpacity: 1,
+          strokeColor: '#ffffff',
+          strokeWeight: 2,
+        });
+      }
+      
+      if (polylineRef.current) {
+        polylineRef.current.setOptions({
+          strokeColor: theme === 'dark' ? '#d4af37' : '#FF0000' // Gold in dark mode, red in light mode
+        });
+      }
+    }
+
     return () => {
       // Cleanup
       if (polylineRef.current) {
@@ -130,13 +225,27 @@ const Map = ({
       markerRef.current = null;
       polylineRef.current = null;
     };
-  }, [center, zoom, route]);
+  }, [center, zoom, route, theme]);
+
+  // Handle menu toggle click
+  const handleMenuToggle = () => {
+    const event = new CustomEvent('toggle-sidebar');
+    window.dispatchEvent(event);
+  };
 
   return (
     <div 
       className={cn("h-full w-full rounded-lg overflow-hidden relative", className)} 
     >
       <div ref={mapRef} className="h-full w-full" />
+      
+      {/* Menu toggle button for mobile */}
+      <button 
+        className="absolute top-4 left-4 z-50 bg-white/80 dark:bg-background/80 p-2 rounded-md shadow-md"
+        onClick={handleMenuToggle}
+      >
+        <Menu className="h-5 w-5 text-gray-700 dark:text-primary" />
+      </button>
     </div>
   );
 };

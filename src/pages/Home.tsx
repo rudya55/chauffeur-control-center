@@ -1,7 +1,7 @@
 
 import OnlineStatusToggle from "@/components/OnlineStatusToggle";
 import Map from "@/components/Map";
-import { Check, Menu, X } from "lucide-react";
+import { Check, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
 import { useEffect, useState } from "react";
@@ -21,7 +21,6 @@ const Home = () => {
   const { toast } = useToast();
   const [incomingReservation, setIncomingReservation] = useState<Reservation | null>(null);
   const [upcomingReservation, setUpcomingReservation] = useState<Reservation | null>(null);
-  const [showSidebar, setShowSidebar] = useState(false);
 
   // Simulate incoming reservation after page load
   useEffect(() => {
@@ -117,29 +116,12 @@ const Home = () => {
     setIncomingReservation(null);
   };
 
-  const handleMenuToggle = () => {
-    // This will update the AppLayout's sidebar state
-    const event = new CustomEvent('toggle-sidebar');
-    window.dispatchEvent(event);
-  };
-
   return (
     <div className="relative h-screen w-full p-0 overflow-hidden">
       {/* Map as background */}
       <div className="absolute inset-0 z-0">
         <Map />
       </div>
-      
-      {/* Menu button */}
-      <Button 
-        variant="ghost" 
-        size="icon" 
-        className="absolute top-4 left-4 bg-white dark:bg-background/80 shadow-md rounded-md z-10"
-        onClick={handleMenuToggle}
-      >
-        <Menu className="h-5 w-5" />
-        <span className="sr-only">Toggle menu</span>
-      </Button>
       
       {/* Status toggle at top center */}
       <div className="absolute top-4 left-1/2 transform -translate-x-1/2 z-10">
@@ -149,40 +131,40 @@ const Home = () => {
       {/* Incoming Reservation card */}
       {incomingReservation && (
         <div className="absolute top-20 left-1/2 transform -translate-x-1/2 z-10 w-11/12 max-w-md">
-          <div className="bg-white rounded-lg shadow-lg p-4">
+          <div className="bg-white dark:bg-card rounded-lg shadow-lg p-4">
             <div className="flex items-center justify-between mb-2">
-              <span className="text-base font-medium">Nouvelle demande de réservation</span>
+              <span className="text-base font-medium dark:text-primary">Nouvelle demande de réservation</span>
             </div>
             <div className="space-y-2 mb-4">
               <div>
-                <p className="text-sm font-medium">Départ:</p>
+                <p className="text-sm font-medium dark:text-primary">Départ:</p>
                 <p className="text-sm">{incomingReservation.pickupAddress}</p>
               </div>
               <div>
-                <p className="text-sm font-medium">Destination:</p>
+                <p className="text-sm font-medium dark:text-primary">Destination:</p>
                 <p className="text-sm">{incomingReservation.destination}</p>
               </div>
               <div className="flex justify-between">
                 <div>
-                  <p className="text-sm font-medium">Date & Heure:</p>
+                  <p className="text-sm font-medium dark:text-primary">Date & Heure:</p>
                   <p className="text-sm">{incomingReservation.date} à {incomingReservation.time}</p>
                 </div>
                 <div>
-                  <p className="text-sm font-medium">Passagers: {incomingReservation.passengers}</p>
-                  <p className="text-sm font-medium">Bagages: {incomingReservation.luggage}</p>
+                  <p className="text-sm font-medium dark:text-primary">Passagers: {incomingReservation.passengers}</p>
+                  <p className="text-sm font-medium dark:text-primary">Bagages: {incomingReservation.luggage}</p>
                 </div>
               </div>
             </div>
             <div className="flex justify-between gap-2">
               <Button 
                 variant="outline" 
-                className="flex-1 bg-red-50 hover:bg-red-100 border-red-200 text-red-600"
+                className="flex-1 bg-red-50 hover:bg-red-100 border-red-200 text-red-600 dark:bg-red-900/20 dark:border-red-800 dark:text-red-400 dark:hover:bg-red-900/30"
                 onClick={handleRejectReservation}
               >
                 <X className="mr-1 h-4 w-4" /> Refuser
               </Button>
               <Button 
-                className="flex-1 bg-green-600 hover:bg-green-700"
+                className="flex-1 bg-green-600 hover:bg-green-700 dark:bg-green-700 dark:hover:bg-green-800"
                 onClick={handleAcceptReservation}
               >
                 <Check className="mr-1 h-4 w-4" /> Accepter
@@ -195,11 +177,11 @@ const Home = () => {
       {/* No reservation message */}
       {!incomingReservation && (
         <div className="absolute top-20 left-1/2 transform -translate-x-1/2 z-10 w-11/12 max-w-md">
-          <div className="bg-white rounded-lg shadow-lg p-4">
+          <div className="bg-white dark:bg-card rounded-lg shadow-lg p-4">
             <div className="flex items-center mb-2">
-              <span className="text-base font-medium">Demandes de réservations en cours</span>
+              <span className="text-base font-medium dark:text-primary">Demandes de réservations en cours</span>
             </div>
-            <div className="text-sm text-gray-500 text-center py-3">
+            <div className="text-sm text-gray-500 dark:text-gray-400 text-center py-3">
               Toutes les nouvelles réservations apparaîtront ici
             </div>
           </div>
@@ -209,24 +191,24 @@ const Home = () => {
       {/* Upcoming reservation (24h before) */}
       {upcomingReservation && (
         <div className="absolute bottom-20 left-1/2 transform -translate-x-1/2 z-10 w-11/12 max-w-md">
-          <div className="bg-white rounded-lg shadow-lg p-4 border-l-4 border-blue-500">
+          <div className="bg-white dark:bg-card rounded-lg shadow-lg p-4 border-l-4 border-blue-500 dark:border-blue-400">
             <div className="flex justify-between items-center mb-2">
-              <span className="text-base font-medium">Course de demain</span>
-              <span className="text-sm bg-blue-100 text-blue-800 rounded-full px-2 py-0.5">
+              <span className="text-base font-medium dark:text-primary">Course de demain</span>
+              <span className="text-sm bg-blue-100 text-blue-800 dark:bg-blue-900/50 dark:text-blue-300 rounded-full px-2 py-0.5">
                 {upcomingReservation.time}
               </span>
             </div>
             <div className="space-y-1">
               <div>
-                <p className="text-sm font-medium">Client:</p>
+                <p className="text-sm font-medium dark:text-primary">Client:</p>
                 <p className="text-sm">{upcomingReservation.clientName}</p>
               </div>
               <div>
-                <p className="text-sm font-medium">Départ:</p>
+                <p className="text-sm font-medium dark:text-primary">Départ:</p>
                 <p className="text-sm">{upcomingReservation.pickupAddress}</p>
               </div>
               <div>
-                <p className="text-sm font-medium">Destination:</p>
+                <p className="text-sm font-medium dark:text-primary">Destination:</p>
                 <p className="text-sm">{upcomingReservation.destination}</p>
               </div>
             </div>
