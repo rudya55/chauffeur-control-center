@@ -1,8 +1,9 @@
+
 import React, { useState } from "react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useLanguage } from "@/hooks/use-language";
 import { LanguageCard } from "@/components/LanguageCard";
-import { Language } from 'lucide-react';
+import { Languages } from 'lucide-react';
 
 const Settings = () => {
   const [activeTab, setActiveTab] = useState("profile");

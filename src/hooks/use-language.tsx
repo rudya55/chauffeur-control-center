@@ -49,16 +49,18 @@ export const LanguageProvider = ({ children }: { children: ReactNode }) => {
     const keys = key.split('.');
     let current: any = translations;
     
-    for (let i = 0; i < keys.length; i++) {
+    for (const k of keys) {
       if (current === undefined || current === null) {
+        console.warn(`Translation key part "${k}" not found in "${key}"`);
         return key;
       }
       
-      current = current[keys[i]];
+      current = current[k];
     }
     
     // Ensure we always return a string
-    if (current === undefined) {
+    if (current === undefined || current === null) {
+      console.warn(`Translation for key "${key}" not found`);
       return key;
     }
     

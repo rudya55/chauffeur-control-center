@@ -8,11 +8,7 @@ import {
   Settings, 
   LogOut,
   Mail,
-  FileText as FileTextIcon,
-  User,
-  CreditCard,
-  ShieldCheck,
-  Bell
+  FileText as FileTextIcon
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useIsMobile } from "@/hooks/use-mobile";
@@ -66,14 +62,8 @@ const AppSidebar = ({ isOpen = false, onClose }: AppSidebarProps) => {
     { title: "Conditions générales", url: "/terms", icon: FileTextIcon },
   ];
 
-  // Settings submenu items
-  const settingsSubmenuItems = [
-    { title: t("settings_section.tabs.profile"), url: "/settings/profile", icon: User },
-    { title: t("settings_section.tabs.documents"), url: "/settings/documents", icon: FileText },
-    { title: t("settings_section.tabs.payments"), url: "/settings/payments", icon: CreditCard },
-    { title: t("settings_section.tabs.security"), url: "/settings/security", icon: ShieldCheck },
-    { title: t("settings_section.tabs.notifications"), url: "/settings/notifications", icon: Bell },
-  ];
+  // No longer needed - settings tabs are managed in the Settings.tsx component
+  // By removing this, we'll eliminate the duplicate submenu items
 
   const handleNavLinkClick = () => {
     if (isMobile && onClose) {
@@ -182,30 +172,7 @@ const AppSidebar = ({ isOpen = false, onClose }: AppSidebarProps) => {
           </SidebarGroupContent>
         </SidebarGroup>
 
-        {/* Settings submenu - only visible when on settings pages */}
-        {isSettingsPage && (!collapsed || isMobile) && (
-          <SidebarGroup className="mt-2 pt-2 border-t">
-            <SidebarGroupLabel>{t("settings_section.title")}</SidebarGroupLabel>
-            <SidebarGroupContent>
-              <SidebarMenu>
-                {settingsSubmenuItems.map((item) => (
-                  <SidebarMenuItem key={item.url}>
-                    <SidebarMenuButton asChild>
-                      <NavLink 
-                        to={item.url} 
-                        className={getNavClasses}
-                        onClick={handleNavLinkClick}
-                      >
-                        <item.icon className="h-4 w-4" />
-                        <span>{item.title}</span>
-                      </NavLink>
-                    </SidebarMenuButton>
-                  </SidebarMenuItem>
-                ))}
-              </SidebarMenu>
-            </SidebarGroupContent>
-          </SidebarGroup>
-        )}
+        {/* Removed duplicate settings submenu here */}
 
         <SidebarGroup className="mt-auto pt-4 border-t">
           <SidebarGroupContent>
