@@ -18,6 +18,7 @@ type ReservationType = {
   flightNumber?: string;
   dispatcher: string;
   passengers?: number;
+  luggage?: number;
   status?: 'pending' | 'accepted' | 'started' | 'arrived' | 'onBoard' | 'completed';
   actualPickupTime?: string;
   dropoffTime?: string;
@@ -40,6 +41,7 @@ const initialUpcomingReservations: ReservationType[] = [
     flightNumber: "AF1234",
     dispatcher: "TaxiCorp",
     passengers: 2,
+    luggage: 3,
     status: 'pending'
   },
   {
@@ -52,6 +54,7 @@ const initialUpcomingReservations: ReservationType[] = [
     flightNumber: "",
     dispatcher: "VTCService",
     passengers: 1,
+    luggage: 1,
     status: 'pending'
   }
 ];
@@ -67,6 +70,7 @@ const initialMyReservations: ReservationType[] = [
     flightNumber: "",
     dispatcher: "LuxDrive",
     passengers: 3,
+    luggage: 4,
     status: 'accepted'
   }
 ];
@@ -86,6 +90,7 @@ const initialCompletedReservations: ReservationType[] = [
     flightNumber: "",
     dispatcher: "TaxiCorp",
     passengers: 2,
+    luggage: 2,
     amount: "25.50",
     rating: 4,
     comment: "Très bon chauffeur, ponctuel et professionnel.",

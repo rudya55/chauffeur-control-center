@@ -1,8 +1,8 @@
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Check, X, MapPin, Phone, Plane, Star, Navigation, Clock, Users } from "lucide-react";
+import { Check, X, MapPin, Phone, Plane, Star, Navigation, Clock, Users, Luggage } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
 
@@ -16,6 +16,7 @@ type ReservationType = {
   flightNumber?: string;
   dispatcher: string;
   passengers?: number;
+  luggage?: number;
   status?: 'pending' | 'accepted' | 'started' | 'arrived' | 'onBoard' | 'completed';
   actualPickupTime?: string;
   dropoffTime?: string;
@@ -51,6 +52,8 @@ const ReservationCard = ({
   const [rating, setRating] = useState(0);
   const [comment, setComment] = useState('');
   const [showNavigationOptions, setShowNavigationOptions] = useState(false);
+  const [timeUntilRide, setTimeUntilRide] = useState<string>("");
+  const [canStartNow, setCanStartNow] = useState(false);
 
   const formattedDate = new Date(reservation.date).toLocaleString('fr-FR', {
     weekday: 'short',
@@ -59,6 +62,38 @@ const ReservationCard = ({
     hour: '2-digit',
     minute: '2-digit'
   });
+
+  useEffect(() => {
+    // Update the timer for accepted reservations
+    if (reservation.status === 'accepted') {
+      const rideTime = new Date(reservation.date).getTime();
+      const twoHoursBeforeMs = rideTime - (2 * 60 * 60 * 1000);
+      
+      const updateTimer = () => {
+        const now = new Date().getTime();
+        const canStartTime = Math.max(twoHoursBeforeMs - now, 0);
+        
+        if (now >= twoHoursBeforeMs) {
+          setCanStartNow(true);
+          setTimeUntilRide("Disponible maintenant");
+        } else {
+          setCanStartNow(false);
+          
+          // Calculate remaining time
+          const hours = Math.floor(canStartTime / (1000 * 60 * 60));
+          const minutes = Math.floor((canStartTime % (1000 * 60 * 60)) / (1000 * 60));
+          const seconds = Math.floor((canStartTime % (1000 * 60)) / 1000);
+          
+          setTimeUntilRide(`${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`);
+        }
+      };
+      
+      updateTimer(); // Initial call
+      const interval = setInterval(updateTimer, 1000);
+      
+      return () => clearInterval(interval);
+    }
+  }, [reservation.date, reservation.status]);
 
   const handleShowPassenger = (name: string) => {
     alert(`Affichage pancarte pour: ${name}`);
@@ -69,13 +104,13 @@ const ReservationCard = ({
     alert(`Vérification du vol: ${flight}`);
   };
 
-  const handleStartNavigation = () => {
-    setShowNavigationOptions(true);
+  const handleNavigationChoice = (app: string, address: string) => {
+    alert(`Navigation vers ${address} avec ${app}`);
+    setShowNavigationOptions(false);
   };
 
-  const handleNavigationChoice = (app: string) => {
-    alert(`Navigation vers ${reservation.pickupAddress} avec ${app}`);
-    setShowNavigationOptions(false);
+  const handleStartNavigation = (address: string) => {
+    setShowNavigationOptions(true);
   };
 
   const handleCompleteRide = () => {
@@ -122,7 +157,7 @@ const ReservationCard = ({
                 <div className="text-sm font-medium">Prise en charge:</div>
                 <div 
                   className="text-sm w-full overflow-ellipsis cursor-pointer hover:text-primary"
-                  onClick={type === 'current' && reservation.status === 'started' ? handleStartNavigation : undefined}
+                  onClick={type === 'current' && reservation.status === 'started' ? () => handleStartNavigation(reservation.pickupAddress) : undefined}
                 >
                   {reservation.pickupAddress}
                 </div>
@@ -130,9 +165,14 @@ const ReservationCard = ({
             </div>
             <div className="flex items-start gap-2">
               <MapPin className="h-4 w-4 mt-1 text-destructive shrink-0" />
-              <div>
+              <div className="w-full">
                 <div className="text-sm font-medium">Destination:</div>
-                <div className="text-sm">{reservation.destination}</div>
+                <div 
+                  className="text-sm w-full overflow-ellipsis cursor-pointer hover:text-primary"
+                  onClick={type === 'current' && (reservation.status === 'arrived' || reservation.status === 'onBoard') ? () => handleStartNavigation(reservation.destination) : undefined}
+                >
+                  {reservation.destination}
+                </div>
               </div>
             </div>
           </div>
@@ -163,6 +203,13 @@ const ReservationCard = ({
                 <span className="text-sm">{reservation.passengers} personne{reservation.passengers > 1 ? 's' : ''}</span>
               </div>
             )}
+            
+            {reservation.luggage && (
+              <div className="flex items-center gap-2">
+                <Luggage className="h-4 w-4 text-gray-500" />
+                <span className="text-sm">{reservation.luggage} bagage{reservation.luggage > 1 ? 's' : ''}</span>
+              </div>
+            )}
           </div>
 
           {type === 'upcoming' && (
@@ -189,17 +236,25 @@ const ReservationCard = ({
           {type === 'current' && (
             <div className="mt-4 flex flex-col gap-2">
               {reservation.status === 'accepted' && (
-                <Button 
-                  variant="default" 
-                  className="w-full bg-primary"
-                  onClick={() => onStartRide?.(reservation.id)}
-                  disabled={!canStartRide()}
-                >
-                  <Clock className="mr-2 h-4 w-4" />
-                  {canStartRide() 
-                    ? "Démarrer la course" 
-                    : "Disponible 2h avant le départ"}
-                </Button>
+                <>
+                  {timeUntilRide && (
+                    <div className={`text-center py-2 rounded-md ${canStartNow ? 'bg-green-100 text-green-800' : 'bg-yellow-100 text-yellow-800'}`}>
+                      <Clock className="inline-block mr-1 h-4 w-4" />
+                      {canStartNow ? 'Disponible maintenant' : `Attente: ${timeUntilRide}`}
+                    </div>
+                  )}
+                  <Button 
+                    variant="default" 
+                    className="w-full bg-primary"
+                    onClick={() => onStartRide?.(reservation.id)}
+                    disabled={!canStartRide()}
+                  >
+                    <Clock className="mr-2 h-4 w-4" />
+                    {canStartRide() 
+                      ? "Démarrer la course" 
+                      : "Disponible 2h avant le départ"}
+                  </Button>
+                </>
               )}
               
               {reservation.status === 'started' && (
@@ -284,15 +339,15 @@ const ReservationCard = ({
             <DialogTitle>Choisir une application de navigation</DialogTitle>
           </DialogHeader>
           <div className="grid gap-4 py-4">
-            <Button onClick={() => handleNavigationChoice("Google Maps")} className="flex items-center justify-center">
+            <Button onClick={() => handleNavigationChoice("Google Maps", reservation.status === 'started' ? reservation.pickupAddress : reservation.destination)} className="flex items-center justify-center">
               <Navigation className="mr-2 h-4 w-4" />
               Google Maps
             </Button>
-            <Button onClick={() => handleNavigationChoice("Waze")} className="flex items-center justify-center">
+            <Button onClick={() => handleNavigationChoice("Waze", reservation.status === 'started' ? reservation.pickupAddress : reservation.destination)} className="flex items-center justify-center">
               <Navigation className="mr-2 h-4 w-4" />
               Waze
             </Button>
-            <Button onClick={() => handleNavigationChoice("Plans")} className="flex items-center justify-center">
+            <Button onClick={() => handleNavigationChoice("Plans", reservation.status === 'started' ? reservation.pickupAddress : reservation.destination)} className="flex items-center justify-center">
               <Navigation className="mr-2 h-4 w-4" />
               Apple Plans
             </Button>
