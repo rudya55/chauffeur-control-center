@@ -1,3 +1,4 @@
+
 import { NavLink, useLocation } from "react-router-dom";
 import { 
   Home, 
@@ -25,7 +26,6 @@ import {
 } from "@/components/ui/sidebar";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { useEffect, useState } from "react";
-import { Button } from "./ui/button";
 import { 
   Dialog, 
   DialogContent, 
@@ -61,20 +61,6 @@ const AppSidebar = ({ isOpen = false, onClose }: AppSidebarProps) => {
     { title: "Conditions générales", url: "/terms", icon: FileTextIcon },
   ];
 
-  // Listen for toggle sidebar events
-  useEffect(() => {
-    const handleToggleSidebar = () => {
-      if (onClose) {
-        onClose();
-      }
-    };
-
-    window.addEventListener('toggle-sidebar', handleToggleSidebar);
-    return () => {
-      window.removeEventListener('toggle-sidebar', handleToggleSidebar);
-    };
-  }, [onClose]);
-
   const handleNavLinkClick = () => {
     if (isMobile && onClose) {
       onClose();
@@ -104,7 +90,7 @@ const AppSidebar = ({ isOpen = false, onClose }: AppSidebarProps) => {
         isMobile 
           ? isOpen ? "translate-x-0" : "-translate-x-full fixed z-50 h-full" 
           : collapsed ? "w-16" : "w-64",
-        isOpen ? "translate-x-0" : "-translate-x-full fixed z-50 h-full",
+        isOpen && isMobile ? "translate-x-0" : isMobile ? "-translate-x-full" : ""
       )}
     >
       <div className="flex flex-col p-4 border-b">
