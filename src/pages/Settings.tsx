@@ -19,9 +19,11 @@ import { Switch } from "@/components/ui/switch";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { toast } from "@/hooks/use-toast";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
-import { Plus, Car, Download, Shield, Bell, Trash2 } from "lucide-react";
+import { Plus, Car, Download, Shield, Bell, Trash2, CreditCard, BankIcon } from "lucide-react";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 import { Label } from "@/components/ui/label";
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 
 const profileFormSchema = z.object({
   name: z.string().min(2, {
@@ -83,10 +85,43 @@ const notificationsFormSchema = z.object({
   }),
 });
 
+const paymentMethodFormSchema = z.object({
+  methodType: z.enum(["card", "bank"]),
+  cardDetails: z.object({
+    cardNumber: z.string().regex(/^\d{16}$/, {
+      message: "Le numéro de carte doit comporter 16 chiffres.",
+    }).optional(),
+    cardName: z.string().min(2, {
+      message: "Le nom sur la carte doit comporter au moins 2 caractères.",
+    }).optional(),
+    expiryDate: z.string().regex(/^\d{2}\/\d{2}$/, {
+      message: "La date d'expiration doit être au format MM/YY.",
+    }).optional(),
+    cvv: z.string().regex(/^\d{3}$/, {
+      message: "Le code CVV doit comporter 3 chiffres.",
+    }).optional(),
+  }).optional(),
+  bankDetails: z.object({
+    accountName: z.string().min(2, {
+      message: "Le nom du titulaire doit comporter au moins 2 caractères.",
+    }).optional(),
+    iban: z.string().min(14, {
+      message: "L'IBAN doit comporter au moins 14 caractères.",
+    }).optional(),
+    bic: z.string().min(8, {
+      message: "Le BIC doit comporter au moins 8 caractères.",
+    }).optional(),
+    bankName: z.string().min(2, {
+      message: "Le nom de la banque doit comporter au moins 2 caractères.",
+    }).optional(),
+  }).optional(),
+});
+
 type ProfileFormValues = z.infer<typeof profileFormSchema>;
 type VehicleFormValues = z.infer<typeof vehicleFormSchema>;
 type PasswordFormValues = z.infer<typeof passwordFormSchema>;
 type NotificationsFormValues = z.infer<typeof notificationsFormSchema>;
+type PaymentMethodFormValues = z.infer<typeof paymentMethodFormSchema>;
 
 const defaultValues: Partial<ProfileFormValues> = {
   name: "Jean Martin",
@@ -125,11 +160,16 @@ const defaultNotificationValues: NotificationsFormValues = {
   },
 };
 
+const defaultPaymentMethodValues: Partial<PaymentMethodFormValues> = {
+  methodType: "card",
+};
+
 const Settings = () => {
   const [vehicleActive, setVehicleActive] = useState(true);
   const [openDialog, setOpenDialog] = useState(false);
   const [deleteAccountDialog, setDeleteAccountDialog] = useState(false);
   const [expanded, setExpanded] = useState<string | null>(null);
+  const [paymentMethod, setPaymentMethod] = useState<"card" | "bank">("card");
 
   const form = useForm<ProfileFormValues>({
     resolver: zodResolver(profileFormSchema),
@@ -152,6 +192,12 @@ const Settings = () => {
   const notificationsForm = useForm<NotificationsFormValues>({
     resolver: zodResolver(notificationsFormSchema),
     defaultValues: defaultNotificationValues,
+    mode: "onChange",
+  });
+
+  const paymentMethodForm = useForm<PaymentMethodFormValues>({
+    resolver: zodResolver(paymentMethodFormSchema),
+    defaultValues: defaultPaymentMethodValues,
     mode: "onChange",
   });
 
@@ -186,6 +232,14 @@ const Settings = () => {
     });
   }
 
+  function onPaymentMethodSubmit(data: PaymentMethodFormValues) {
+    const methodType = data.methodType === "card" ? "Carte bancaire" : "Coordonnées bancaires";
+    toast({
+      title: "Méthode de paiement ajoutée",
+      description: `Votre ${methodType} a été enregistrée avec succès`,
+    });
+  }
+
   function handleVehicleStatusChange(checked: boolean) {
     setVehicleActive(checked);
     toast({
@@ -210,6 +264,11 @@ const Settings = () => {
     setDeleteAccountDialog(false);
   }
 
+  function handlePaymentMethodChange(value: "card" | "bank") {
+    setPaymentMethod(value);
+    paymentMethodForm.setValue("methodType", value);
+  }
+
   const toggleExpand = (id: string) => {
     setExpanded(expanded === id ? null : id);
   };
@@ -222,6 +281,7 @@ const Settings = () => {
         <TabsList className="w-full md:w-auto">
           <TabsTrigger value="profile">Profil</TabsTrigger>
           <TabsTrigger value="documents">Documents</TabsTrigger>
+          <TabsTrigger value="payments">Paiements</TabsTrigger>
           <TabsTrigger value="security">Sécurité</TabsTrigger>
           <TabsTrigger value="notifications">Notifications</TabsTrigger>
         </TabsList>
@@ -559,6 +619,299 @@ const Settings = () => {
                     </div>
                   </CollapsibleContent>
                 </Collapsible>
+              </div>
+            </CardContent>
+          </Card>
+        </TabsContent>
+        
+        <TabsContent value="payments" className="mt-4 space-y-4">
+          <Card>
+            <CardHeader>
+              <div className="flex items-center gap-2">
+                <CreditCard className="text-primary" size={20} />
+                <div>
+                  <CardTitle>Méthodes de paiement</CardTitle>
+                  <CardDescription>
+                    Ajoutez des méthodes de paiement pour recevoir vos revenus.
+                  </CardDescription>
+                </div>
+              </div>
+            </CardHeader>
+            <CardContent className="space-y-6">
+              <Form {...paymentMethodForm}>
+                <form onSubmit={paymentMethodForm.handleSubmit(onPaymentMethodSubmit)} className="space-y-6">
+                  <div className="space-y-4">
+                    <RadioGroup 
+                      defaultValue="card" 
+                      value={paymentMethod}
+                      onValueChange={(value) => handlePaymentMethodChange(value as "card" | "bank")}
+                      className="grid grid-cols-2 gap-4"
+                    >
+                      <div>
+                        <RadioGroupItem value="card" id="card" className="peer sr-only" />
+                        <Label
+                          htmlFor="card"
+                          className="flex flex-col items-center justify-between rounded-md border-2 border-muted bg-popover p-4 hover:bg-accent hover:text-accent-foreground peer-data-[state=checked]:border-primary [&:has([data-state=checked])]:border-primary"
+                        >
+                          <CreditCard className="mb-3 h-6 w-6" />
+                          <span className="font-medium">Carte Bancaire</span>
+                        </Label>
+                      </div>
+                      <div>
+                        <RadioGroupItem value="bank" id="bank" className="peer sr-only" />
+                        <Label
+                          htmlFor="bank"
+                          className="flex flex-col items-center justify-between rounded-md border-2 border-muted bg-popover p-4 hover:bg-accent hover:text-accent-foreground peer-data-[state=checked]:border-primary [&:has([data-state=checked])]:border-primary"
+                        >
+                          <BankIcon className="mb-3 h-6 w-6" />
+                          <span className="font-medium">Coordonnées Bancaires</span>
+                        </Label>
+                      </div>
+                    </RadioGroup>
+                  </div>
+
+                  {paymentMethod === "card" && (
+                    <div className="space-y-4 pt-4">
+                      <h3 className="text-lg font-medium">Informations de carte bancaire</h3>
+                      
+                      <FormField
+                        control={paymentMethodForm.control}
+                        name="cardDetails.cardNumber"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>Numéro de carte</FormLabel>
+                            <FormControl>
+                              <Input placeholder="1234 5678 9012 3456" {...field} />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                      
+                      <FormField
+                        control={paymentMethodForm.control}
+                        name="cardDetails.cardName"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>Nom sur la carte</FormLabel>
+                            <FormControl>
+                              <Input placeholder="Jean Martin" {...field} />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                      
+                      <div className="grid grid-cols-2 gap-4">
+                        <FormField
+                          control={paymentMethodForm.control}
+                          name="cardDetails.expiryDate"
+                          render={({ field }) => (
+                            <FormItem>
+                              <FormLabel>Date d'expiration</FormLabel>
+                              <FormControl>
+                                <Input placeholder="MM/YY" {...field} />
+                              </FormControl>
+                              <FormMessage />
+                            </FormItem>
+                          )}
+                        />
+                        
+                        <FormField
+                          control={paymentMethodForm.control}
+                          name="cardDetails.cvv"
+                          render={({ field }) => (
+                            <FormItem>
+                              <FormLabel>CVV</FormLabel>
+                              <FormControl>
+                                <Input placeholder="123" {...field} />
+                              </FormControl>
+                              <FormMessage />
+                            </FormItem>
+                          )}
+                        />
+                      </div>
+                    </div>
+                  )}
+
+                  {paymentMethod === "bank" && (
+                    <div className="space-y-4 pt-4">
+                      <h3 className="text-lg font-medium">Coordonnées bancaires</h3>
+                      
+                      <FormField
+                        control={paymentMethodForm.control}
+                        name="bankDetails.accountName"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>Nom du titulaire</FormLabel>
+                            <FormControl>
+                              <Input placeholder="Jean Martin" {...field} />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                      
+                      <FormField
+                        control={paymentMethodForm.control}
+                        name="bankDetails.iban"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>IBAN</FormLabel>
+                            <FormControl>
+                              <Input placeholder="FR76 1234 5678 9123 4567 8912 345" {...field} />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                      
+                      <FormField
+                        control={paymentMethodForm.control}
+                        name="bankDetails.bic"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>BIC / SWIFT</FormLabel>
+                            <FormControl>
+                              <Input placeholder="ABCDEFGH123" {...field} />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                      
+                      <FormField
+                        control={paymentMethodForm.control}
+                        name="bankDetails.bankName"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>Nom de la banque</FormLabel>
+                            <FormControl>
+                              <Input placeholder="Banque Nationale" {...field} />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                    </div>
+                  )}
+                  
+                  <div className="pt-4">
+                    <Button type="submit">Enregistrer la méthode de paiement</Button>
+                  </div>
+                </form>
+              </Form>
+            </CardContent>
+          </Card>
+          
+          <Card>
+            <CardHeader>
+              <CardTitle>Paiements automatiques</CardTitle>
+              <CardDescription>
+                Configurez les paramètres pour recevoir vos paiements automatiquement.
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div className="flex items-center justify-between">
+                <div className="space-y-0.5">
+                  <Label htmlFor="auto-payout">Versements automatiques</Label>
+                  <FormDescription>
+                    Recevoir automatiquement vos paiements lorsque votre solde atteint un certain montant
+                  </FormDescription>
+                </div>
+                <Switch id="auto-payout" defaultChecked={true} />
+              </div>
+              
+              <div className="pt-2">
+                <Label htmlFor="payout-threshold">Seuil de versement</Label>
+                <Select defaultValue="100">
+                  <SelectTrigger id="payout-threshold" className="w-full">
+                    <SelectValue placeholder="Sélectionnez un seuil" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="50">50 €</SelectItem>
+                    <SelectItem value="100">100 €</SelectItem>
+                    <SelectItem value="200">200 €</SelectItem>
+                    <SelectItem value="500">500 €</SelectItem>
+                  </SelectContent>
+                </Select>
+                <FormDescription>
+                  Le montant minimum que votre solde doit atteindre avant un versement automatique
+                </FormDescription>
+              </div>
+              
+              <div className="pt-2">
+                <Label htmlFor="payout-frequency">Fréquence de versement</Label>
+                <Select defaultValue="weekly">
+                  <SelectTrigger id="payout-frequency" className="w-full">
+                    <SelectValue placeholder="Sélectionnez une fréquence" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="daily">Quotidien</SelectItem>
+                    <SelectItem value="weekly">Hebdomadaire</SelectItem>
+                    <SelectItem value="biweekly">Toutes les deux semaines</SelectItem>
+                    <SelectItem value="monthly">Mensuel</SelectItem>
+                  </SelectContent>
+                </Select>
+                <FormDescription>
+                  La fréquence à laquelle les versements sont effectués
+                </FormDescription>
+              </div>
+            </CardContent>
+            <CardFooter>
+              <Button>Enregistrer les préférences de paiement</Button>
+            </CardFooter>
+          </Card>
+          
+          <Card>
+            <CardHeader>
+              <CardTitle>Historique des paiements</CardTitle>
+              <CardDescription>
+                Consultez l'historique de vos paiements reçus.
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-4">
+                <div className="border rounded-md p-4">
+                  <div className="flex justify-between items-center">
+                    <div>
+                      <h3 className="font-medium">Versement vers compte bancaire</h3>
+                      <p className="text-sm text-muted-foreground">15 mai 2024</p>
+                    </div>
+                    <div className="text-right">
+                      <p className="font-medium">485,75 €</p>
+                      <p className="text-sm text-green-600">Versé</p>
+                    </div>
+                  </div>
+                </div>
+                
+                <div className="border rounded-md p-4">
+                  <div className="flex justify-between items-center">
+                    <div>
+                      <h3 className="font-medium">Versement vers compte bancaire</h3>
+                      <p className="text-sm text-muted-foreground">8 mai 2024</p>
+                    </div>
+                    <div className="text-right">
+                      <p className="font-medium">367,20 €</p>
+                      <p className="text-sm text-green-600">Versé</p>
+                    </div>
+                  </div>
+                </div>
+                
+                <div className="border rounded-md p-4">
+                  <div className="flex justify-between items-center">
+                    <div>
+                      <h3 className="font-medium">Versement vers compte bancaire</h3>
+                      <p className="text-sm text-muted-foreground">1 mai 2024</p>
+                    </div>
+                    <div className="text-right">
+                      <p className="font-medium">523,50 €</p>
+                      <p className="text-sm text-green-600">Versé</p>
+                    </div>
+                  </div>
+                </div>
+                
+                <Button variant="outline" className="w-full">Voir tout l'historique</Button>
               </div>
             </CardContent>
           </Card>
