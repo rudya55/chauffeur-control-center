@@ -18,6 +18,9 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import { Switch } from "@/components/ui/switch";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { toast } from "@/hooks/use-toast";
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { Plus, Car } from "lucide-react";
+import { useState } from "react";
 
 const profileFormSchema = z.object({
   name: z.string().min(2, {
@@ -31,7 +34,23 @@ const profileFormSchema = z.object({
   }),
 });
 
+const vehicleFormSchema = z.object({
+  brand: z.string().min(2, {
+    message: "La marque doit comporter au moins 2 caractères.",
+  }),
+  model: z.string().min(2, {
+    message: "Le modèle doit comporter au moins 2 caractères.",
+  }),
+  year: z.string().regex(/^\d{4}$/, {
+    message: "L'année doit être au format YYYY.",
+  }),
+  registration: z.string().min(5, {
+    message: "L'immatriculation doit comporter au moins 5 caractères.",
+  }),
+});
+
 type ProfileFormValues = z.infer<typeof profileFormSchema>;
+type VehicleFormValues = z.infer<typeof vehicleFormSchema>;
 
 const defaultValues: Partial<ProfileFormValues> = {
   name: "Jean Martin",
@@ -39,10 +58,26 @@ const defaultValues: Partial<ProfileFormValues> = {
   phone: "+33612345678",
 };
 
+const defaultVehicleValues: Partial<VehicleFormValues> = {
+  brand: "",
+  model: "",
+  year: "",
+  registration: "",
+};
+
 const Settings = () => {
+  const [vehicleActive, setVehicleActive] = useState(true);
+  const [openDialog, setOpenDialog] = useState(false);
+
   const form = useForm<ProfileFormValues>({
     resolver: zodResolver(profileFormSchema),
     defaultValues,
+    mode: "onChange",
+  });
+
+  const vehicleForm = useForm<VehicleFormValues>({
+    resolver: zodResolver(vehicleFormSchema),
+    defaultValues: defaultVehicleValues,
     mode: "onChange",
   });
 
@@ -50,6 +85,23 @@ const Settings = () => {
     toast({
       title: "Profil mis à jour",
       description: "Vos informations personnelles ont été mises à jour",
+    });
+  }
+
+  function onVehicleSubmit(data: VehicleFormValues) {
+    toast({
+      title: "Véhicule ajouté",
+      description: `${data.brand} ${data.model} a été ajouté à votre flotte`,
+    });
+    setOpenDialog(false);
+    vehicleForm.reset();
+  }
+
+  function handleVehicleStatusChange(checked: boolean) {
+    setVehicleActive(checked);
+    toast({
+      title: checked ? "Véhicule activé" : "Véhicule désactivé",
+      description: checked ? "Votre véhicule est maintenant disponible pour les courses" : "Votre véhicule n'est plus disponible pour les courses",
     });
   }
 
@@ -131,10 +183,89 @@ const Settings = () => {
           
           <Card>
             <CardHeader>
-              <CardTitle>Votre véhicule</CardTitle>
-              <CardDescription>
-                Informations sur votre véhicule actuel.
-              </CardDescription>
+              <div className="flex items-center justify-between">
+                <div>
+                  <CardTitle>Votre véhicule</CardTitle>
+                  <CardDescription>
+                    Informations sur votre véhicule actuel.
+                  </CardDescription>
+                </div>
+                <Dialog open={openDialog} onOpenChange={setOpenDialog}>
+                  <DialogTrigger asChild>
+                    <Button variant="outline" size="sm">
+                      <Plus className="mr-1" size={16} />
+                      Ajouter un véhicule
+                    </Button>
+                  </DialogTrigger>
+                  <DialogContent>
+                    <DialogHeader>
+                      <DialogTitle>Ajouter un véhicule</DialogTitle>
+                      <DialogDescription>
+                        Renseignez les informations de votre nouveau véhicule.
+                      </DialogDescription>
+                    </DialogHeader>
+                    <Form {...vehicleForm}>
+                      <form onSubmit={vehicleForm.handleSubmit(onVehicleSubmit)} className="space-y-4">
+                        <FormField
+                          control={vehicleForm.control}
+                          name="brand"
+                          render={({ field }) => (
+                            <FormItem>
+                              <FormLabel>Marque</FormLabel>
+                              <FormControl>
+                                <Input placeholder="Mercedes, BMW, etc." {...field} />
+                              </FormControl>
+                              <FormMessage />
+                            </FormItem>
+                          )}
+                        />
+                        <FormField
+                          control={vehicleForm.control}
+                          name="model"
+                          render={({ field }) => (
+                            <FormItem>
+                              <FormLabel>Modèle</FormLabel>
+                              <FormControl>
+                                <Input placeholder="Classe E, Série 5, etc." {...field} />
+                              </FormControl>
+                              <FormMessage />
+                            </FormItem>
+                          )}
+                        />
+                        <FormField
+                          control={vehicleForm.control}
+                          name="year"
+                          render={({ field }) => (
+                            <FormItem>
+                              <FormLabel>Année</FormLabel>
+                              <FormControl>
+                                <Input placeholder="2023" {...field} />
+                              </FormControl>
+                              <FormMessage />
+                            </FormItem>
+                          )}
+                        />
+                        <FormField
+                          control={vehicleForm.control}
+                          name="registration"
+                          render={({ field }) => (
+                            <FormItem>
+                              <FormLabel>Immatriculation</FormLabel>
+                              <FormControl>
+                                <Input placeholder="AB-123-CD" {...field} />
+                              </FormControl>
+                              <FormMessage />
+                            </FormItem>
+                          )}
+                        />
+                        <DialogFooter>
+                          <Button type="submit">Enregistrer le véhicule</Button>
+                        </DialogFooter>
+                      </form>
+                    </Form>
+                  </DialogContent>
+                </Dialog>
+              </div>
             </CardHeader>
             <CardContent className="space-y-4">
               <div className="grid grid-cols-2 gap-4">
@@ -154,6 +285,17 @@ const Settings = () => {
                   <h3 className="text-sm font-medium">Immatriculation</h3>
                   <p className="text-sm">AB-123-CD</p>
                 </div>
+              </div>
+              <div className="flex items-center justify-between border-t border-gray-100 pt-4 mt-2">
+                <div className="flex items-center space-x-2">
+                  <Car size={18} />
+                  <span className="text-sm font-medium">Véhicule actif</span>
+                </div>
+                <Switch 
+                  id="vehicle-active" 
+                  checked={vehicleActive}
+                  onCheckedChange={handleVehicleStatusChange}
+                />
               </div>
               <Button variant="outline" className="w-full">
                 Modifier les informations du véhicule
