@@ -194,8 +194,8 @@ const ReservationCard = ({
               <div className="w-full">
                 <div className="text-sm font-medium">Prise en charge:</div>
                 <div 
-                  className="text-sm w-full overflow-ellipsis cursor-pointer hover:text-primary"
-                  onClick={type === 'current' && reservation.status === 'started' ? () => handleStartNavigation(reservation.pickupAddress) : undefined}
+                  className={`text-sm w-full overflow-ellipsis ${(type === 'current' && (reservation.status === 'accepted' || reservation.status === 'started')) ? 'cursor-pointer hover:text-primary' : ''}`}
+                  onClick={(type === 'current' && (reservation.status === 'accepted' || reservation.status === 'started')) ? () => handleStartNavigation(reservation.pickupAddress) : undefined}
                 >
                   {reservation.pickupAddress}
                 </div>
@@ -206,8 +206,8 @@ const ReservationCard = ({
               <div className="w-full">
                 <div className="text-sm font-medium">Destination:</div>
                 <div 
-                  className="text-sm w-full overflow-ellipsis cursor-pointer hover:text-primary"
-                  onClick={type === 'current' && (reservation.status === 'arrived' || reservation.status === 'onBoard') ? () => handleStartNavigation(reservation.destination) : undefined}
+                  className={`text-sm w-full overflow-ellipsis ${(type === 'current' && (reservation.status === 'accepted' || reservation.status === 'arrived' || reservation.status === 'onBoard' || reservation.status === 'started')) ? 'cursor-pointer hover:text-primary' : ''}`}
+                  onClick={(type === 'current' && (reservation.status === 'accepted' || reservation.status === 'arrived' || reservation.status === 'onBoard' || reservation.status === 'started')) ? () => handleStartNavigation(reservation.destination) : undefined}
                 >
                   {reservation.destination}
                 </div>
