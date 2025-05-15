@@ -54,7 +54,7 @@ const CircularTimer = ({ targetTime, onTimeReached, durationInSeconds = 10 }: Ci
 
   return (
     <div className="flex flex-col items-center justify-center">
-      <div className="relative w-24 h-24 mb-2">
+      <div className="relative w-16 h-16 mb-2">
         {/* Circular progress background */}
         <div className="absolute inset-0 rounded-full bg-gray-100 border border-gray-200"></div>
         
@@ -84,11 +84,11 @@ const CircularTimer = ({ targetTime, onTimeReached, durationInSeconds = 10 }: Ci
         
         {/* Center clock icon */}
         <div className="absolute inset-0 flex items-center justify-center">
-          <Clock className="h-8 w-8 text-primary" />
+          <Clock className="h-4 w-4 text-primary" />
         </div>
       </div>
       
-      <div className="text-lg font-medium text-primary">
+      <div className="text-sm font-medium text-primary">
         {timeLeft}
       </div>
     </div>

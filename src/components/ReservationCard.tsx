@@ -75,21 +75,15 @@ const ReservationCard = ({
   useEffect(() => {
     // Update the timer for accepted reservations - using 10 seconds for testing
     if (reservation.status === 'accepted') {
-      const rideTime = new Date(reservation.date).getTime();
-      // 10 seconds before the ride time
-      const testTimeBeforeMs = rideTime - (10 * 1000);
-      
-      // Set target time for the circular timer
-      const targetDate = new Date(testTimeBeforeMs);
+      const now = new Date();
+      // Set target time 10 seconds from now
+      const targetDate = new Date(now.getTime() + 10 * 1000);
       setTargetTime(targetDate);
       
       const updateAvailability = () => {
-        const now = new Date().getTime();
-        
-        if (now >= testTimeBeforeMs) {
+        const currentTime = new Date().getTime();
+        if (currentTime >= targetDate.getTime()) {
           setCanStartNow(true);
-        } else {
-          setCanStartNow(false);
         }
       };
       
@@ -98,7 +92,7 @@ const ReservationCard = ({
       
       return () => clearInterval(interval);
     }
-  }, [reservation.date, reservation.status]);
+  }, [reservation.status]);
 
   const handleShowPassenger = (name: string) => {
     if (!name) return;
@@ -297,9 +291,7 @@ const ReservationCard = ({
                     disabled={!canStartNow}
                   >
                     <Clock className="mr-2 h-4 w-4" />
-                    {canStartNow 
-                      ? "Démarrer la course" 
-                      : "Démarrer la course"}
+                    Démarrer la course
                   </Button>
                 </>
               )}
