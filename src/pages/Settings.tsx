@@ -1,4 +1,5 @@
 
+import { useState } from "react";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
@@ -19,8 +20,8 @@ import { Switch } from "@/components/ui/switch";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { toast } from "@/hooks/use-toast";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
-import { Plus, Car } from "lucide-react";
-import { useState } from "react";
+import { Plus, Car, Download, Shield, Bell, Trash2 } from "lucide-react";
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 
 const profileFormSchema = z.object({
   name: z.string().min(2, {
@@ -49,8 +50,24 @@ const vehicleFormSchema = z.object({
   }),
 });
 
+const passwordFormSchema = z.object({
+  currentPassword: z.string().min(8, {
+    message: "Le mot de passe doit comporter au moins 8 caractères.",
+  }),
+  newPassword: z.string().min(8, {
+    message: "Le mot de passe doit comporter au moins 8 caractères.",
+  }),
+  confirmPassword: z.string().min(8, {
+    message: "Le mot de passe doit comporter au moins 8 caractères.",
+  }),
+}).refine((data) => data.newPassword === data.confirmPassword, {
+  message: "Les mots de passe ne correspondent pas.",
+  path: ["confirmPassword"],
+});
+
 type ProfileFormValues = z.infer<typeof profileFormSchema>;
 type VehicleFormValues = z.infer<typeof vehicleFormSchema>;
+type PasswordFormValues = z.infer<typeof passwordFormSchema>;
 
 const defaultValues: Partial<ProfileFormValues> = {
   name: "Jean Martin",
@@ -65,9 +82,17 @@ const defaultVehicleValues: Partial<VehicleFormValues> = {
   registration: "",
 };
 
+const defaultPasswordValues: Partial<PasswordFormValues> = {
+  currentPassword: "",
+  newPassword: "",
+  confirmPassword: "",
+};
+
 const Settings = () => {
   const [vehicleActive, setVehicleActive] = useState(true);
   const [openDialog, setOpenDialog] = useState(false);
+  const [deleteAccountDialog, setDeleteAccountDialog] = useState(false);
+  const [expanded, setExpanded] = useState<string | null>(null);
 
   const form = useForm<ProfileFormValues>({
     resolver: zodResolver(profileFormSchema),
@@ -78,6 +103,12 @@ const Settings = () => {
   const vehicleForm = useForm<VehicleFormValues>({
     resolver: zodResolver(vehicleFormSchema),
     defaultValues: defaultVehicleValues,
+    mode: "onChange",
+  });
+
+  const passwordForm = useForm<PasswordFormValues>({
+    resolver: zodResolver(passwordFormSchema),
+    defaultValues: defaultPasswordValues,
     mode: "onChange",
   });
 
@@ -97,6 +128,14 @@ const Settings = () => {
     vehicleForm.reset();
   }
 
+  function onPasswordSubmit(data: PasswordFormValues) {
+    toast({
+      title: "Mot de passe mis à jour",
+      description: "Votre mot de passe a été modifié avec succès",
+    });
+    passwordForm.reset();
+  }
+
   function handleVehicleStatusChange(checked: boolean) {
     setVehicleActive(checked);
     toast({
@@ -104,6 +143,26 @@ const Settings = () => {
       description: checked ? "Votre véhicule est maintenant disponible pour les courses" : "Votre véhicule n'est plus disponible pour les courses",
     });
   }
+
+  function handleDocumentDownload(documentName: string) {
+    toast({
+      title: "Téléchargement démarré",
+      description: `Le document ${documentName} est en cours de téléchargement`,
+    });
+  }
+
+  function handleDeleteAccount() {
+    toast({
+      variant: "destructive",
+      title: "Compte supprimé",
+      description: "Votre compte a été supprimé définitivement",
+    });
+    setDeleteAccountDialog(false);
+  }
+
+  const toggleExpand = (id: string) => {
+    setExpanded(expanded === id ? null : id);
+  };
 
   return (
     <div className="space-y-4">
@@ -309,7 +368,7 @@ const Settings = () => {
             <CardHeader>
               <CardTitle>Documents</CardTitle>
               <CardDescription>
-                Gérez vos documents professionnels.
+                Gérez et téléchargez vos documents professionnels.
               </CardDescription>
             </CardHeader>
             <CardContent>
@@ -319,31 +378,137 @@ const Settings = () => {
                     <h3 className="font-medium">Permis de conduire</h3>
                     <p className="text-sm text-muted-foreground">Valide jusqu'au 15/10/2027</p>
                   </div>
-                  <Button variant="outline" size="sm">Mettre à jour</Button>
+                  <div className="flex gap-2">
+                    <Button 
+                      variant="outline" 
+                      size="sm" 
+                      onClick={() => handleDocumentDownload("Permis de conduire")}
+                    >
+                      <Download className="mr-1" size={16} />
+                      Télécharger
+                    </Button>
+                    <Button variant="outline" size="sm">Mettre à jour</Button>
+                  </div>
                 </div>
+                
                 <div className="flex items-center justify-between p-3 border rounded-md">
                   <div>
                     <h3 className="font-medium">Carte grise</h3>
                     <p className="text-sm text-muted-foreground">Mise à jour il y a 8 mois</p>
                   </div>
-                  <Button variant="outline" size="sm">Mettre à jour</Button>
+                  <div className="flex gap-2">
+                    <Button 
+                      variant="outline" 
+                      size="sm" 
+                      onClick={() => handleDocumentDownload("Carte grise")}
+                    >
+                      <Download className="mr-1" size={16} />
+                      Télécharger
+                    </Button>
+                    <Button variant="outline" size="sm">Mettre à jour</Button>
+                  </div>
                 </div>
+                
                 <div className="flex items-center justify-between p-3 border rounded-md">
                   <div>
                     <h3 className="font-medium">Assurance professionnelle</h3>
                     <p className="text-sm text-muted-foreground">Expire dans 45 jours</p>
                   </div>
-                  <Button variant="outline" size="sm">Mettre à jour</Button>
+                  <div className="flex gap-2">
+                    <Button 
+                      variant="outline" 
+                      size="sm" 
+                      onClick={() => handleDocumentDownload("Assurance professionnelle")}
+                    >
+                      <Download className="mr-1" size={16} />
+                      Télécharger
+                    </Button>
+                    <Button variant="outline" size="sm">Mettre à jour</Button>
+                  </div>
                 </div>
+                
                 <div className="flex items-center justify-between p-3 border rounded-md bg-destructive/10">
                   <div>
                     <h3 className="font-medium">Carte VTC</h3>
                     <p className="text-sm text-destructive">Expiré depuis 5 jours</p>
                   </div>
-                  <Button variant="outline" size="sm" className="border-destructive text-destructive">
-                    Action requise
+                  <div className="flex gap-2">
+                    <Button 
+                      variant="outline" 
+                      size="sm" 
+                      onClick={() => handleDocumentDownload("Carte VTC")}
+                    >
+                      <Download className="mr-1" size={16} />
+                      Télécharger
+                    </Button>
+                    <Button variant="outline" size="sm" className="border-destructive text-destructive">
+                      Action requise
+                    </Button>
+                  </div>
+                </div>
+                
+                <div className="flex items-center justify-between p-3 border rounded-md">
+                  <div>
+                    <h3 className="font-medium">Factures et relevés</h3>
+                    <p className="text-sm text-muted-foreground">Accédez à vos documents financiers</p>
+                  </div>
+                  <Button 
+                    variant="outline" 
+                    size="sm" 
+                    onClick={() => toggleExpand('factures')}
+                  >
+                    {expanded === 'factures' ? 'Masquer' : 'Afficher'}
                   </Button>
                 </div>
+                
+                <Collapsible open={expanded === 'factures'} className="border rounded-md p-3">
+                  <CollapsibleContent className="space-y-3 pt-2">
+                    <div className="flex items-center justify-between border-t pt-2">
+                      <div>
+                        <h4 className="font-medium">Factures Mai 2024</h4>
+                        <p className="text-sm text-muted-foreground">Ensemble des factures du mois</p>
+                      </div>
+                      <Button 
+                        variant="outline" 
+                        size="sm" 
+                        onClick={() => handleDocumentDownload("Factures Mai 2024")}
+                      >
+                        <Download className="mr-1" size={16} />
+                        Télécharger
+                      </Button>
+                    </div>
+                    
+                    <div className="flex items-center justify-between border-t pt-2">
+                      <div>
+                        <h4 className="font-medium">Factures Avril 2024</h4>
+                        <p className="text-sm text-muted-foreground">Ensemble des factures du mois</p>
+                      </div>
+                      <Button 
+                        variant="outline" 
+                        size="sm" 
+                        onClick={() => handleDocumentDownload("Factures Avril 2024")}
+                      >
+                        <Download className="mr-1" size={16} />
+                        Télécharger
+                      </Button>
+                    </div>
+                    
+                    <div className="flex items-center justify-between border-t pt-2">
+                      <div>
+                        <h4 className="font-medium">Rapport annuel 2023</h4>
+                        <p className="text-sm text-muted-foreground">Résumé des activités de l'année</p>
+                      </div>
+                      <Button 
+                        variant="outline" 
+                        size="sm" 
+                        onClick={() => handleDocumentDownload("Rapport annuel 2023")}
+                      >
+                        <Download className="mr-1" size={16} />
+                        Télécharger
+                      </Button>
+                    </div>
+                  </CollapsibleContent>
+                </Collapsible>
               </div>
             </CardContent>
           </Card>
@@ -352,31 +517,66 @@ const Settings = () => {
         <TabsContent value="security" className="mt-4 space-y-4">
           <Card>
             <CardHeader>
-              <CardTitle>Sécurité</CardTitle>
-              <CardDescription>
-                Gérez la sécurité de votre compte.
-              </CardDescription>
+              <div className="flex items-center gap-2">
+                <Shield className="text-primary" size={20} />
+                <div>
+                  <CardTitle>Sécurité du compte</CardTitle>
+                  <CardDescription>
+                    Gérez la sécurité de votre compte.
+                  </CardDescription>
+                </div>
+              </div>
             </CardHeader>
-            <CardContent className="space-y-4">
+            <CardContent className="space-y-6">
               <div className="space-y-4">
                 <h3 className="text-lg font-medium">Mot de passe</h3>
-                <div className="grid gap-2">
-                  <div className="grid gap-1">
-                    <Label htmlFor="current">Mot de passe actuel</Label>
-                    <Input id="current" type="password" />
-                  </div>
-                  <div className="grid gap-1">
-                    <Label htmlFor="new">Nouveau mot de passe</Label>
-                    <Input id="new" type="password" />
-                  </div>
-                  <div className="grid gap-1">
-                    <Label htmlFor="confirm">Confirmer le mot de passe</Label>
-                    <Input id="confirm" type="password" />
-                  </div>
-                </div>
-                <Button>Changer le mot de passe</Button>
+                <Form {...passwordForm}>
+                  <form onSubmit={passwordForm.handleSubmit(onPasswordSubmit)} className="space-y-4">
+                    <FormField
+                      control={passwordForm.control}
+                      name="currentPassword"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Mot de passe actuel</FormLabel>
+                          <FormControl>
+                            <Input type="password" {...field} />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                    <FormField
+                      control={passwordForm.control}
+                      name="newPassword"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Nouveau mot de passe</FormLabel>
+                          <FormControl>
+                            <Input type="password" {...field} />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                    <FormField
+                      control={passwordForm.control}
+                      name="confirmPassword"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Confirmer le mot de passe</FormLabel>
+                          <FormControl>
+                            <Input type="password" {...field} />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                    <Button type="submit">Changer le mot de passe</Button>
+                  </form>
+                </Form>
               </div>
-              <div className="space-y-4">
+              
+              <div className="space-y-4 border-t pt-6">
                 <h3 className="text-lg font-medium">Double authentification</h3>
                 <div className="flex items-center space-x-2">
                   <Switch id="2fa" />
@@ -384,7 +584,57 @@ const Settings = () => {
                 </div>
                 <p className="text-sm text-muted-foreground">
                   Protégez votre compte avec une couche de sécurité supplémentaire.
+                  Vous recevrez un code par SMS à chaque connexion.
                 </p>
+              </div>
+              
+              <div className="space-y-4 border-t pt-6">
+                <h3 className="text-lg font-medium text-destructive">Zone de danger</h3>
+                <p className="text-sm text-muted-foreground">
+                  Cette action est irréversible. Toutes vos données seront définitivement supprimées.
+                </p>
+                <Dialog open={deleteAccountDialog} onOpenChange={setDeleteAccountDialog}>
+                  <DialogTrigger asChild>
+                    <Button variant="destructive" className="w-full sm:w-auto">
+                      <Trash2 className="mr-1" size={16} />
+                      Supprimer mon compte
+                    </Button>
+                  </DialogTrigger>
+                  <DialogContent>
+                    <DialogHeader>
+                      <DialogTitle className="text-destructive">Supprimer votre compte ?</DialogTitle>
+                      <DialogDescription>
+                        Cette action est irréversible. Toutes vos données seront définitivement supprimées 
+                        de nos serveurs.
+                      </DialogDescription>
+                    </DialogHeader>
+                    <div className="p-4 border border-destructive/20 rounded-md bg-destructive/5 my-2">
+                      <p className="text-sm font-medium">Les éléments suivants seront supprimés :</p>
+                      <ul className="text-sm mt-2 space-y-1 list-disc pl-4">
+                        <li>Votre profil et vos informations personnelles</li>
+                        <li>Votre historique de courses et de paiements</li>
+                        <li>Tous vos documents téléchargés</li>
+                        <li>Vos préférences et paramètres</li>
+                      </ul>
+                    </div>
+                    <DialogFooter className="flex flex-col sm:flex-row gap-2">
+                      <Button 
+                        variant="outline" 
+                        onClick={() => setDeleteAccountDialog(false)}
+                        className="w-full sm:w-auto"
+                      >
+                        Annuler
+                      </Button>
+                      <Button 
+                        variant="destructive" 
+                        onClick={handleDeleteAccount}
+                        className="w-full sm:w-auto"
+                      >
+                        Confirmer la suppression
+                      </Button>
+                    </DialogFooter>
+                  </DialogContent>
+                </Dialog>
               </div>
             </CardContent>
           </Card>
@@ -393,12 +643,17 @@ const Settings = () => {
         <TabsContent value="notifications" className="mt-4 space-y-4">
           <Card>
             <CardHeader>
-              <CardTitle>Notifications</CardTitle>
-              <CardDescription>
-                Configurez vos préférences de notification.
-              </CardDescription>
+              <div className="flex items-center gap-2">
+                <Bell className="text-primary" size={20} />
+                <div>
+                  <CardTitle>Notifications</CardTitle>
+                  <CardDescription>
+                    Configurez vos préférences de notification.
+                  </CardDescription>
+                </div>
+              </div>
             </CardHeader>
-            <CardContent className="space-y-4">
+            <CardContent className="space-y-6">
               <h3 className="text-lg font-medium">Notifications de l'application</h3>
               <div className="space-y-4">
                 <div className="flex items-center justify-between">
@@ -436,6 +691,63 @@ const Settings = () => {
                     </FormDescription>
                   </div>
                   <Switch id="promotions" />
+                </div>
+              </div>
+              
+              <div className="space-y-4 border-t pt-6">
+                <h3 className="text-lg font-medium">Notifications par email</h3>
+                <div className="space-y-4">
+                  <div className="flex items-center justify-between">
+                    <div className="space-y-0.5">
+                      <Label htmlFor="email_reservations">Réservations</Label>
+                      <FormDescription>
+                        Recevez un email pour chaque nouvelle réservation
+                      </FormDescription>
+                    </div>
+                    <Switch id="email_reservations" defaultChecked />
+                  </div>
+                  <div className="flex items-center justify-between">
+                    <div className="space-y-0.5">
+                      <Label htmlFor="email_payments">Paiements</Label>
+                      <FormDescription>
+                        Recevez un email pour chaque nouveau paiement
+                      </FormDescription>
+                    </div>
+                    <Switch id="email_payments" defaultChecked />
+                  </div>
+                  <div className="flex items-center justify-between">
+                    <div className="space-y-0.5">
+                      <Label htmlFor="email_news">Actualités</Label>
+                      <FormDescription>
+                        Recevez notre newsletter mensuelle
+                      </FormDescription>
+                    </div>
+                    <Switch id="email_news" />
+                  </div>
+                </div>
+              </div>
+              
+              <div className="space-y-4 border-t pt-6">
+                <h3 className="text-lg font-medium">Notifications SMS</h3>
+                <div className="space-y-4">
+                  <div className="flex items-center justify-between">
+                    <div className="space-y-0.5">
+                      <Label htmlFor="sms_reservations">Réservations urgentes</Label>
+                      <FormDescription>
+                        Recevez un SMS pour les réservations à court terme
+                      </FormDescription>
+                    </div>
+                    <Switch id="sms_reservations" defaultChecked />
+                  </div>
+                  <div className="flex items-center justify-between">
+                    <div className="space-y-0.5">
+                      <Label htmlFor="sms_security">Alertes de sécurité</Label>
+                      <FormDescription>
+                        Recevez un SMS pour les connexions depuis un nouvel appareil
+                      </FormDescription>
+                    </div>
+                    <Switch id="sms_security" defaultChecked />
+                  </div>
                 </div>
               </div>
             </CardContent>
