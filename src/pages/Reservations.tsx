@@ -6,6 +6,8 @@ import { Menu } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { ChatDialog } from "@/components/ChatDialog";
+import NotificationBell from "@/components/NotificationBell";
+import { useLanguage } from "@/hooks/use-language";
 
 // Type de réservation
 type VehicleType = 'standard' | 'berline' | 'van' | 'mini-bus' | 'first-class';
@@ -135,6 +137,7 @@ const initialCompletedReservations: ReservationType[] = [
 ];
 
 const Reservations = () => {
+  const { t } = useLanguage();
   const [activeTab, setActiveTab] = useState("upcoming");
   const [upcomingReservations, setUpcomingReservations] = useState<ReservationType[]>(initialUpcomingReservations);
   const [myReservations, setMyReservations] = useState<ReservationType[]>(initialMyReservations);
@@ -249,35 +252,40 @@ const Reservations = () => {
   return (
     <div className="space-y-4 p-4">
       <div className="flex items-center justify-between">
-        <h1 className="text-2xl font-bold tracking-tight">Réservations</h1>
+        <h1 className="text-2xl font-bold tracking-tight">{t("reservations")}</h1>
         
-        {/* Menu hamburger */}
-        <Sheet open={isSidebarOpen} onOpenChange={setIsSidebarOpen}>
-          <SheetTrigger asChild>
-            <Button variant="outline" size="icon">
-              <Menu className="h-5 w-5" />
-              <span className="sr-only">Menu</span>
-            </Button>
-          </SheetTrigger>
-          <SheetContent side="left">
-            <div className="py-4">
-              <h2 className="text-lg font-medium mb-4">Menu</h2>
-              <nav className="space-y-2">
-                <a href="/" className="block px-4 py-2 hover:bg-muted rounded-md">Accueil</a>
-                <a href="/reservations" className="block px-4 py-2 bg-muted rounded-md font-medium">Réservations</a>
-                <a href="/accounting" className="block px-4 py-2 hover:bg-muted rounded-md">Comptabilité</a>
-                <a href="/analytics" className="block px-4 py-2 hover:bg-muted rounded-md">Analyse</a>
-                <a href="/settings" className="block px-4 py-2 hover:bg-muted rounded-md">Paramètres</a>
-                <button 
-                  className="block w-full text-left px-4 py-2 hover:bg-muted rounded-md text-destructive"
-                  onClick={() => alert("Déconnexion")}
-                >
-                  Déconnexion
-                </button>
-              </nav>
-            </div>
-          </SheetContent>
-        </Sheet>
+        <div className="flex items-center gap-2">
+          {/* Add notification bell */}
+          <NotificationBell />
+          
+          {/* Menu hamburger */}
+          <Sheet open={isSidebarOpen} onOpenChange={setIsSidebarOpen}>
+            <SheetTrigger asChild>
+              <Button variant="outline" size="icon">
+                <Menu className="h-5 w-5" />
+                <span className="sr-only">Menu</span>
+              </Button>
+            </SheetTrigger>
+            <SheetContent side="left">
+              <div className="py-4">
+                <h2 className="text-lg font-medium mb-4">{t("menu")}</h2>
+                <nav className="space-y-2">
+                  <a href="/" className="block px-4 py-2 hover:bg-muted rounded-md">{t("home")}</a>
+                  <a href="/reservations" className="block px-4 py-2 bg-muted rounded-md font-medium">{t("reservations")}</a>
+                  <a href="/accounting" className="block px-4 py-2 hover:bg-muted rounded-md">{t("accounting")}</a>
+                  <a href="/analytics" className="block px-4 py-2 hover:bg-muted rounded-md">{t("analytics")}</a>
+                  <a href="/settings" className="block px-4 py-2 hover:bg-muted rounded-md">{t("settings")}</a>
+                  <button 
+                    className="block w-full text-left px-4 py-2 hover:bg-muted rounded-md text-destructive"
+                    onClick={() => alert(t("logout"))}
+                  >
+                    {t("logout")}
+                  </button>
+                </nav>
+              </div>
+            </SheetContent>
+          </Sheet>
+        </div>
       </div>
       
       <Tabs defaultValue="upcoming" className="w-full" onValueChange={setActiveTab}>

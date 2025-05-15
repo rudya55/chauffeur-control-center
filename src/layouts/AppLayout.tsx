@@ -1,54 +1,30 @@
 
-import { useEffect, useState } from "react";
 import { Outlet } from "react-router-dom";
 import AppSidebar from "@/components/AppSidebar";
 import MobileHeader from "@/components/MobileHeader";
-import { SidebarProvider } from "@/components/ui/sidebar";
-import { useIsMobile } from "@/hooks/use-mobile";
-import { useTheme } from "@/hooks/use-theme";
-import ThemeToggle from "@/components/ThemeToggle";
-import { cn } from "@/lib/utils";
+import { useMobile } from "@/hooks/use-mobile";
+import NotificationBell from "@/components/NotificationBell";
 
 const AppLayout = () => {
-  const [sidebarOpen, setSidebarOpen] = useState(true);
-  const isMobile = useIsMobile();
-  const { theme } = useTheme();
-
-  // Listen for custom sidebar toggle events
-  useEffect(() => {
-    const handleToggleSidebar = () => {
-      setSidebarOpen(prev => !prev);
-    };
-
-    window.addEventListener('toggle-sidebar', handleToggleSidebar);
-    return () => {
-      window.removeEventListener('toggle-sidebar', handleToggleSidebar);
-    };
-  }, []);
+  const isMobile = useMobile();
 
   return (
-    <SidebarProvider>
-      <div className={cn("flex flex-col h-screen w-full max-w-full", theme === 'dark' ? 'dark' : '')}>
-        {isMobile ? (
-          <MobileHeader 
-            isOpen={sidebarOpen} 
-            onToggle={() => setSidebarOpen(!sidebarOpen)}
-          />
-        ) : (
-          <div className="h-16 border-b bg-background flex items-center px-4 justify-end">
-            <ThemeToggle />
+    <div className="flex h-screen">
+      {!isMobile && <AppSidebar />}
+      <div className="flex-1 flex flex-col overflow-hidden">
+        {isMobile && (
+          <div className="flex justify-between items-center px-4 py-2 border-b">
+            <MobileHeader />
+            <div className="flex items-center gap-2">
+              <NotificationBell />
+            </div>
           </div>
         )}
-        
-        <div className="flex flex-1 overflow-hidden">
-          <AppSidebar isOpen={sidebarOpen} onClose={() => setSidebarOpen(false)} />
-          
-          <main className="flex-1 overflow-auto bg-background text-foreground">
-            <Outlet />
-          </main>
-        </div>
+        <main className="flex-1 overflow-auto bg-muted/30">
+          <Outlet />
+        </main>
       </div>
-    </SidebarProvider>
+    </div>
   );
 };
 
