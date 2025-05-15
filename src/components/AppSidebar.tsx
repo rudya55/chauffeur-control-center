@@ -56,29 +56,23 @@ const AppSidebar = ({ isOpen = false, onClose }: AppSidebarProps) => {
   const driverName = "Jean Dupont";
   const driverRating = 4.8;
   
-  // Make sure we're handling nested translation objects properly
-  const getTranslation = (key: string): string => {
-    const value = t(key);
-    return typeof value === 'string' ? value : key;
-  };
-  
   const menuItems = [
-    { title: getTranslation("home"), url: "/", icon: Home },
-    { title: getTranslation("reservations"), url: "/reservations", icon: Calendar },
-    { title: getTranslation("accounting"), url: "/accounting", icon: FileText },
-    { title: getTranslation("analytics"), url: "/analytics", icon: BarChart4 },
-    { title: getTranslation("settings"), url: "/settings", icon: Settings },
+    { title: t("home"), url: "/", icon: Home },
+    { title: t("reservations"), url: "/reservations", icon: Calendar },
+    { title: t("accounting"), url: "/accounting", icon: FileText },
+    { title: t("analytics"), url: "/analytics", icon: BarChart4 },
+    { title: t("settings"), url: "/settings", icon: Settings },
     { title: "Nous contacter", url: "/contact", icon: Mail },
     { title: "Conditions générales", url: "/terms", icon: FileTextIcon },
   ];
 
   // Settings submenu items
   const settingsSubmenuItems = [
-    { title: getTranslation("settings_section.tabs.profile"), url: "/settings/profile", icon: User },
-    { title: getTranslation("settings_section.tabs.documents"), url: "/settings/documents", icon: FileText },
-    { title: getTranslation("settings_section.tabs.payments"), url: "/settings/payments", icon: CreditCard },
-    { title: getTranslation("settings_section.tabs.security"), url: "/settings/security", icon: ShieldCheck },
-    { title: getTranslation("settings_section.tabs.notifications"), url: "/settings/notifications", icon: Bell },
+    { title: t("settings_section.tabs.profile"), url: "/settings/profile", icon: User },
+    { title: t("settings_section.tabs.documents"), url: "/settings/documents", icon: FileText },
+    { title: t("settings_section.tabs.payments"), url: "/settings/payments", icon: CreditCard },
+    { title: t("settings_section.tabs.security"), url: "/settings/security", icon: ShieldCheck },
+    { title: t("settings_section.tabs.notifications"), url: "/settings/notifications", icon: Bell },
   ];
 
   const handleNavLinkClick = () => {
@@ -191,7 +185,7 @@ const AppSidebar = ({ isOpen = false, onClose }: AppSidebarProps) => {
         {/* Settings submenu - only visible when on settings pages */}
         {isSettingsPage && (!collapsed || isMobile) && (
           <SidebarGroup className="mt-2 pt-2 border-t">
-            <SidebarGroupLabel>{getTranslation("settings_section.title")}</SidebarGroupLabel>
+            <SidebarGroupLabel>{t("settings_section.title")}</SidebarGroupLabel>
             <SidebarGroupContent>
               <SidebarMenu>
                 {settingsSubmenuItems.map((item) => (
@@ -223,7 +217,7 @@ const AppSidebar = ({ isOpen = false, onClose }: AppSidebarProps) => {
                     onClick={() => alert("Déconnexion")}
                   >
                     <LogOut className="h-5 w-5" />
-                    {(!collapsed || isMobile) && <span>{typeof t("logout") === 'string' ? t("logout") : "Déconnexion"}</span>}
+                    {(!collapsed || isMobile) && <span>{t("logout")}</span>}
                   </button>
                 </SidebarMenuButton>
               </SidebarMenuItem>

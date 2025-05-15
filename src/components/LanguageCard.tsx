@@ -25,7 +25,7 @@ export const LanguageCard = () => {
     setLanguage(selectedLanguage);
     toast({
       title: t("language.save"),
-      description: `${t("language." + selectedLanguage)}`,
+      description: t(`language.${selectedLanguage}`),
     });
   };
 

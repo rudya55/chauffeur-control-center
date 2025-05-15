@@ -6,7 +6,7 @@ type SupportedLanguages = "fr" | "en" | "es" | "de" | "it";
 type LanguageContextType = {
   language: SupportedLanguages;
   setLanguage: (language: SupportedLanguages) => void;
-  t: (key: string) => string | Record<string, any>;
+  t: (key: string) => string;
 };
 
 const defaultLanguage = "fr";
@@ -44,9 +44,10 @@ export const LanguageProvider = ({ children }: { children: ReactNode }) => {
   }, [language]);
 
   // Helper function to get nested translations using dot notation
-  const t = (key: string): string | Record<string, any> => {
+  // Always returns a string to avoid React rendering issues
+  const t = (key: string): string => {
     const keys = key.split('.');
-    let current = translations;
+    let current: any = translations;
     
     for (let i = 0; i < keys.length; i++) {
       if (current === undefined || current === null) {
@@ -56,7 +57,17 @@ export const LanguageProvider = ({ children }: { children: ReactNode }) => {
       current = current[keys[i]];
     }
     
-    return current !== undefined ? current : key;
+    // Ensure we always return a string
+    if (current === undefined) {
+      return key;
+    }
+    
+    if (typeof current === 'object') {
+      console.warn(`Translation key "${key}" resolved to an object, not a string. Check your translation usage.`);
+      return key;
+    }
+    
+    return String(current);
   };
 
   return (
