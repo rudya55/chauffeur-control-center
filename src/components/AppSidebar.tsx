@@ -58,8 +58,8 @@ const AppSidebar = ({ isOpen = false, onClose }: AppSidebarProps) => {
     { title: t("accounting"), url: "/accounting", icon: FileText },
     { title: t("analytics"), url: "/analytics", icon: BarChart4 },
     { title: t("settings"), url: "/settings", icon: Settings },
-    { title: "Nous contacter", url: "/contact", icon: Mail },
-    { title: "Conditions générales", url: "/terms", icon: FileTextIcon },
+    { title: t("contact"), url: "/contact", icon: Mail },
+    { title: t("terms"), url: "/terms", icon: FileTextIcon },
   ];
 
   // No longer needed - settings tabs are managed in the Settings.tsx component
@@ -86,9 +86,6 @@ const AppSidebar = ({ isOpen = false, onClose }: AppSidebarProps) => {
         ? "bg-primary/10 text-primary font-medium" 
         : "hover:bg-muted/50 text-foreground/80"
     );
-
-  // Check if current path is a settings page
-  const isSettingsPage = location.pathname.startsWith('/settings');
 
   return (
     <Sidebar
@@ -171,8 +168,6 @@ const AppSidebar = ({ isOpen = false, onClose }: AppSidebarProps) => {
             </SidebarMenu>
           </SidebarGroupContent>
         </SidebarGroup>
-
-        {/* Removed duplicate settings submenu here */}
 
         <SidebarGroup className="mt-auto pt-4 border-t">
           <SidebarGroupContent>
