@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from "react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
@@ -40,45 +41,7 @@ type ReservationType = {
   route?: {lat: number, lng: number}[];
 };
 
-// Données de réservations (simulations)
-const initialUpcomingReservations: ReservationType[] = [
-  {
-    id: "1",
-    clientName: "Client 1", // Masqué jusqu'à l'acceptation
-    pickupAddress: "Aéroport Charles de Gaulle, Terminal 2E",
-    destination: "23 Rue de Rivoli, Paris",
-    date: "2025-05-16T14:30:00",
-    phone: "+33612345678",
-    flightNumber: "AF1234",
-    dispatcher: "TaxiCorp",
-    dispatcherLogo: "🚕",
-    passengers: 2,
-    luggage: 3,
-    status: 'pending',
-    driverAmount: "45.00",
-    amount: "55.00",
-    commission: "10.00",
-    paymentType: 'card',
-    vehicleType: 'berline'
-  },
-  {
-    id: "2",
-    clientName: "Client 2", // Masqué jusqu'à l'acceptation
-    pickupAddress: "Gare de Lyon, Paris",
-    destination: "45 Avenue des Champs-Élysées, Paris",
-    date: "2025-05-17T09:15:00",
-    phone: "+33687654321",
-    flightNumber: "",
-    dispatcher: "VTCService",
-    dispatcherLogo: "🚘",
-    passengers: 1,
-    luggage: 1,
-    status: 'pending',
-    driverAmount: "38.00",
-    paymentType: 'transfer',
-    vehicleType: 'standard'
-  }
-];
+// Removed initialUpcomingReservations as we don't need it anymore
 
 const initialMyReservations: ReservationType[] = [
   {
@@ -138,42 +101,14 @@ const initialCompletedReservations: ReservationType[] = [
 
 const Reservations = () => {
   const { t } = useLanguage();
-  const [activeTab, setActiveTab] = useState("upcoming");
-  const [upcomingReservations, setUpcomingReservations] = useState<ReservationType[]>(initialUpcomingReservations);
+  const [activeTab, setActiveTab] = useState("current");
   const [myReservations, setMyReservations] = useState<ReservationType[]>(initialMyReservations);
   const [completedReservations, setCompletedReservations] = useState<ReservationType[]>(initialCompletedReservations);
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [showChat, setShowChat] = useState(false);
   const [currentDispatcher, setCurrentDispatcher] = useState("");
 
-  // Gérer l'acceptation d'une réservation
-  const handleAcceptReservation = (id: string) => {
-    // Trouver la réservation
-    const reservationToAccept = upcomingReservations.find(res => res.id === id);
-    if (!reservationToAccept) return;
-
-    // Supprimer de la liste des réservations à venir
-    setUpcomingReservations(prev => prev.filter(res => res.id !== id));
-
-    // Ajouter à la liste des réservations acceptées avec le statut mis à jour
-    setMyReservations(prev => [
-      ...prev, 
-      { ...reservationToAccept, status: 'accepted' }
-    ]);
-    
-    // Save to localStorage to sync with Home page
-    const updatedMyReservations = [...myReservations, { ...reservationToAccept, status: 'accepted' }];
-    localStorage.setItem('myReservations', JSON.stringify(updatedMyReservations));
-    
-    // Update upcoming reservations in localStorage
-    const updatedUpcomingReservations = upcomingReservations.filter(res => res.id !== id);
-    localStorage.setItem('upcomingReservations', JSON.stringify(updatedUpcomingReservations));
-  };
-
-  // Gérer le refus d'une réservation
-  const handleRejectReservation = (id: string) => {
-    setUpcomingReservations(prev => prev.filter(res => res.id !== id));
-  };
+  // Removed functions related to accepting/rejecting reservations
 
   // Gérer le démarrage d'une course
   const handleStartRide = (id: string) => {
@@ -238,14 +173,9 @@ const Reservations = () => {
   // Load reservations from localStorage on initial load
   useEffect(() => {
     const storedMyReservations = localStorage.getItem('myReservations');
-    const storedUpcomingReservations = localStorage.getItem('upcomingReservations');
     
     if (storedMyReservations) {
       setMyReservations(JSON.parse(storedMyReservations));
-    }
-    
-    if (storedUpcomingReservations) {
-      setUpcomingReservations(JSON.parse(storedUpcomingReservations));
     }
   }, []);
 
@@ -288,16 +218,8 @@ const Reservations = () => {
         </div>
       </div>
       
-      <Tabs defaultValue="upcoming" className="w-full" onValueChange={setActiveTab}>
+      <Tabs defaultValue="current" className="w-full" onValueChange={setActiveTab}>
         <TabsList className="w-full">
-          <TabsTrigger value="upcoming" className="flex-1">
-            À venir
-            {upcomingReservations.length > 0 && (
-              <Badge variant="secondary" className="ml-2">
-                {upcomingReservations.length}
-              </Badge>
-            )}
-          </TabsTrigger>
           <TabsTrigger value="current" className="flex-1">
             Mes Réservations
             {myReservations.length > 0 && (
@@ -311,25 +233,6 @@ const Reservations = () => {
           </TabsTrigger>
         </TabsList>
         
-        <TabsContent value="upcoming" className="mt-4">
-          {upcomingReservations.length > 0 ? (
-            upcomingReservations.map(reservation => (
-              <ReservationCard 
-                key={reservation.id} 
-                reservation={{...reservation, clientName: ""}} // Masquer le nom client 
-                type="upcoming"
-                onAccept={handleAcceptReservation}
-                onReject={handleRejectReservation}
-                // No chat with dispatcher option here
-              />
-            ))
-          ) : (
-            <div className="text-center py-10 text-gray-500">
-              Aucune réservation à venir
-            </div>
-          )}
-        </TabsContent>
-        
         <TabsContent value="current" className="mt-4">
           {myReservations.length > 0 ? (
             myReservations.map(reservation => (
@@ -341,7 +244,7 @@ const Reservations = () => {
                 onArrived={handleArrived}
                 onClientBoarded={handleClientBoarded}
                 onComplete={handleCompleteRide}
-                onChatWithDispatcher={openChatWithDispatcher} // Chat available only in current reservations
+                onChatWithDispatcher={openChatWithDispatcher}
               />
             ))
           ) : (
