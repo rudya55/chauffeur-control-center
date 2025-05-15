@@ -164,7 +164,7 @@ const ReservationCard = ({
                 >
                   {reservation.clientName}
                   {reservation.dispatcherLogo && (
-                    <span className="ml-2 text-lg" title={reservation.dispatcher}>
+                    <span className="ml-2 text-sm" title={reservation.dispatcher}>
                       {reservation.dispatcherLogo}
                     </span>
                   )}
@@ -299,7 +299,7 @@ const ReservationCard = ({
                     <Clock className="mr-2 h-4 w-4" />
                     {canStartNow 
                       ? "Démarrer la course" 
-                      : "Disponible après le chrono"}
+                      : "Démarrer la course"}
                   </Button>
                 </>
               )}
