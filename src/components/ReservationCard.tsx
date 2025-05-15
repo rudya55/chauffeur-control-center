@@ -92,6 +92,17 @@ const ReservationCard = ({
     }
   };
 
+  // Function to get payment type text
+  const getPaymentTypeText = (type?: PaymentType) => {
+    switch(type) {
+      case 'cash': return "Espèces";
+      case 'card': return "Carte bleue";
+      case 'transfer': return "Virement";
+      case 'paypal': return "PayPal";
+      default: return "Paiement";
+    }
+  };
+
   // Function to render vehicle type icon
   const renderVehicleIcon = (type?: VehicleType) => {
     return <CarFront className="h-4 w-4 text-gray-500" />;
@@ -190,7 +201,6 @@ const ReservationCard = ({
                   <div className="h-2 w-2 bg-black rounded-full mr-2"></div>
                   <div className="text-base">{formattedDate}</div>
                 </div>
-                <div className="font-bold">≈ {reservation.driverAmount}€ (NET)</div>
               </div>
               
               <div className="flex items-center justify-between mb-3">
@@ -199,15 +209,36 @@ const ReservationCard = ({
                 <div className="font-bold text-right">{reservation.destination}</div>
               </div>
               
-              <div className="flex items-center gap-2 mb-4">
-                <Users className="h-4 w-4 text-gray-500" />
-                <span className="text-sm">
-                  {reservation.passengers} personne{reservation.passengers !== 1 ? 's' : ''}
-                </span>
-                <Luggage className="h-4 w-4 ml-2 text-gray-500" />
-                <span className="text-sm">
-                  {reservation.luggage} bagage{reservation.luggage !== 1 ? 's' : ''}
-                </span>
+              <div className="flex items-center gap-2 mb-4 flex-wrap">
+                {/* First line with passengers and luggage */}
+                <div className="flex items-center gap-1 mr-4">
+                  <Users className="h-4 w-4 text-indigo-500" />
+                  <span className="text-sm">
+                    {reservation.passengers} personne{reservation.passengers !== 1 ? 's' : ''}
+                  </span>
+                  
+                  <Luggage className="h-4 w-4 ml-2 text-amber-500" />
+                  <span className="text-sm">
+                    {reservation.luggage} bagage{reservation.luggage !== 1 ? 's' : ''}
+                  </span>
+                  
+                  {reservation.vehicleType && (
+                    <>
+                      <CarFront className="h-4 w-4 ml-2 text-slate-500" />
+                      <span className="text-sm capitalize">
+                        {reservation.vehicleType === 'first-class' ? 'First Class' : reservation.vehicleType}
+                      </span>
+                    </>
+                  )}
+                </div>
+                
+                {/* Payment type with icon */}
+                {reservation.paymentType && (
+                  <div className="flex items-center gap-1">
+                    {renderPaymentIcon(reservation.paymentType)}
+                    <span className="text-sm">{getPaymentTypeText(reservation.paymentType)}</span>
+                  </div>
+                )}
               </div>
 
               {/* Buttons for accepting/rejecting */}
@@ -227,6 +258,13 @@ const ReservationCard = ({
                   <Check className="mr-2 h-4 w-4" />
                   Accepter
                 </Button>
+              </div>
+              
+              {/* Price at the bottom */}
+              <div className="mt-4 pt-3 border-t border-gray-200 text-center">
+                <div className="text-lg font-bold text-emerald-600">
+                  {reservation.driverAmount}€ <span className="text-xs text-gray-500">(NET)</span>
+                </div>
               </div>
             </>
           )}
@@ -288,39 +326,62 @@ const ReservationCard = ({
               </div>
 
               <div className="mt-4 space-y-2">
-                {/* Payment and price information */}
-                {reservation.driverAmount && (
-                  <div className="flex items-center gap-2">
-                    {renderPaymentIcon(reservation.paymentType)}
-                    <span className="text-sm">
-                      {reservation.paymentType === 'cash' && "Espèces"}
-                      {reservation.paymentType === 'card' && "Carte bleue"}
-                      {reservation.paymentType === 'transfer' && "Virement"}
-                      {reservation.paymentType === 'paypal' && "PayPal"}
-                      {!reservation.paymentType && "Paiement"} - 
-                      {type === 'upcoming' ? (
-                        <span className="font-medium"> {reservation.driverAmount}€ net chauffeur</span>
-                      ) : (
-                        reservation.paymentType === 'cash' || reservation.paymentType === 'card' ? (
-                          <span> {reservation.amount}€ client / {reservation.commission}€ commission / <span className="font-medium">{reservation.driverAmount}€ net</span></span>
-                        ) : (
-                          <span className="font-medium"> {reservation.driverAmount}€ net chauffeur</span>
-                        )
-                      )}
-                    </span>
+                {/* Combine passenger, luggage, vehicle and payment info on the same line */}
+                <div className="flex items-center gap-2 flex-wrap">
+                  {/* Client name (only for non-upcoming) */}
+                  {reservation.clientName && (
+                    <div className="flex items-center gap-1 mr-3">
+                      <Users className="h-4 w-4 text-indigo-500" />
+                      <span 
+                        className="text-sm cursor-pointer hover:text-primary"
+                        onClick={() => handleShowPassenger(reservation.clientName)}
+                      >
+                        {reservation.clientName}
+                      </span>
+                    </div>
+                  )}
+                  
+                  {/* Passengers and luggage combined */}
+                  <div className="flex items-center gap-1 mr-3">
+                    {reservation.passengers && (
+                      <>
+                        <Users className="h-4 w-4 text-indigo-500" />
+                        <span className="text-sm">
+                          {reservation.passengers} <span className="text-xs">pers.</span>
+                        </span>
+                      </>
+                    )}
+                    
+                    {reservation.luggage && (
+                      <>
+                        <Luggage className="h-4 w-4 ml-2 text-amber-500" />
+                        <span className="text-sm">
+                          {reservation.luggage} <span className="text-xs">bag.</span>
+                        </span>
+                      </>
+                    )}
                   </div>
-                )}
+                  
+                  {/* Vehicle type */}
+                  {reservation.vehicleType && (
+                    <div className="flex items-center gap-1 mr-3">
+                      <CarFront className="h-4 w-4 text-slate-500" />
+                      <span className="text-sm capitalize">
+                        {reservation.vehicleType === 'first-class' ? 'First Class' : reservation.vehicleType}
+                      </span>
+                    </div>
+                  )}
+                  
+                  {/* Payment type */}
+                  {reservation.paymentType && (
+                    <div className="flex items-center gap-1">
+                      {renderPaymentIcon(reservation.paymentType)}
+                      <span className="text-sm">{getPaymentTypeText(reservation.paymentType)}</span>
+                    </div>
+                  )}
+                </div>
 
-                {/* Vehicle type */}
-                {reservation.vehicleType && (
-                  <div className="flex items-center gap-2">
-                    <CarFront className="h-4 w-4 text-gray-500" />
-                    <span className="text-sm capitalize">
-                      {reservation.vehicleType === 'first-class' ? 'First Class' : reservation.vehicleType}
-                    </span>
-                  </div>
-                )}
-
+                {/* Flight info if available */}
                 {reservation.flightNumber && (
                   <div 
                     className="flex items-center gap-2 cursor-pointer hover:text-primary"
@@ -330,55 +391,7 @@ const ReservationCard = ({
                     <span className="text-sm">{reservation.flightNumber}</span>
                   </div>
                 )}
-                
-                {/* Display client name on a separate line when it exists and not in upcoming tab */}
-                {reservation.clientName && type !== 'upcoming' && (
-                  <div className="flex items-center gap-2">
-                    <Users className="h-4 w-4 text-gray-500" />
-                    <span 
-                      className="text-sm cursor-pointer hover:text-primary"
-                      onClick={() => handleShowPassenger(reservation.clientName)}
-                    >
-                      {reservation.clientName}
-                    </span>
-                  </div>
-                )}
-
-                {reservation.passengers && (
-                  <div className="flex items-center gap-2">
-                    <Users className="h-4 w-4 text-gray-500" />
-                    <span className="text-sm">{reservation.passengers} personne{reservation.passengers > 1 ? 's' : ''}</span>
-                  </div>
-                )}
-                
-                {reservation.luggage && (
-                  <div className="flex items-center gap-2">
-                    <Luggage className="h-4 w-4 text-gray-500" />
-                    <span className="text-sm">{reservation.luggage} bagage{reservation.luggage > 1 ? 's' : ''}</span>
-                  </div>
-                )}
               </div>
-
-              {type === 'upcoming' && (
-                <div className="mt-4 flex gap-2">
-                  <Button 
-                    variant="outline" 
-                    className="flex-1 bg-secondary/10 hover:bg-secondary/20 border-secondary/30"
-                    onClick={() => onAccept?.(reservation.id)}
-                  >
-                    <Check className="mr-2 h-4 w-4" />
-                    Accepter
-                  </Button>
-                  <Button 
-                    variant="outline" 
-                    className="flex-1 bg-destructive/10 hover:bg-destructive/20 border-destructive/30"
-                    onClick={() => onReject?.(reservation.id)}
-                  >
-                    <X className="mr-2 h-4 w-4" />
-                    Refuser
-                  </Button>
-                </div>
-              )}
 
               {type === 'current' && (
                 <div className="mt-4 flex flex-col gap-2">
@@ -490,6 +503,18 @@ const ReservationCard = ({
                   )}
                 </div>
               )}
+              
+              {/* Price at the bottom for current and completed */}
+              <div className="mt-4 pt-3 border-t border-gray-200 text-center">
+                <div className="text-lg font-bold text-emerald-600">
+                  {reservation.driverAmount}€ <span className="text-xs text-gray-500">(NET)</span>
+                </div>
+                {(reservation.amount && reservation.commission) && (
+                  <div className="text-sm text-gray-500">
+                    {reservation.amount}€ client / {reservation.commission}€ commission
+                  </div>
+                )}
+              </div>
             </>
           )}
         </CardContent>
