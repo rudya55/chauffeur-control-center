@@ -1,10 +1,11 @@
+
 import { useState, useEffect } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { 
   Check, X, MapPin, Plane, Star, Navigation, Clock, Users, 
   Luggage, Flag, MessageSquare, CarFront, DollarSign, CreditCard, 
-  Euro, Bank
+  Euro, Banknote
 } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
@@ -83,7 +84,7 @@ const ReservationCard = ({
       case 'card':
         return <CreditCard className="h-4 w-4 text-blue-500" />;
       case 'transfer':
-        return <Bank className="h-4 w-4 text-purple-500" />;
+        return <Banknote className="h-4 w-4 text-purple-500" />; // Changed from Bank to Banknote
       case 'paypal':
         return <DollarSign className="h-4 w-4 text-blue-600" />;
       default:

@@ -1,7 +1,7 @@
 
 import OnlineStatusToggle from "@/components/OnlineStatusToggle";
 import Map from "@/components/Map";
-import { Check, X, MapPin, Users, Luggage, CarFront, Euro, CreditCard, DollarSign, Bank } from "lucide-react";
+import { Check, X, MapPin, Users, Luggage, CarFront, Euro, CreditCard, DollarSign, Banknote } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
 import { useEffect, useState } from "react";
@@ -115,7 +115,7 @@ const Home = () => {
       case 'card':
         return <CreditCard className="h-4 w-4 text-blue-500" />;
       case 'transfer':
-        return <Bank className="h-4 w-4 text-purple-500" />; 
+        return <Banknote className="h-4 w-4 text-purple-500" />; // Changed from Bank to Banknote
       case 'paypal':
         return <DollarSign className="h-4 w-4 text-blue-600" />; 
       default:
