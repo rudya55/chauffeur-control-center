@@ -30,7 +30,8 @@ interface AppSidebarProps {
 }
 
 const AppSidebar = ({ isOpen = false, onClose }: AppSidebarProps) => {
-  const { collapsed } = useSidebar();
+  const { state } = useSidebar();
+  const collapsed = state === "collapsed";
   const location = useLocation();
   const isMobile = useIsMobile();
   
@@ -64,7 +65,6 @@ const AppSidebar = ({ isOpen = false, onClose }: AppSidebarProps) => {
           ? isOpen ? "translate-x-0" : "-translate-x-full fixed z-50 h-full" 
           : collapsed ? "w-16" : "w-64",
       )}
-      collapsible={!isMobile}
     >
       <div className="flex items-center justify-between p-4 border-b">
         <div className={cn("flex items-center", collapsed && !isMobile && "hidden")}>

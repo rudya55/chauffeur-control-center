@@ -11,7 +11,7 @@ const AppLayout = () => {
   const isMobile = useIsMobile();
 
   return (
-    <SidebarProvider collapsedWidth={60}>
+    <SidebarProvider>
       <div className="flex min-h-screen w-full">
         {isMobile ? (
           <MobileHeader 

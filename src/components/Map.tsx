@@ -10,11 +10,11 @@ interface MapProps {
 
 const Map = ({ className, center = { lat: 48.8566, lng: 2.3522 }, zoom = 14 }: MapProps) => {
   const mapRef = useRef<HTMLDivElement>(null);
-  const mapInstanceRef = useRef<google.maps.Map | null>(null);
-  const markerRef = useRef<google.maps.Marker | null>(null);
+  const mapInstanceRef = useRef<any>(null);
+  const markerRef = useRef<any>(null);
 
   useEffect(() => {
-    // Load Google Maps API
+    // Load Google Maps API script
     const loadMap = () => {
       if (!window.google) {
         const script = document.createElement('script');
@@ -47,13 +47,16 @@ const Map = ({ className, center = { lat: 48.8566, lng: 2.3522 }, zoom = 14 }: M
           ]
         };
 
+        // @ts-ignore
         mapInstanceRef.current = new window.google.maps.Map(mapRef.current, mapOptions);
 
         // Add a marker for the driver's position
+        // @ts-ignore
         markerRef.current = new window.google.maps.Marker({
           position: center,
           map: mapInstanceRef.current,
           icon: {
+            // @ts-ignore
             path: window.google.maps.SymbolPath.CIRCLE,
             scale: 10,
             fillColor: '#1a73e8',
@@ -102,5 +105,12 @@ const Map = ({ className, center = { lat: 48.8566, lng: 2.3522 }, zoom = 14 }: M
     />
   );
 };
+
+// Add the missing google type definition for TypeScript
+declare global {
+  interface Window {
+    google: any;
+  }
+}
 
 export default Map;
