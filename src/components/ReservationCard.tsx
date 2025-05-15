@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -7,6 +6,7 @@ import { Badge } from "@/components/ui/badge";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
 import { toast } from "@/hooks/use-toast";
 import Map from "@/components/Map";
+import CircularTimer from "@/components/CircularTimer";
 
 type ReservationType = {
   id: string;
@@ -58,11 +58,11 @@ const ReservationCard = ({
   const [rating, setRating] = useState(0);
   const [comment, setComment] = useState('');
   const [showNavigationOptions, setShowNavigationOptions] = useState(false);
-  const [timeUntilRide, setTimeUntilRide] = useState<string>("");
   const [canStartNow, setCanStartNow] = useState(false);
   const [navigationAddress, setNavigationAddress] = useState("");
   const [showPassengerDialog, setShowPassengerDialog] = useState(false);
   const [showFlightDialog, setShowFlightDialog] = useState(false);
+  const [targetTime, setTargetTime] = useState<Date | null>(null);
 
   const formattedDate = new Date(reservation.date).toLocaleString('fr-FR', {
     weekday: 'short',
@@ -73,31 +73,28 @@ const ReservationCard = ({
   });
 
   useEffect(() => {
-    // Update the timer for accepted reservations - 4 seconds for testing
+    // Update the timer for accepted reservations - using 10 seconds for testing
     if (reservation.status === 'accepted') {
       const rideTime = new Date(reservation.date).getTime();
-      // 4 seconds before the ride time
-      const testTimeBeforeMs = rideTime - (4 * 1000);
+      // 10 seconds before the ride time
+      const testTimeBeforeMs = rideTime - (10 * 1000);
       
-      const updateTimer = () => {
+      // Set target time for the circular timer
+      const targetDate = new Date(testTimeBeforeMs);
+      setTargetTime(targetDate);
+      
+      const updateAvailability = () => {
         const now = new Date().getTime();
-        const canStartTime = Math.max(testTimeBeforeMs - now, 0);
         
         if (now >= testTimeBeforeMs) {
           setCanStartNow(true);
-          setTimeUntilRide("Disponible maintenant");
         } else {
           setCanStartNow(false);
-          
-          // Calculate remaining time
-          const seconds = Math.floor(canStartTime / 1000);
-          
-          setTimeUntilRide(`00:00:${seconds.toString().padStart(2, '0')}`);
         }
       };
       
-      updateTimer(); // Initial call
-      const interval = setInterval(updateTimer, 1000);
+      updateAvailability(); // Initial call
+      const interval = setInterval(updateAvailability, 1000);
       
       return () => clearInterval(interval);
     }
@@ -136,10 +133,10 @@ const ReservationCard = ({
   };
 
   const canStartRide = () => {
-    // 4 seconds test instead of 2 hours
+    // 10 seconds test instead of 2 hours
     const rideTime = new Date(reservation.date).getTime();
     const now = new Date().getTime();
-    const testTimeInMs = 4 * 1000; // 4 seconds for testing
+    const testTimeInMs = 10 * 1000; // 10 seconds for testing
     
     return now >= (rideTime - testTimeInMs);
   };
@@ -147,6 +144,11 @@ const ReservationCard = ({
   // Pour discuter avec le dispatcher
   const handleChatWithDispatcher = () => {
     onChatWithDispatcher?.(reservation.dispatcher);
+  };
+
+  // Handle when timer reaches completion
+  const handleTimerComplete = () => {
+    setCanStartNow(true);
   };
 
   return (
@@ -279,20 +281,23 @@ const ReservationCard = ({
             <div className="mt-4 flex flex-col gap-2">
               {reservation.status === 'accepted' && (
                 <>
-                  {timeUntilRide && (
-                    <div className={`text-center py-2 rounded-md ${canStartNow ? 'bg-green-100 text-green-800' : 'bg-yellow-100 text-yellow-800'}`}>
-                      <Clock className="inline-block mr-1 h-4 w-4" />
-                      {canStartNow ? 'Disponible maintenant' : `Attente: ${timeUntilRide}`}
+                  {targetTime && (
+                    <div className={`flex justify-center py-2 ${canStartNow ? 'text-green-800' : ''}`}>
+                      <CircularTimer 
+                        targetTime={targetTime} 
+                        onTimeReached={handleTimerComplete} 
+                        durationInSeconds={10}
+                      />
                     </div>
                   )}
                   <Button 
                     variant="default" 
                     className="w-full bg-primary"
                     onClick={() => onStartRide?.(reservation.id)}
-                    disabled={!canStartRide()}
+                    disabled={!canStartNow}
                   >
                     <Clock className="mr-2 h-4 w-4" />
-                    {canStartRide() 
+                    {canStartNow 
                       ? "Démarrer la course" 
                       : "Disponible après le chrono"}
                   </Button>
