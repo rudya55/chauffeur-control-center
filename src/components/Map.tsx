@@ -101,7 +101,7 @@ const Map = ({ className, center = { lat: 48.8566, lng: 2.3522 }, zoom = 14 }: M
   return (
     <div 
       ref={mapRef} 
-      className={cn("h-full w-full rounded-lg overflow-hidden", className)} 
+      className={cn("h-full w-full rounded-lg overflow-hidden relative", className)} 
     />
   );
 };
