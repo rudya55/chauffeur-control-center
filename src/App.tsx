@@ -10,6 +10,8 @@ import Reservations from "./pages/Reservations";
 import Accounting from "./pages/Accounting";
 import Analytics from "./pages/Analytics";
 import Settings from "./pages/Settings";
+import Contact from "./pages/Contact";
+import Terms from "./pages/Terms";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -27,6 +29,8 @@ const App = () => (
             <Route path="accounting" element={<Accounting />} />
             <Route path="analytics" element={<Analytics />} />
             <Route path="settings" element={<Settings />} />
+            <Route path="contact" element={<Contact />} />
+            <Route path="terms" element={<Terms />} />
           </Route>
           <Route path="*" element={<NotFound />} />
         </Routes>

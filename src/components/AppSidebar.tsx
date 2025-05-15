@@ -8,6 +8,8 @@ import {
   Settings, 
   LogOut,
   Menu,
+  Mail,
+  FileText as FileTextIcon
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useIsMobile } from "@/hooks/use-mobile";
@@ -23,6 +25,8 @@ import {
   SidebarTrigger,
   useSidebar,
 } from "@/components/ui/sidebar";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Badge } from "@/components/ui/badge";
 
 interface AppSidebarProps {
   isOpen?: boolean;
@@ -35,12 +39,18 @@ const AppSidebar = ({ isOpen = false, onClose }: AppSidebarProps) => {
   const location = useLocation();
   const isMobile = useIsMobile();
   
+  // Driver information
+  const driverName = "Jean Dupont";
+  const driverRating = 4.8;
+  
   const menuItems = [
     { title: "Accueil", url: "/", icon: Home },
     { title: "Réservations", url: "/reservations", icon: Calendar },
     { title: "Comptabilité", url: "/accounting", icon: FileText },
     { title: "Analyse", url: "/analytics", icon: BarChart4 },
     { title: "Paramètres", url: "/settings", icon: Settings },
+    { title: "Nous contacter", url: "/contact", icon: Mail },
+    { title: "Conditions générales", url: "/terms", icon: FileTextIcon },
   ];
 
   const handleNavLinkClick = () => {
@@ -66,11 +76,21 @@ const AppSidebar = ({ isOpen = false, onClose }: AppSidebarProps) => {
           : collapsed ? "w-16" : "w-64",
       )}
     >
-      <div className="flex items-center justify-between p-4 border-b">
-        <div className={cn("flex items-center", collapsed && !isMobile && "hidden")}>
-          <span className="text-xl font-bold text-primary">Taxi App</span>
-        </div>
-        {!isMobile && <SidebarTrigger className="ml-2" />}
+      <div className="flex flex-col p-4 border-b">
+        {(!collapsed || isMobile) && (
+          <div className="flex flex-col items-center mb-2">
+            <Avatar className="h-16 w-16 mb-2">
+              <AvatarImage src="/profile-photo.jpg" alt="Driver" />
+              <AvatarFallback>JD</AvatarFallback>
+            </Avatar>
+            <h3 className="font-medium text-base">{driverName}</h3>
+            <div className="flex items-center">
+              <span className="text-sm font-medium text-yellow-500">{driverRating}</span>
+              <span className="text-sm text-yellow-500 ml-1">★</span>
+            </div>
+          </div>
+        )}
+        {!isMobile && <SidebarTrigger className="ml-auto" />}
       </div>
 
       <SidebarContent className="p-2">

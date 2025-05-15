@@ -12,19 +12,21 @@ const AppLayout = () => {
 
   return (
     <SidebarProvider>
-      <div className="flex min-h-screen w-full">
-        {isMobile ? (
+      <div className="flex flex-col h-screen w-full bg-gray-50">
+        {isMobile && (
           <MobileHeader 
             isOpen={sidebarOpen} 
             onToggle={() => setSidebarOpen(!sidebarOpen)}
           />
-        ) : null}
+        )}
         
-        <AppSidebar isOpen={sidebarOpen} onClose={() => setSidebarOpen(false)} />
-        
-        <main className="flex-1 overflow-hidden">
-          <Outlet />
-        </main>
+        <div className="flex flex-1 overflow-hidden">
+          <AppSidebar isOpen={sidebarOpen} onClose={() => setSidebarOpen(false)} />
+          
+          <main className="flex-1 overflow-auto">
+            <Outlet />
+          </main>
+        </div>
       </div>
     </SidebarProvider>
   );
