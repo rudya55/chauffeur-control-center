@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -230,264 +231,266 @@ const ReservationCard = ({
             </>
           )}
 
-          {/* For current and completed reservations, keep the existing detailed format */}
+          {/* For current and completed reservations */}
           {type !== 'upcoming' && (
-            <div className="flex justify-between items-start mb-2">
-              <div>
-                <div className="text-sm text-gray-500">
-                  {formattedDate}
-                </div>
-              </div>
-              <div className="flex items-center gap-2">
-                <Badge className="flex items-center gap-1">
-                  <Flag className="h-3 w-3" />
-                  {reservation.dispatcher}
-                </Badge>
-                
-                {/* Chat button - only show for current reservations */}
-                {type === 'current' && onChatWithDispatcher && (
-                  <Button 
-                    variant="ghost" 
-                    size="icon" 
-                    className="h-8 w-8" 
-                    onClick={handleChatWithDispatcher}
-                  >
-                    <MessageSquare className="h-4 w-4" />
-                  </Button>
-                )}
-              </div>
-            </div>
-
-            <div className="mt-4 space-y-2">
-              <div className="flex items-start gap-2">
-                <MapPin className="h-4 w-4 mt-1 text-primary shrink-0" />
-                <div className="w-full">
-                  <div className="text-sm font-medium">Prise en charge:</div>
-                  <div 
-                    className={`text-sm w-full overflow-ellipsis ${(type === 'current' && (reservation.status === 'accepted' || reservation.status === 'started')) ? 'cursor-pointer hover:text-primary' : ''}`}
-                    onClick={(type === 'current' && (reservation.status === 'accepted' || reservation.status === 'started')) ? () => handleStartNavigation(reservation.pickupAddress) : undefined}
-                  >
-                    {reservation.pickupAddress}
+            <>
+              <div className="flex justify-between items-start mb-2">
+                <div>
+                  <div className="text-sm text-gray-500">
+                    {formattedDate}
                   </div>
                 </div>
-              </div>
-              <div className="flex items-start gap-2">
-                <MapPin className="h-4 w-4 mt-1 text-destructive shrink-0" />
-                <div className="w-full">
-                  <div className="text-sm font-medium">Destination:</div>
-                  <div 
-                    className={`text-sm w-full overflow-ellipsis ${(type === 'current' && (reservation.status === 'accepted' || reservation.status === 'arrived' || reservation.status === 'onBoard' || reservation.status === 'started')) ? 'cursor-pointer hover:text-primary' : ''}`}
-                    onClick={(type === 'current' && (reservation.status === 'accepted' || reservation.status === 'arrived' || reservation.status === 'onBoard' || reservation.status === 'started')) ? () => handleStartNavigation(reservation.destination) : undefined}
-                  >
-                    {reservation.destination}
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            <div className="mt-4 space-y-2">
-              {/* Payment and price information */}
-              {reservation.driverAmount && (
                 <div className="flex items-center gap-2">
-                  {renderPaymentIcon(reservation.paymentType)}
-                  <span className="text-sm">
-                    {reservation.paymentType === 'cash' && "Espèces"}
-                    {reservation.paymentType === 'card' && "Carte bleue"}
-                    {reservation.paymentType === 'transfer' && "Virement"}
-                    {reservation.paymentType === 'paypal' && "PayPal"}
-                    {!reservation.paymentType && "Paiement"} - 
-                    {type === 'upcoming' ? (
-                      <span className="font-medium"> {reservation.driverAmount}€ net chauffeur</span>
-                    ) : (
-                      reservation.paymentType === 'cash' || reservation.paymentType === 'card' ? (
-                        <span> {reservation.amount}€ client / {reservation.commission}€ commission / <span className="font-medium">{reservation.driverAmount}€ net</span></span>
-                      ) : (
-                        <span className="font-medium"> {reservation.driverAmount}€ net chauffeur</span>
-                      )
-                    )}
-                  </span>
-                </div>
-              )}
-
-              {/* Vehicle type */}
-              {reservation.vehicleType && (
-                <div className="flex items-center gap-2">
-                  <CarFront className="h-4 w-4 text-gray-500" />
-                  <span className="text-sm capitalize">
-                    {reservation.vehicleType === 'first-class' ? 'First Class' : reservation.vehicleType}
-                  </span>
-                </div>
-              )}
-
-              {reservation.flightNumber && (
-                <div 
-                  className="flex items-center gap-2 cursor-pointer hover:text-primary"
-                  onClick={() => handleCheckFlight(reservation.flightNumber || '')}
-                >
-                  <Plane className="h-4 w-4 text-gray-500" />
-                  <span className="text-sm">{reservation.flightNumber}</span>
-                </div>
-              )}
-              
-              {/* Display client name on a separate line when it exists and not in upcoming tab */}
-              {reservation.clientName && type !== 'upcoming' && (
-                <div className="flex items-center gap-2">
-                  <Users className="h-4 w-4 text-gray-500" />
-                  <span 
-                    className="text-sm cursor-pointer hover:text-primary"
-                    onClick={() => handleShowPassenger(reservation.clientName)}
-                  >
-                    {reservation.clientName}
-                  </span>
-                </div>
-              )}
-
-              {reservation.passengers && (
-                <div className="flex items-center gap-2">
-                  <Users className="h-4 w-4 text-gray-500" />
-                  <span className="text-sm">{reservation.passengers} personne{reservation.passengers > 1 ? 's' : ''}</span>
-                </div>
-              )}
-              
-              {reservation.luggage && (
-                <div className="flex items-center gap-2">
-                  <Luggage className="h-4 w-4 text-gray-500" />
-                  <span className="text-sm">{reservation.luggage} bagage{reservation.luggage > 1 ? 's' : ''}</span>
-                </div>
-              )}
-            </div>
-
-            {type === 'upcoming' && (
-              <div className="mt-4 flex gap-2">
-                <Button 
-                  variant="outline" 
-                  className="flex-1 bg-secondary/10 hover:bg-secondary/20 border-secondary/30"
-                  onClick={() => onAccept?.(reservation.id)}
-                >
-                  <Check className="mr-2 h-4 w-4" />
-                  Accepter
-                </Button>
-                <Button 
-                  variant="outline" 
-                  className="flex-1 bg-destructive/10 hover:bg-destructive/20 border-destructive/30"
-                  onClick={() => onReject?.(reservation.id)}
-                >
-                  <X className="mr-2 h-4 w-4" />
-                  Refuser
-                </Button>
-              </div>
-            )}
-
-            {type === 'current' && (
-              <div className="mt-4 flex flex-col gap-2">
-                {reservation.status === 'accepted' && (
-                  <>
-                    {targetTime && (
-                      <div className={`flex justify-center py-2 ${canStartNow ? 'text-green-800' : ''}`}>
-                        <CircularTimer 
-                          targetTime={targetTime} 
-                          onTimeReached={handleTimerComplete} 
-                          durationInSeconds={10}
-                        />
-                      </div>
-                    )}
+                  <Badge className="flex items-center gap-1">
+                    <Flag className="h-3 w-3" />
+                    {reservation.dispatcher}
+                  </Badge>
+                  
+                  {/* Chat button - only show for current reservations */}
+                  {type === 'current' && onChatWithDispatcher && (
                     <Button 
-                      variant="default" 
-                      className="w-full bg-primary"
-                      onClick={() => onStartRide?.(reservation.id)}
-                      disabled={!canStartNow}
+                      variant="ghost" 
+                      size="icon" 
+                      className="h-8 w-8" 
+                      onClick={handleChatWithDispatcher}
                     >
-                      <Clock className="mr-2 h-4 w-4" />
-                      Démarrer la course
+                      <MessageSquare className="h-4 w-4" />
                     </Button>
-                  </>
-                )}
-                
-                {reservation.status === 'started' && (
-                  <Button 
-                    variant="default" 
-                    className="w-full bg-blue-500 hover:bg-blue-600"
-                    onClick={() => onArrived?.(reservation.id)}
-                  >
-                    <MapPin className="mr-2 h-4 w-4" />
-                    Arrivé au point de prise en charge
-                  </Button>
-                )}
-                
-                {reservation.status === 'arrived' && (
-                  <Button 
-                    variant="default" 
-                    className="w-full bg-green-500 hover:bg-green-600"
-                    onClick={() => onClientBoarded?.(reservation.id)}
-                  >
-                    <Users className="mr-2 h-4 w-4" />
-                    Client à bord
-                  </Button>
-                )}
-                
-                {reservation.status === 'onBoard' && (
-                  <Button 
-                    variant="default" 
-                    className="w-full bg-red-500 hover:bg-red-600"
-                    onClick={handleCompleteRide}
-                  >
-                    <Check className="mr-2 h-4 w-4" />
-                    Terminer la course
-                  </Button>
-                )}
-              </div>
-            )}
-
-            {type === 'completed' && (
-              <div className="mt-4 border-t pt-3">
-                <div className="grid grid-cols-3 gap-2">
-                  <div className="text-center">
-                    <div className="text-xs text-gray-500">Distance</div>
-                    <div className="font-medium">{reservation.distance}</div>
-                  </div>
-                  <div className="text-center">
-                    <div className="text-xs text-gray-500">Durée</div>
-                    <div className="font-medium">{reservation.duration}</div>
-                  </div>
-                  <div className="text-center">
-                    <div className="text-xs text-gray-500">Montant</div>
-                    <div className="font-medium">{reservation.amount} €</div>
-                  </div>
+                  )}
                 </div>
-                
-                {reservation.rating && (
-                  <div className="mt-3 flex items-center justify-center">
-                    <div className="text-xs text-gray-500 mr-2">Évaluation:</div>
-                    <div className="flex">
-                      {Array(5).fill(0).map((_, i) => (
-                        <Star 
-                          key={i} 
-                          className={`h-4 w-4 ${i < (reservation.rating || 0) ? 'text-yellow-500 fill-yellow-500' : 'text-gray-300'}`} 
-                        />
-                      ))}
+              </div>
+
+              <div className="mt-4 space-y-2">
+                <div className="flex items-start gap-2">
+                  <MapPin className="h-4 w-4 mt-1 text-primary shrink-0" />
+                  <div className="w-full">
+                    <div className="text-sm font-medium">Prise en charge:</div>
+                    <div 
+                      className={`text-sm w-full overflow-ellipsis ${(type === 'current' && (reservation.status === 'accepted' || reservation.status === 'started')) ? 'cursor-pointer hover:text-primary' : ''}`}
+                      onClick={(type === 'current' && (reservation.status === 'accepted' || reservation.status === 'started')) ? () => handleStartNavigation(reservation.pickupAddress) : undefined}
+                    >
+                      {reservation.pickupAddress}
                     </div>
                   </div>
+                </div>
+                <div className="flex items-start gap-2">
+                  <MapPin className="h-4 w-4 mt-1 text-destructive shrink-0" />
+                  <div className="w-full">
+                    <div className="text-sm font-medium">Destination:</div>
+                    <div 
+                      className={`text-sm w-full overflow-ellipsis ${(type === 'current' && (reservation.status === 'accepted' || reservation.status === 'arrived' || reservation.status === 'onBoard' || reservation.status === 'started')) ? 'cursor-pointer hover:text-primary' : ''}`}
+                      onClick={(type === 'current' && (reservation.status === 'accepted' || reservation.status === 'arrived' || reservation.status === 'onBoard' || reservation.status === 'started')) ? () => handleStartNavigation(reservation.destination) : undefined}
+                    >
+                      {reservation.destination}
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div className="mt-4 space-y-2">
+                {/* Payment and price information */}
+                {reservation.driverAmount && (
+                  <div className="flex items-center gap-2">
+                    {renderPaymentIcon(reservation.paymentType)}
+                    <span className="text-sm">
+                      {reservation.paymentType === 'cash' && "Espèces"}
+                      {reservation.paymentType === 'card' && "Carte bleue"}
+                      {reservation.paymentType === 'transfer' && "Virement"}
+                      {reservation.paymentType === 'paypal' && "PayPal"}
+                      {!reservation.paymentType && "Paiement"} - 
+                      {type === 'upcoming' ? (
+                        <span className="font-medium"> {reservation.driverAmount}€ net chauffeur</span>
+                      ) : (
+                        reservation.paymentType === 'cash' || reservation.paymentType === 'card' ? (
+                          <span> {reservation.amount}€ client / {reservation.commission}€ commission / <span className="font-medium">{reservation.driverAmount}€ net</span></span>
+                        ) : (
+                          <span className="font-medium"> {reservation.driverAmount}€ net chauffeur</span>
+                        )
+                      )}
+                    </span>
+                  </div>
                 )}
-                
-                {reservation.comment && (
-                  <div className="mt-2 text-sm text-gray-600">
-                    <p className="italic">"{reservation.comment}"</p>
+
+                {/* Vehicle type */}
+                {reservation.vehicleType && (
+                  <div className="flex items-center gap-2">
+                    <CarFront className="h-4 w-4 text-gray-500" />
+                    <span className="text-sm capitalize">
+                      {reservation.vehicleType === 'first-class' ? 'First Class' : reservation.vehicleType}
+                    </span>
+                  </div>
+                )}
+
+                {reservation.flightNumber && (
+                  <div 
+                    className="flex items-center gap-2 cursor-pointer hover:text-primary"
+                    onClick={() => handleCheckFlight(reservation.flightNumber || '')}
+                  >
+                    <Plane className="h-4 w-4 text-gray-500" />
+                    <span className="text-sm">{reservation.flightNumber}</span>
                   </div>
                 )}
                 
-                {/* Carte avec l'itinéraire pour les courses terminées */}
-                {reservation.route && (
-                  <div className="mt-3 h-40 rounded-md overflow-hidden">
-                    <Map 
-                      className="w-full h-full" 
-                      center={reservation.route[0]}
-                      zoom={14}
-                      route={reservation.route}
-                    />
+                {/* Display client name on a separate line when it exists and not in upcoming tab */}
+                {reservation.clientName && type !== 'upcoming' && (
+                  <div className="flex items-center gap-2">
+                    <Users className="h-4 w-4 text-gray-500" />
+                    <span 
+                      className="text-sm cursor-pointer hover:text-primary"
+                      onClick={() => handleShowPassenger(reservation.clientName)}
+                    >
+                      {reservation.clientName}
+                    </span>
+                  </div>
+                )}
+
+                {reservation.passengers && (
+                  <div className="flex items-center gap-2">
+                    <Users className="h-4 w-4 text-gray-500" />
+                    <span className="text-sm">{reservation.passengers} personne{reservation.passengers > 1 ? 's' : ''}</span>
+                  </div>
+                )}
+                
+                {reservation.luggage && (
+                  <div className="flex items-center gap-2">
+                    <Luggage className="h-4 w-4 text-gray-500" />
+                    <span className="text-sm">{reservation.luggage} bagage{reservation.luggage > 1 ? 's' : ''}</span>
                   </div>
                 )}
               </div>
-            )}
+
+              {type === 'upcoming' && (
+                <div className="mt-4 flex gap-2">
+                  <Button 
+                    variant="outline" 
+                    className="flex-1 bg-secondary/10 hover:bg-secondary/20 border-secondary/30"
+                    onClick={() => onAccept?.(reservation.id)}
+                  >
+                    <Check className="mr-2 h-4 w-4" />
+                    Accepter
+                  </Button>
+                  <Button 
+                    variant="outline" 
+                    className="flex-1 bg-destructive/10 hover:bg-destructive/20 border-destructive/30"
+                    onClick={() => onReject?.(reservation.id)}
+                  >
+                    <X className="mr-2 h-4 w-4" />
+                    Refuser
+                  </Button>
+                </div>
+              )}
+
+              {type === 'current' && (
+                <div className="mt-4 flex flex-col gap-2">
+                  {reservation.status === 'accepted' && (
+                    <>
+                      {targetTime && (
+                        <div className={`flex justify-center py-2 ${canStartNow ? 'text-green-800' : ''}`}>
+                          <CircularTimer 
+                            targetTime={targetTime} 
+                            onTimeReached={handleTimerComplete} 
+                            durationInSeconds={10}
+                          />
+                        </div>
+                      )}
+                      <Button 
+                        variant="default" 
+                        className="w-full bg-primary"
+                        onClick={() => onStartRide?.(reservation.id)}
+                        disabled={!canStartNow}
+                      >
+                        <Clock className="mr-2 h-4 w-4" />
+                        Démarrer la course
+                      </Button>
+                    </>
+                  )}
+                  
+                  {reservation.status === 'started' && (
+                    <Button 
+                      variant="default" 
+                      className="w-full bg-blue-500 hover:bg-blue-600"
+                      onClick={() => onArrived?.(reservation.id)}
+                    >
+                      <MapPin className="mr-2 h-4 w-4" />
+                      Arrivé au point de prise en charge
+                    </Button>
+                  )}
+                  
+                  {reservation.status === 'arrived' && (
+                    <Button 
+                      variant="default" 
+                      className="w-full bg-green-500 hover:bg-green-600"
+                      onClick={() => onClientBoarded?.(reservation.id)}
+                    >
+                      <Users className="mr-2 h-4 w-4" />
+                      Client à bord
+                    </Button>
+                  )}
+                  
+                  {reservation.status === 'onBoard' && (
+                    <Button 
+                      variant="default" 
+                      className="w-full bg-red-500 hover:bg-red-600"
+                      onClick={handleCompleteRide}
+                    >
+                      <Check className="mr-2 h-4 w-4" />
+                      Terminer la course
+                    </Button>
+                  )}
+                </div>
+              )}
+
+              {type === 'completed' && (
+                <div className="mt-4 border-t pt-3">
+                  <div className="grid grid-cols-3 gap-2">
+                    <div className="text-center">
+                      <div className="text-xs text-gray-500">Distance</div>
+                      <div className="font-medium">{reservation.distance}</div>
+                    </div>
+                    <div className="text-center">
+                      <div className="text-xs text-gray-500">Durée</div>
+                      <div className="font-medium">{reservation.duration}</div>
+                    </div>
+                    <div className="text-center">
+                      <div className="text-xs text-gray-500">Montant</div>
+                      <div className="font-medium">{reservation.amount} €</div>
+                    </div>
+                  </div>
+                  
+                  {reservation.rating && (
+                    <div className="mt-3 flex items-center justify-center">
+                      <div className="text-xs text-gray-500 mr-2">Évaluation:</div>
+                      <div className="flex">
+                        {Array(5).fill(0).map((_, i) => (
+                          <Star 
+                            key={i} 
+                            className={`h-4 w-4 ${i < (reservation.rating || 0) ? 'text-yellow-500 fill-yellow-500' : 'text-gray-300'}`} 
+                          />
+                        ))}
+                      </div>
+                    </div>
+                  )}
+                  
+                  {reservation.comment && (
+                    <div className="mt-2 text-sm text-gray-600">
+                      <p className="italic">"{reservation.comment}"</p>
+                    </div>
+                  )}
+                  
+                  {/* Carte avec l'itinéraire pour les courses terminées */}
+                  {reservation.route && (
+                    <div className="mt-3 h-40 rounded-md overflow-hidden">
+                      <Map 
+                        className="w-full h-full" 
+                        center={reservation.route[0]}
+                        zoom={14}
+                        route={reservation.route}
+                      />
+                    </div>
+                  )}
+                </div>
+              )}
+            </>
           )}
         </CardContent>
       </Card>
