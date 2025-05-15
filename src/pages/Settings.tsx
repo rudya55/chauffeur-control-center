@@ -65,9 +65,28 @@ const passwordFormSchema = z.object({
   path: ["confirmPassword"],
 });
 
+const notificationsFormSchema = z.object({
+  appNotifications: z.object({
+    newReservation: z.boolean().default(true),
+    reservationReminder: z.boolean().default(true),
+    flightStatus: z.boolean().default(true),
+    promotions: z.boolean().default(false),
+  }),
+  emailNotifications: z.object({
+    reservations: z.boolean().default(true),
+    payments: z.boolean().default(true),
+    news: z.boolean().default(false),
+  }),
+  smsNotifications: z.object({
+    urgentReservations: z.boolean().default(true),
+    security: z.boolean().default(true),
+  }),
+});
+
 type ProfileFormValues = z.infer<typeof profileFormSchema>;
 type VehicleFormValues = z.infer<typeof vehicleFormSchema>;
 type PasswordFormValues = z.infer<typeof passwordFormSchema>;
+type NotificationsFormValues = z.infer<typeof notificationsFormSchema>;
 
 const defaultValues: Partial<ProfileFormValues> = {
   name: "Jean Martin",
@@ -86,6 +105,24 @@ const defaultPasswordValues: Partial<PasswordFormValues> = {
   currentPassword: "",
   newPassword: "",
   confirmPassword: "",
+};
+
+const defaultNotificationValues: NotificationsFormValues = {
+  appNotifications: {
+    newReservation: true,
+    reservationReminder: true,
+    flightStatus: true,
+    promotions: false,
+  },
+  emailNotifications: {
+    reservations: true,
+    payments: true,
+    news: false,
+  },
+  smsNotifications: {
+    urgentReservations: true,
+    security: true,
+  },
 };
 
 const Settings = () => {
@@ -112,6 +149,12 @@ const Settings = () => {
     mode: "onChange",
   });
 
+  const notificationsForm = useForm<NotificationsFormValues>({
+    resolver: zodResolver(notificationsFormSchema),
+    defaultValues: defaultNotificationValues,
+    mode: "onChange",
+  });
+
   function onSubmit(data: ProfileFormValues) {
     toast({
       title: "Profil mis à jour",
@@ -134,6 +177,13 @@ const Settings = () => {
       description: "Votre mot de passe a été modifié avec succès",
     });
     passwordForm.reset();
+  }
+
+  function onNotificationsSubmit(data: NotificationsFormValues) {
+    toast({
+      title: "Préférences de notification mises à jour",
+      description: "Vos préférences de notification ont été enregistrées",
+    });
   }
 
   function handleVehicleStatusChange(checked: boolean) {
@@ -175,7 +225,6 @@ const Settings = () => {
           <TabsTrigger value="security">Sécurité</TabsTrigger>
           <TabsTrigger value="notifications">Notifications</TabsTrigger>
         </TabsList>
-        
         
         <TabsContent value="profile" className="mt-4 space-y-4">
           <Card>
@@ -655,102 +704,221 @@ const Settings = () => {
               </div>
             </CardHeader>
             <CardContent className="space-y-6">
-              <h3 className="text-lg font-medium">Notifications de l'application</h3>
-              <div className="space-y-4">
-                <div className="flex items-center justify-between">
-                  <div className="space-y-0.5">
-                    <Label htmlFor="new_reservation">Nouvelles réservations</Label>
-                    <FormDescription>
-                      Recevez des notifications pour les nouvelles réservations
-                    </FormDescription>
+              <Form {...notificationsForm}>
+                <form onSubmit={notificationsForm.handleSubmit(onNotificationsSubmit)} className="space-y-8">
+                  <div className="space-y-4">
+                    <h3 className="text-lg font-medium">Notifications de l'application</h3>
+                    
+                    <FormField
+                      control={notificationsForm.control}
+                      name="appNotifications.newReservation"
+                      render={({ field }) => (
+                        <FormItem className="flex items-center justify-between space-y-0">
+                          <div className="space-y-0.5">
+                            <FormLabel htmlFor="new_reservation">Nouvelles réservations</FormLabel>
+                            <FormDescription>
+                              Recevez des notifications pour les nouvelles réservations
+                            </FormDescription>
+                          </div>
+                          <FormControl>
+                            <Switch 
+                              id="new_reservation"
+                              checked={field.value}
+                              onCheckedChange={field.onChange}
+                            />
+                          </FormControl>
+                        </FormItem>
+                      )}
+                    />
+                    
+                    <FormField
+                      control={notificationsForm.control}
+                      name="appNotifications.reservationReminder"
+                      render={({ field }) => (
+                        <FormItem className="flex items-center justify-between space-y-0">
+                          <div className="space-y-0.5">
+                            <FormLabel htmlFor="reservation_reminder">Rappels de réservation</FormLabel>
+                            <FormDescription>
+                              Recevez des rappels 1 heure avant vos réservations
+                            </FormDescription>
+                          </div>
+                          <FormControl>
+                            <Switch 
+                              id="reservation_reminder"
+                              checked={field.value}
+                              onCheckedChange={field.onChange}
+                            />
+                          </FormControl>
+                        </FormItem>
+                      )}
+                    />
+                    
+                    <FormField
+                      control={notificationsForm.control}
+                      name="appNotifications.flightStatus"
+                      render={({ field }) => (
+                        <FormItem className="flex items-center justify-between space-y-0">
+                          <div className="space-y-0.5">
+                            <FormLabel htmlFor="flight_status">Mises à jour des vols</FormLabel>
+                            <FormDescription>
+                              Recevez des notifications sur les changements de statut des vols
+                            </FormDescription>
+                          </div>
+                          <FormControl>
+                            <Switch 
+                              id="flight_status"
+                              checked={field.value}
+                              onCheckedChange={field.onChange}
+                            />
+                          </FormControl>
+                        </FormItem>
+                      )}
+                    />
+                    
+                    <FormField
+                      control={notificationsForm.control}
+                      name="appNotifications.promotions"
+                      render={({ field }) => (
+                        <FormItem className="flex items-center justify-between space-y-0">
+                          <div className="space-y-0.5">
+                            <FormLabel htmlFor="promotions">Promotions et actualités</FormLabel>
+                            <FormDescription>
+                              Recevez des informations sur les promotions et les actualités
+                            </FormDescription>
+                          </div>
+                          <FormControl>
+                            <Switch 
+                              id="promotions"
+                              checked={field.value}
+                              onCheckedChange={field.onChange}
+                            />
+                          </FormControl>
+                        </FormItem>
+                      )}
+                    />
                   </div>
-                  <Switch id="new_reservation" defaultChecked />
-                </div>
-                <div className="flex items-center justify-between">
-                  <div className="space-y-0.5">
-                    <Label htmlFor="reservation_reminder">Rappels de réservation</Label>
-                    <FormDescription>
-                      Recevez des rappels 1 heure avant vos réservations
-                    </FormDescription>
+                  
+                  <div className="space-y-4 border-t pt-6">
+                    <h3 className="text-lg font-medium">Notifications par email</h3>
+                    
+                    <FormField
+                      control={notificationsForm.control}
+                      name="emailNotifications.reservations"
+                      render={({ field }) => (
+                        <FormItem className="flex items-center justify-between space-y-0">
+                          <div className="space-y-0.5">
+                            <FormLabel htmlFor="email_reservations">Réservations</FormLabel>
+                            <FormDescription>
+                              Recevez un email pour chaque nouvelle réservation
+                            </FormDescription>
+                          </div>
+                          <FormControl>
+                            <Switch 
+                              id="email_reservations"
+                              checked={field.value}
+                              onCheckedChange={field.onChange}
+                            />
+                          </FormControl>
+                        </FormItem>
+                      )}
+                    />
+                    
+                    <FormField
+                      control={notificationsForm.control}
+                      name="emailNotifications.payments"
+                      render={({ field }) => (
+                        <FormItem className="flex items-center justify-between space-y-0">
+                          <div className="space-y-0.5">
+                            <FormLabel htmlFor="email_payments">Paiements</FormLabel>
+                            <FormDescription>
+                              Recevez un email pour chaque nouveau paiement
+                            </FormDescription>
+                          </div>
+                          <FormControl>
+                            <Switch 
+                              id="email_payments"
+                              checked={field.value}
+                              onCheckedChange={field.onChange}
+                            />
+                          </FormControl>
+                        </FormItem>
+                      )}
+                    />
+                    
+                    <FormField
+                      control={notificationsForm.control}
+                      name="emailNotifications.news"
+                      render={({ field }) => (
+                        <FormItem className="flex items-center justify-between space-y-0">
+                          <div className="space-y-0.5">
+                            <FormLabel htmlFor="email_news">Actualités</FormLabel>
+                            <FormDescription>
+                              Recevez notre newsletter mensuelle
+                            </FormDescription>
+                          </div>
+                          <FormControl>
+                            <Switch 
+                              id="email_news"
+                              checked={field.value}
+                              onCheckedChange={field.onChange}
+                            />
+                          </FormControl>
+                        </FormItem>
+                      )}
+                    />
                   </div>
-                  <Switch id="reservation_reminder" defaultChecked />
-                </div>
-                <div className="flex items-center justify-between">
-                  <div className="space-y-0.5">
-                    <Label htmlFor="flight_status">Mises à jour des vols</Label>
-                    <FormDescription>
-                      Recevez des notifications sur les changements de statut des vols
-                    </FormDescription>
+                  
+                  <div className="space-y-4 border-t pt-6">
+                    <h3 className="text-lg font-medium">Notifications SMS</h3>
+                    
+                    <FormField
+                      control={notificationsForm.control}
+                      name="smsNotifications.urgentReservations"
+                      render={({ field }) => (
+                        <FormItem className="flex items-center justify-between space-y-0">
+                          <div className="space-y-0.5">
+                            <FormLabel htmlFor="sms_reservations">Réservations urgentes</FormLabel>
+                            <FormDescription>
+                              Recevez un SMS pour les réservations à court terme
+                            </FormDescription>
+                          </div>
+                          <FormControl>
+                            <Switch 
+                              id="sms_reservations"
+                              checked={field.value}
+                              onCheckedChange={field.onChange}
+                            />
+                          </FormControl>
+                        </FormItem>
+                      )}
+                    />
+                    
+                    <FormField
+                      control={notificationsForm.control}
+                      name="smsNotifications.security"
+                      render={({ field }) => (
+                        <FormItem className="flex items-center justify-between space-y-0">
+                          <div className="space-y-0.5">
+                            <FormLabel htmlFor="sms_security">Alertes de sécurité</FormLabel>
+                            <FormDescription>
+                              Recevez un SMS pour les connexions depuis un nouvel appareil
+                            </FormDescription>
+                          </div>
+                          <FormControl>
+                            <Switch 
+                              id="sms_security"
+                              checked={field.value}
+                              onCheckedChange={field.onChange}
+                            />
+                          </FormControl>
+                        </FormItem>
+                      )}
+                    />
                   </div>
-                  <Switch id="flight_status" defaultChecked />
-                </div>
-                <div className="flex items-center justify-between">
-                  <div className="space-y-0.5">
-                    <Label htmlFor="promotions">Promotions et actualités</Label>
-                    <FormDescription>
-                      Recevez des informations sur les promotions et les actualités
-                    </FormDescription>
-                  </div>
-                  <Switch id="promotions" />
-                </div>
-              </div>
-              
-              <div className="space-y-4 border-t pt-6">
-                <h3 className="text-lg font-medium">Notifications par email</h3>
-                <div className="space-y-4">
-                  <div className="flex items-center justify-between">
-                    <div className="space-y-0.5">
-                      <Label htmlFor="email_reservations">Réservations</Label>
-                      <FormDescription>
-                        Recevez un email pour chaque nouvelle réservation
-                      </FormDescription>
-                    </div>
-                    <Switch id="email_reservations" defaultChecked />
-                  </div>
-                  <div className="flex items-center justify-between">
-                    <div className="space-y-0.5">
-                      <Label htmlFor="email_payments">Paiements</Label>
-                      <FormDescription>
-                        Recevez un email pour chaque nouveau paiement
-                      </FormDescription>
-                    </div>
-                    <Switch id="email_payments" defaultChecked />
-                  </div>
-                  <div className="flex items-center justify-between">
-                    <div className="space-y-0.5">
-                      <Label htmlFor="email_news">Actualités</Label>
-                      <FormDescription>
-                        Recevez notre newsletter mensuelle
-                      </FormDescription>
-                    </div>
-                    <Switch id="email_news" />
-                  </div>
-                </div>
-              </div>
-              
-              <div className="space-y-4 border-t pt-6">
-                <h3 className="text-lg font-medium">Notifications SMS</h3>
-                <div className="space-y-4">
-                  <div className="flex items-center justify-between">
-                    <div className="space-y-0.5">
-                      <Label htmlFor="sms_reservations">Réservations urgentes</Label>
-                      <FormDescription>
-                        Recevez un SMS pour les réservations à court terme
-                      </FormDescription>
-                    </div>
-                    <Switch id="sms_reservations" defaultChecked />
-                  </div>
-                  <div className="flex items-center justify-between">
-                    <div className="space-y-0.5">
-                      <Label htmlFor="sms_security">Alertes de sécurité</Label>
-                      <FormDescription>
-                        Recevez un SMS pour les connexions depuis un nouvel appareil
-                      </FormDescription>
-                    </div>
-                    <Switch id="sms_security" defaultChecked />
-                  </div>
-                </div>
-              </div>
+                  
+                  <Button type="submit">Enregistrer les préférences</Button>
+                </form>
+              </Form>
             </CardContent>
           </Card>
         </TabsContent>
