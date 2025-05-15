@@ -22,6 +22,7 @@ import {
   CalendarIcon,
   X,
 } from "lucide-react";
+import { Badge } from "@/components/ui/badge";
 
 interface Event {
   id: string;
