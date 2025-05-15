@@ -42,15 +42,33 @@ const FormField = <
 const useFormField = () => {
   const fieldContext = React.useContext(FormFieldContext)
   const itemContext = React.useContext(FormItemContext)
-  const { getFieldState, formState } = useFormContext()
-
-  const fieldState = getFieldState(fieldContext.name, formState)
-
+  
+  // Check if the context exists before destructuring
+  const formContext = useFormContext()
+  
   if (!fieldContext) {
     throw new Error("useFormField should be used within <FormField>")
   }
+  
+  if (!formContext) {
+    // Return default values when not within a form context
+    return {
+      id: itemContext?.id || "",
+      name: fieldContext.name,
+      formItemId: `${itemContext?.id || ""}-form-item`,
+      formDescriptionId: `${itemContext?.id || ""}-form-item-description`,
+      formMessageId: `${itemContext?.id || ""}-form-item-message`,
+      invalid: false,
+      isDirty: false,
+      isTouched: false,
+    }
+  }
 
-  const { id } = itemContext
+  // If form context exists, then use it
+  const { getFieldState, formState } = formContext
+  const fieldState = getFieldState(fieldContext.name, formState)
+
+  const { id } = itemContext || { id: "" }
 
   return {
     id,
@@ -66,9 +84,7 @@ type FormItemContextValue = {
   id: string
 }
 
-const FormItemContext = React.createContext<FormItemContextValue>(
-  {} as FormItemContextValue
-)
+const FormItemContext = React.createContext<FormItemContextValue | undefined>(undefined)
 
 const FormItem = React.forwardRef<
   HTMLDivElement,
