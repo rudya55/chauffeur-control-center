@@ -6,7 +6,7 @@ type SupportedLanguages = "fr" | "en" | "es" | "de" | "it";
 type LanguageContextType = {
   language: SupportedLanguages;
   setLanguage: (language: SupportedLanguages) => void;
-  t: (key: string) => string;
+  t: (key: string) => string | Record<string, any>;
 };
 
 const defaultLanguage = "fr";
@@ -26,7 +26,7 @@ export const LanguageProvider = ({ children }: { children: ReactNode }) => {
     return (savedLanguage as SupportedLanguages) || defaultLanguage;
   });
   
-  const [translations, setTranslations] = useState<Record<string, string>>({});
+  const [translations, setTranslations] = useState<Record<string, any>>({});
 
   useEffect(() => {
     // Save to localStorage whenever language changes
@@ -43,8 +43,20 @@ export const LanguageProvider = ({ children }: { children: ReactNode }) => {
       });
   }, [language]);
 
-  const t = (key: string): string => {
-    return translations[key] || key;
+  // Helper function to get nested translations using dot notation
+  const t = (key: string): string | Record<string, any> => {
+    const keys = key.split('.');
+    let current = translations;
+    
+    for (let i = 0; i < keys.length; i++) {
+      if (current === undefined || current === null) {
+        return key;
+      }
+      
+      current = current[keys[i]];
+    }
+    
+    return current !== undefined ? current : key;
   };
 
   return (
