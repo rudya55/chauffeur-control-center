@@ -209,14 +209,12 @@ const ReservationCard = ({
                 onClick={() => handleCheckFlight(reservation.flightNumber || '')}
               >
                 <Plane className="h-4 w-4 text-gray-500" />
-                <span className="text-sm">
-                  {reservation.flightNumber} 
-                  {reservation.clientName && <span className="ml-2">- {reservation.clientName}</span>}
-                </span>
+                <span className="text-sm">{reservation.flightNumber}</span>
               </div>
             )}
             
-            {!reservation.flightNumber && reservation.clientName && type !== 'upcoming' && (
+            {/* Display client name on a separate line when it exists and not in upcoming tab */}
+            {reservation.clientName && type !== 'upcoming' && (
               <div className="flex items-center gap-2">
                 <Users className="h-4 w-4 text-gray-500" />
                 <span 

@@ -43,34 +43,34 @@ const invoices = [
 
 // Mock data for charts
 const dailyData = [
-  { day: "Lun", revenue: 85, rides: 4 },
-  { day: "Mar", revenue: 120, rides: 5 },
-  { day: "Mer", revenue: 70, rides: 3 },
-  { day: "Jeu", revenue: 95, rides: 4 },
-  { day: "Ven", revenue: 150, rides: 7 },
-  { day: "Sam", revenue: 200, rides: 10 },
-  { day: "Dim", revenue: 180, rides: 8 }
+  { day: "Lun", revenue: 85, rides: 4, label: "85,00 €" },
+  { day: "Mar", revenue: 120, rides: 5, label: "120,00 €" },
+  { day: "Mer", revenue: 70, rides: 3, label: "70,00 €" },
+  { day: "Jeu", revenue: 95, rides: 4, label: "95,00 €" },
+  { day: "Ven", revenue: 150, rides: 7, label: "150,00 €" },
+  { day: "Sam", revenue: 200, rides: 10, label: "200,00 €" },
+  { day: "Dim", revenue: 180, rides: 8, label: "180,00 €" }
 ];
 
 const monthlyData = [
-  { month: "Jan", revenue: 1200, rides: 45 },
-  { month: "Fév", revenue: 1350, rides: 50 },
-  { month: "Mar", revenue: 1500, rides: 55 },
-  { month: "Avr", revenue: 1400, rides: 52 },
-  { month: "Mai", revenue: 1650, rides: 63 },
-  { month: "Juin", revenue: 1800, rides: 70 },
-  { month: "Juil", revenue: 2000, rides: 78 },
-  { month: "Août", revenue: 2100, rides: 80 },
-  { month: "Sep", revenue: 1900, rides: 75 },
-  { month: "Oct", revenue: 1700, rides: 65 },
-  { month: "Nov", revenue: 1550, rides: 58 },
-  { month: "Déc", revenue: 1800, rides: 72 }
+  { month: "Jan", revenue: 1200, rides: 45, label: "1200,00 €" },
+  { month: "Fév", revenue: 1350, rides: 50, label: "1350,00 €" },
+  { month: "Mar", revenue: 1500, rides: 55, label: "1500,00 €" },
+  { month: "Avr", revenue: 1400, rides: 52, label: "1400,00 €" },
+  { month: "Mai", revenue: 1650, rides: 63, label: "1650,00 €" },
+  { month: "Juin", revenue: 1800, rides: 70, label: "1800,00 €" },
+  { month: "Juil", revenue: 2000, rides: 78, label: "2000,00 €" },
+  { month: "Août", revenue: 2100, rides: 80, label: "2100,00 €" },
+  { month: "Sep", revenue: 1900, rides: 75, label: "1900,00 €" },
+  { month: "Oct", revenue: 1700, rides: 65, label: "1700,00 €" },
+  { month: "Nov", revenue: 1550, rides: 58, label: "1550,00 €" },
+  { month: "Déc", revenue: 1800, rides: 72, label: "1800,00 €" }
 ];
 
 const yearlyData = [
-  { year: "2023", revenue: 18500, rides: 720 },
-  { year: "2024", revenue: 21000, rides: 810 },
-  { year: "2025", revenue: 7500, rides: 290 }
+  { year: "2023", revenue: 18500, rides: 720, label: "18500,00 €" },
+  { year: "2024", revenue: 21000, rides: 810, label: "21000,00 €" },
+  { year: "2025", revenue: 7500, rides: 290, label: "7500,00 €" }
 ];
 
 const Accounting = () => {
@@ -100,6 +100,30 @@ const Accounting = () => {
 
   const formatEuro = (value: number) => `${value.toFixed(2)} €`;
 
+  // Get today's revenue
+  const getTodayRevenue = () => {
+    // Assuming today is Thursday (index 3 in our dailyData array)
+    const todayIndex = new Date().getDay() - 1; // 0 = Monday in our data
+    const adjustedIndex = todayIndex < 0 ? 6 : todayIndex; // Handle Sunday
+    return dailyData[adjustedIndex].revenue;
+  };
+
+  const todayRevenue = getTodayRevenue();
+
+  // Custom tooltip formatter for charts to display revenue labels
+  const CustomTooltip = (props: any) => {
+    const { active, payload } = props;
+    if (active && payload && payload.length) {
+      return (
+        <div className="bg-white p-2 border rounded shadow-sm">
+          <p className="font-medium">{formatEuro(payload[0].value)}</p>
+          {payload[1] && <p className="text-sm">{payload[1].value} courses</p>}
+        </div>
+      );
+    }
+    return null;
+  };
+
   return (
     <div className="space-y-4">
       <h1 className="text-2xl font-bold tracking-tight">Comptabilité</h1>
@@ -107,12 +131,12 @@ const Accounting = () => {
       <div className="grid gap-4 md:grid-cols-3">
         <Card>
           <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium">Revenus ce mois</CardTitle>
+            <CardTitle className="text-sm font-medium">Revenus aujourd'hui</CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">313,45 €</div>
+            <div className="text-2xl font-bold">{formatEuro(todayRevenue)}</div>
             <p className="text-xs text-muted-foreground">
-              +12.5% par rapport au mois dernier
+              {new Date().toLocaleDateString('fr-FR', { weekday: 'long' })}
             </p>
           </CardContent>
         </Card>
@@ -173,6 +197,18 @@ const Accounting = () => {
                   className="h-full"
                 />
               </div>
+              
+              {/* Daily figures in a grid */}
+              <div className="grid grid-cols-7 gap-2 mt-4 mb-4">
+                {dailyData.map((day) => (
+                  <div key={day.day} className="p-2 rounded-md bg-slate-50 text-center">
+                    <div className="font-medium">{day.day}</div>
+                    <div className="text-sm">{formatEuro(day.revenue)}</div>
+                    <div className="text-xs text-muted-foreground">{day.rides} courses</div>
+                  </div>
+                ))}
+              </div>
+              
               <div className="h-48 mt-4">
                 <BarChart 
                   data={dailyData}
