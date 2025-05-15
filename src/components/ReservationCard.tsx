@@ -73,10 +73,10 @@ const ReservationCard = ({
   });
 
   useEffect(() => {
-    // Update the timer for accepted reservations - RACCOURCI à 4 secondes pour les tests
+    // Update the timer for accepted reservations - 4 seconds for testing
     if (reservation.status === 'accepted') {
       const rideTime = new Date(reservation.date).getTime();
-      // 4 secondes avant l'heure au lieu de 2 heures
+      // 4 seconds before the ride time
       const testTimeBeforeMs = rideTime - (4 * 1000);
       
       const updateTimer = () => {
@@ -136,10 +136,10 @@ const ReservationCard = ({
   };
 
   const canStartRide = () => {
-    // Test de 4 secondes au lieu de 2 heures
+    // 4 seconds test instead of 2 hours
     const rideTime = new Date(reservation.date).getTime();
     const now = new Date().getTime();
-    const testTimeInMs = 4 * 1000; // 4 secondes pour les tests
+    const testTimeInMs = 4 * 1000; // 4 seconds for testing
     
     return now >= (rideTime - testTimeInMs);
   };
@@ -178,8 +178,8 @@ const ReservationCard = ({
                 {reservation.dispatcher}
               </Badge>
               
-              {/* Bouton de chat avec le dispatcher */}
-              {(type === 'current' || type === 'upcoming') && onChatWithDispatcher && (
+              {/* Chat button - only show for current reservations */}
+              {type === 'current' && onChatWithDispatcher && (
                 <Button 
                   variant="ghost" 
                   size="icon" 

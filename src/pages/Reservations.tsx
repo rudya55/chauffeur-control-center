@@ -268,7 +268,7 @@ const Reservations = () => {
                 type="upcoming"
                 onAccept={handleAcceptReservation}
                 onReject={handleRejectReservation}
-                onChatWithDispatcher={openChatWithDispatcher}
+                // No chat with dispatcher option here
               />
             ))
           ) : (
@@ -289,7 +289,7 @@ const Reservations = () => {
                 onArrived={handleArrived}
                 onClientBoarded={handleClientBoarded}
                 onComplete={handleCompleteRide}
-                onChatWithDispatcher={openChatWithDispatcher}
+                onChatWithDispatcher={openChatWithDispatcher} // Chat available only in current reservations
               />
             ))
           ) : (
