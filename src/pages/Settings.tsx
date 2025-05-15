@@ -19,7 +19,22 @@ import { Switch } from "@/components/ui/switch";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { toast } from "@/hooks/use-toast";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
-import { Plus, Car, Download, Shield, Bell, Trash2, CreditCard, Banknote, Languages } from "lucide-react";
+import { 
+  Plus, 
+  Car, 
+  Download, 
+  Shield, 
+  Bell, 
+  Trash2, 
+  CreditCard, 
+  Banknote, 
+  Languages,
+  User,
+  FileText,
+  Settings as SettingsIcon,
+  AlertCircle,
+  Calendar
+} from "lucide-react";
 import { Collapsible, CollapsibleContent } from "@/components/ui/collapsible";
 import { Label } from "@/components/ui/label";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
@@ -299,9 +314,12 @@ const Settings = () => {
                   <AvatarFallback>JM</AvatarFallback>
                 </Avatar>
                 <div>
-                  <CardTitle>Informations personnelles</CardTitle>
+                  <CardTitle className="flex items-center gap-2">
+                    <User size={20} className="text-primary" />
+                    {t("settings.profile.personal_info")}
+                  </CardTitle>
                   <CardDescription>
-                    Mettez à jour vos informations personnelles.
+                    {t("settings.profile.update_info")}
                   </CardDescription>
                 </div>
               </div>
@@ -314,7 +332,7 @@ const Settings = () => {
                     name="name"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>Nom complet</FormLabel>
+                        <FormLabel>{t("settings.profile.full_name")}</FormLabel>
                         <FormControl>
                           <Input placeholder="Votre nom" {...field} />
                         </FormControl>
@@ -327,7 +345,7 @@ const Settings = () => {
                     name="email"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>Email</FormLabel>
+                        <FormLabel>{t("settings.profile.email")}</FormLabel>
                         <FormControl>
                           <Input placeholder="Votre email" {...field} />
                         </FormControl>
@@ -340,7 +358,7 @@ const Settings = () => {
                     name="phone"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>Téléphone</FormLabel>
+                        <FormLabel>{t("settings.profile.phone")}</FormLabel>
                         <FormControl>
                           <Input placeholder="Votre numéro de téléphone" {...field} />
                         </FormControl>
@@ -348,7 +366,7 @@ const Settings = () => {
                       </FormItem>
                     )}
                   />
-                  <Button type="submit">Enregistrer les modifications</Button>
+                  <Button type="submit">{t("settings.profile.save_changes")}</Button>
                 </form>
               </Form>
             </CardContent>
@@ -358,23 +376,26 @@ const Settings = () => {
             <CardHeader>
               <div className="flex items-center justify-between">
                 <div>
-                  <CardTitle>Votre véhicule</CardTitle>
+                  <CardTitle className="flex items-center gap-2">
+                    <Car className="text-primary" size={20} />
+                    {t("settings.vehicle.title")}
+                  </CardTitle>
                   <CardDescription>
-                    Informations sur votre véhicule actuel.
+                    {t("settings.vehicle.info")}
                   </CardDescription>
                 </div>
                 <Dialog open={openDialog} onOpenChange={setOpenDialog}>
                   <DialogTrigger asChild>
                     <Button variant="outline" size="sm">
                       <Plus className="mr-1" size={16} />
-                      Ajouter un véhicule
+                      {t("settings.vehicle.add")}
                     </Button>
                   </DialogTrigger>
                   <DialogContent>
                     <DialogHeader>
-                      <DialogTitle>Ajouter un véhicule</DialogTitle>
+                      <DialogTitle>{t("settings.vehicle.add")}</DialogTitle>
                       <DialogDescription>
-                        Renseignez les informations de votre nouveau véhicule.
+                        {t("settings.vehicle.add_info")}
                       </DialogDescription>
                     </DialogHeader>
                     <Form {...vehicleForm}>
@@ -462,7 +483,7 @@ const Settings = () => {
               <div className="flex items-center justify-between border-t border-gray-100 pt-4 mt-2">
                 <div className="flex items-center space-x-2">
                   <Car size={18} />
-                  <span className="text-sm font-medium">Véhicule actif</span>
+                  <span className="text-sm font-medium">{t("settings.vehicle.active")}</span>
                 </div>
                 <Switch 
                   id="vehicle-active" 
@@ -471,7 +492,7 @@ const Settings = () => {
                 />
               </div>
               <Button variant="outline" className="w-full">
-                Modifier les informations du véhicule
+                {t("settings.vehicle.edit")}
               </Button>
             </CardContent>
           </Card>
@@ -480,9 +501,12 @@ const Settings = () => {
         <TabsContent value="documents" className="mt-4 space-y-4">
           <Card>
             <CardHeader>
-              <CardTitle>Documents</CardTitle>
+              <CardTitle className="flex items-center gap-2">
+                <FileText className="text-primary" size={20} />
+                {t("settings.documents.title")}
+              </CardTitle>
               <CardDescription>
-                Gérez et téléchargez vos documents professionnels.
+                {t("settings.documents.manage")}
               </CardDescription>
             </CardHeader>
             <CardContent>
@@ -634,9 +658,9 @@ const Settings = () => {
               <div className="flex items-center gap-2">
                 <CreditCard className="text-primary" size={20} />
                 <div>
-                  <CardTitle>Méthodes de paiement</CardTitle>
+                  <CardTitle>{t("settings.payments.methods")}</CardTitle>
                   <CardDescription>
-                    Ajoutez des méthodes de paiement pour recevoir vos revenus.
+                    {t("settings.payments.add_method")}
                   </CardDescription>
                 </div>
               </div>
@@ -810,9 +834,9 @@ const Settings = () => {
           
           <Card>
             <CardHeader>
-              <CardTitle>Paiements automatiques</CardTitle>
+              <CardTitle>{t("settings.payments.auto_payments")}</CardTitle>
               <CardDescription>
-                Configurez les paramètres pour recevoir vos paiements automatiquement.
+                {t("settings.payments.auto_settings")}
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
@@ -845,7 +869,7 @@ const Settings = () => {
               </div>
             </CardContent>
             <CardFooter>
-              <Button>Enregistrer les préférences de paiement</Button>
+              <Button>{t("settings.payments.save_preferences")}</Button>
             </CardFooter>
           </Card>
         </TabsContent>
@@ -856,9 +880,9 @@ const Settings = () => {
               <div className="flex items-center gap-2">
                 <Shield className="text-primary" size={20} />
                 <div>
-                  <CardTitle>Sécurité du compte</CardTitle>
+                  <CardTitle>{t("settings.security.title")}</CardTitle>
                   <CardDescription>
-                    Gérez la sécurité de votre compte.
+                    {t("settings.security.manage")}
                   </CardDescription>
                 </div>
               </div>
@@ -933,24 +957,23 @@ const Settings = () => {
                   <DialogTrigger asChild>
                     <Button variant="destructive" className="w-full sm:w-auto">
                       <Trash2 className="mr-1" size={16} />
-                      Supprimer mon compte
+                      {t("settings.security.delete_account")}
                     </Button>
                   </DialogTrigger>
                   <DialogContent>
                     <DialogHeader>
-                      <DialogTitle className="text-destructive">Supprimer votre compte ?</DialogTitle>
+                      <DialogTitle className="text-destructive">{t("settings.security.delete_confirm")}</DialogTitle>
                       <DialogDescription>
-                        Cette action est irréversible. Toutes vos données seront définitivement supprimées 
-                        de nos serveurs.
+                        {t("settings.security.delete_description")}
                       </DialogDescription>
                     </DialogHeader>
                     <div className="p-4 border border-destructive/20 rounded-md bg-destructive/5 my-2">
-                      <p className="text-sm font-medium">Les éléments suivants seront supprimés :</p>
+                      <p className="text-sm font-medium">{t("settings.security.items_deleted")}</p>
                       <ul className="text-sm mt-2 space-y-1 list-disc pl-4">
-                        <li>Votre profil et vos informations personnelles</li>
-                        <li>Votre historique de courses et de paiements</li>
-                        <li>Tous vos documents téléchargés</li>
-                        <li>Vos préférences et paramètres</li>
+                        <li>{t("settings.security.profile_delete")}</li>
+                        <li>{t("settings.security.history_delete")}</li>
+                        <li>{t("settings.security.documents_delete")}</li>
+                        <li>{t("settings.security.preferences_delete")}</li>
                       </ul>
                     </div>
                     <DialogFooter className="flex flex-col sm:flex-row gap-2">
@@ -959,14 +982,14 @@ const Settings = () => {
                         onClick={() => setDeleteAccountDialog(false)}
                         className="w-full sm:w-auto"
                       >
-                        Annuler
+                        {t("settings.security.cancel")}
                       </Button>
                       <Button 
                         variant="destructive" 
                         onClick={handleDeleteAccount}
                         className="w-full sm:w-auto"
                       >
-                        Confirmer la suppression
+                        {t("settings.security.confirm_deletion")}
                       </Button>
                     </DialogFooter>
                   </DialogContent>
@@ -982,9 +1005,9 @@ const Settings = () => {
               <div className="flex items-center gap-2">
                 <Bell className="text-primary" size={20} />
                 <div>
-                  <CardTitle>Notifications</CardTitle>
+                  <CardTitle>{t("settings.notifications.title")}</CardTitle>
                   <CardDescription>
-                    Configurez vos préférences de notification.
+                    {t("settings.notifications.configure")}
                   </CardDescription>
                 </div>
               </div>
@@ -1210,7 +1233,22 @@ const Settings = () => {
         </TabsContent>
         
         <TabsContent value="language" className="mt-4 space-y-4">
-          <LanguageCard />
+          <Card>
+            <CardHeader>
+              <div className="flex items-center gap-2">
+                <Languages className="text-primary" size={20} />
+                <div>
+                  <CardTitle>{t("language.title")}</CardTitle>
+                  <CardDescription>
+                    {t("language.select")}
+                  </CardDescription>
+                </div>
+              </div>
+            </CardHeader>
+            <CardContent>
+              <LanguageCard />
+            </CardContent>
+          </Card>
         </TabsContent>
       </Tabs>
     </div>

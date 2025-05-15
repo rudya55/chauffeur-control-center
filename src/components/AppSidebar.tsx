@@ -33,6 +33,7 @@ import {
   DialogTitle, 
   DialogTrigger 
 } from "@/components/ui/dialog";
+import { useLanguage } from "@/hooks/use-language";
 
 interface AppSidebarProps {
   isOpen?: boolean;
@@ -45,18 +46,18 @@ const AppSidebar = ({ isOpen = false, onClose }: AppSidebarProps) => {
   const location = useLocation();
   const isMobile = useIsMobile();
   const [avatarUrl, setAvatarUrl] = useState("/profile-photo.jpg");
+  const { t } = useLanguage();
   
   // Driver information
   const driverName = "Jean Dupont";
   const driverRating = 4.8;
   
   const menuItems = [
-    { title: "Accueil", url: "/", icon: Home },
-    { title: "Calendrier", url: "/calendar", icon: Calendar },
-    { title: "Réservations", url: "/reservations", icon: Calendar },
-    { title: "Comptabilité", url: "/accounting", icon: FileText },
-    { title: "Analyse", url: "/analytics", icon: BarChart4 },
-    { title: "Paramètres", url: "/settings", icon: Settings },
+    { title: t("home"), url: "/", icon: Home },
+    { title: t("reservations"), url: "/reservations", icon: Calendar },
+    { title: t("accounting"), url: "/accounting", icon: FileText },
+    { title: t("analytics"), url: "/analytics", icon: BarChart4 },
+    { title: t("settings"), url: "/settings", icon: Settings },
     { title: "Nous contacter", url: "/contact", icon: Mail },
     { title: "Conditions générales", url: "/terms", icon: FileTextIcon },
   ];
@@ -175,7 +176,7 @@ const AppSidebar = ({ isOpen = false, onClose }: AppSidebarProps) => {
                     onClick={() => alert("Déconnexion")}
                   >
                     <LogOut className="h-5 w-5" />
-                    {(!collapsed || isMobile) && <span>Déconnexion</span>}
+                    {(!collapsed || isMobile) && <span>{t("logout")}</span>}
                   </button>
                 </SidebarMenuButton>
               </SidebarMenuItem>
