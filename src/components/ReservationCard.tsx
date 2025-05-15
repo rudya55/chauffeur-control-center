@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Check, X, MapPin, Phone, Plane, Star, Navigation, Clock, Users, Luggage, Flag, MessageSquare } from "lucide-react";
+import { Check, X, MapPin, Plane, Star, Navigation, Clock, Users, Luggage, Flag, MessageSquare } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
 import { toast } from "@/hooks/use-toast";
@@ -151,19 +151,6 @@ const ReservationCard = ({
         <CardContent className="pt-6">
           <div className="flex justify-between items-start mb-2">
             <div>
-              {reservation.clientName ? (
-                <h3 
-                  className="text-lg font-semibold cursor-pointer hover:text-primary flex items-center"
-                  onClick={() => handleShowPassenger(reservation.clientName)}
-                >
-                  {reservation.clientName}
-                  {reservation.dispatcherLogo && (
-                    <span className="ml-2 text-sm" title={reservation.dispatcher}>
-                      {reservation.dispatcherLogo}
-                    </span>
-                  )}
-                </h3>
-              ) : null}
               <div className="text-sm text-gray-500">
                 {formattedDate}
               </div>
@@ -216,22 +203,28 @@ const ReservationCard = ({
           </div>
 
           <div className="mt-4 space-y-2">
-            {type !== 'upcoming' && (
-              <div className="flex items-center gap-2">
-                <Phone className="h-4 w-4 text-gray-500" />
-                <a href={`tel:${reservation.phone}`} className="text-sm hover:text-primary">
-                  {reservation.phone}
-                </a>
-              </div>
-            )}
-            
             {reservation.flightNumber && (
               <div 
                 className="flex items-center gap-2 cursor-pointer hover:text-primary"
                 onClick={() => handleCheckFlight(reservation.flightNumber || '')}
               >
                 <Plane className="h-4 w-4 text-gray-500" />
-                <span className="text-sm">{reservation.flightNumber}</span>
+                <span className="text-sm">
+                  {reservation.flightNumber} 
+                  {reservation.clientName && <span className="ml-2">- {reservation.clientName}</span>}
+                </span>
+              </div>
+            )}
+            
+            {!reservation.flightNumber && reservation.clientName && type !== 'upcoming' && (
+              <div className="flex items-center gap-2">
+                <Users className="h-4 w-4 text-gray-500" />
+                <span 
+                  className="text-sm cursor-pointer hover:text-primary"
+                  onClick={() => handleShowPassenger(reservation.clientName)}
+                >
+                  {reservation.clientName}
+                </span>
               </div>
             )}
 
