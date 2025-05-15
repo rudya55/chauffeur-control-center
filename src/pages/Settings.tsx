@@ -4,6 +4,18 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useLanguage } from "@/hooks/use-language";
 import { LanguageCard } from "@/components/LanguageCard";
 import { Languages, FileText, CreditCard, Shield, Bell, User } from 'lucide-react';
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
+import { Button } from "@/components/ui/button";
 
 const Settings = () => {
   const [activeTab, setActiveTab] = useState("profile");
@@ -63,9 +75,9 @@ const Settings = () => {
               <label className="text-sm font-medium">{t("settings_section.profile.phone")}</label>
               <input type="tel" className="w-full mt-1 p-2 border rounded" defaultValue="+33 6 12 34 56 78" />
             </div>
-            <button className="bg-primary text-white py-2 px-4 rounded mt-2">
+            <Button className="w-fit">
               {t("settings_section.profile.save_changes")}
-            </button>
+            </Button>
           </div>
         </TabsContent>
         
@@ -77,7 +89,7 @@ const Settings = () => {
             <h3 className="font-medium mb-2">Permis de conduire</h3>
             <div className="flex items-center justify-between">
               <span className="text-sm text-green-600">Vérifié</span>
-              <button className="text-primary text-sm">Voir le document</button>
+              <Button variant="outline" size="sm">Voir le document</Button>
             </div>
           </div>
           
@@ -85,7 +97,7 @@ const Settings = () => {
             <h3 className="font-medium mb-2">Carte d'identité</h3>
             <div className="flex items-center justify-between">
               <span className="text-sm text-green-600">Vérifié</span>
-              <button className="text-primary text-sm">Voir le document</button>
+              <Button variant="outline" size="sm">Voir le document</Button>
             </div>
           </div>
           
@@ -93,13 +105,13 @@ const Settings = () => {
             <h3 className="font-medium mb-2">Attestation d'assurance</h3>
             <div className="flex items-center justify-between">
               <span className="text-sm text-amber-600">En attente de vérification</span>
-              <button className="text-primary text-sm">Voir le document</button>
+              <Button variant="outline" size="sm">Voir le document</Button>
             </div>
           </div>
           
-          <button className="bg-primary text-white py-2 px-4 rounded mt-4">
-            Ajouter un document
-          </button>
+          <Button className="mt-4">
+            Télécharger un document
+          </Button>
         </TabsContent>
         
         <TabsContent value="payments">
@@ -110,7 +122,7 @@ const Settings = () => {
             <h3 className="font-medium mb-2">Carte Visa ****4578</h3>
             <div className="flex items-center justify-between">
               <span className="text-sm">Expire le 09/25</span>
-              <button className="text-red-500 text-sm">Supprimer</button>
+              <Button variant="outline" size="sm" className="text-red-500">Supprimer</Button>
             </div>
           </div>
           
@@ -118,13 +130,13 @@ const Settings = () => {
             <h3 className="font-medium mb-2">Compte bancaire</h3>
             <div className="flex items-center justify-between">
               <span className="text-sm">IBAN FR76****1234</span>
-              <button className="text-red-500 text-sm">Supprimer</button>
+              <Button variant="outline" size="sm" className="text-red-500">Supprimer</Button>
             </div>
           </div>
           
-          <button className="bg-primary text-white py-2 px-4 rounded mt-4">
+          <Button className="mt-4">
             Ajouter un moyen de paiement
-          </button>
+          </Button>
         </TabsContent>
         
         <TabsContent value="security">
@@ -147,9 +159,9 @@ const Settings = () => {
                   <label className="text-sm font-medium">Confirmer le mot de passe</label>
                   <input type="password" className="w-full mt-1 p-2 border rounded" />
                 </div>
-                <button className="bg-primary text-white py-2 px-4 rounded mt-2 w-fit">
+                <Button className="w-fit">
                   Mettre à jour le mot de passe
-                </button>
+                </Button>
               </div>
             </div>
             
@@ -157,10 +169,33 @@ const Settings = () => {
               <h3 className="font-medium mb-2">Authentification à deux facteurs</h3>
               <div className="flex items-center justify-between">
                 <span className="text-sm">Protection supplémentaire pour votre compte</span>
-                <button className="bg-primary text-white py-1 px-3 rounded text-sm">
+                <Button size="sm">
                   Activer
-                </button>
+                </Button>
               </div>
+            </div>
+            
+            <div className="pt-4 border-t">
+              <h3 className="font-medium mb-2 text-red-600">Zone de danger</h3>
+              <AlertDialog>
+                <AlertDialogTrigger asChild>
+                  <Button variant="destructive">Supprimer mon compte</Button>
+                </AlertDialogTrigger>
+                <AlertDialogContent>
+                  <AlertDialogHeader>
+                    <AlertDialogTitle>Êtes-vous sûr de vouloir supprimer votre compte?</AlertDialogTitle>
+                    <AlertDialogDescription>
+                      Cette action est définitive. Toutes vos données et votre historique seront supprimés.
+                    </AlertDialogDescription>
+                  </AlertDialogHeader>
+                  <AlertDialogFooter>
+                    <AlertDialogCancel>Annuler</AlertDialogCancel>
+                    <AlertDialogAction className="bg-red-600 hover:bg-red-700">
+                      Supprimer définitivement
+                    </AlertDialogAction>
+                  </AlertDialogFooter>
+                </AlertDialogContent>
+              </AlertDialog>
             </div>
           </div>
         </TabsContent>

@@ -62,9 +62,6 @@ const AppSidebar = ({ isOpen = false, onClose }: AppSidebarProps) => {
     { title: t("terms"), url: "/terms", icon: FileTextIcon },
   ];
 
-  // No longer needed - settings tabs are managed in the Settings.tsx component
-  // By removing this, we'll eliminate the duplicate submenu items
-
   const handleNavLinkClick = () => {
     if (isMobile && onClose) {
       onClose();
