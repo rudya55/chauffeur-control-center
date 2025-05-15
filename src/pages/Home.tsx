@@ -1,6 +1,7 @@
+
 import OnlineStatusToggle from "@/components/OnlineStatusToggle";
 import Map from "@/components/Map";
-import { Check, X, MapPin, Users, Luggage, CarFront, Euro, CreditCard, DollarSign } from "lucide-react";
+import { Check, X, MapPin, Users, Luggage, CarFront, Euro, CreditCard, DollarSign, Bank } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
 import { useEffect, useState } from "react";
@@ -24,7 +25,6 @@ interface Reservation {
 const Home = () => {
   const { toast } = useToast();
   const [incomingReservation, setIncomingReservation] = useState<Reservation | null>(null);
-  const [upcomingReservation, setUpcomingReservation] = useState<Reservation | null>(null);
   const [sidebarOpen, setSidebarOpen] = useState(false);
 
   // Simulate incoming reservation after page load
@@ -44,37 +44,9 @@ const Home = () => {
       });
     }, 3000);
     
-    // Show upcoming reservation (24h before)
-    setUpcomingReservation({
-      id: '124',
-      pickupAddress: 'Gare de Lyon, Paris',
-      destination: '45 Avenue des Champs-Élysées, Paris',
-      date: '2025-05-16',
-      time: '10:15',
-      clientName: 'Marie Dubois',
-      passengers: 1,
-      luggage: 1,
-      amount: '35.00',
-      driverAmount: '28.00',
-      commission: '7.00',
-      paymentType: 'cash',
-      vehicleType: 'standard'
-    });
-
     // Notification system
     const checkUpcomingReservations = () => {
       const now = new Date();
-      const upcomingRes = {
-        id: '124',
-        pickupAddress: 'Gare de Lyon, Paris',
-        destination: '45 Avenue des Champs-Élysées, Paris',
-        date: '2025-05-16',
-        time: '10:15',
-        clientName: 'Marie Dubois',
-        passengers: 1,
-        luggage: 1
-      };
-
       // Simulate a reservation tomorrow
       const reservationDate = new Date('2025-05-16T10:15:00');
       const hoursDiff = Math.floor((reservationDate.getTime() - now.getTime()) / (1000 * 60 * 60));
@@ -143,7 +115,7 @@ const Home = () => {
       case 'card':
         return <CreditCard className="h-4 w-4 text-blue-500" />;
       case 'transfer':
-        return <DollarSign className="h-4 w-4 text-purple-500" />; 
+        return <Bank className="h-4 w-4 text-purple-500" />; 
       case 'paypal':
         return <DollarSign className="h-4 w-4 text-blue-600" />; 
       default:
@@ -194,9 +166,7 @@ const Home = () => {
                   <div className="flex items-center">
                     <Users className="h-4 w-4 mr-1 text-gray-500" />
                     <p className="text-sm">Passagers: {incomingReservation.passengers}</p>
-                  </div>
-                  <div className="flex items-center">
-                    <Luggage className="h-4 w-4 mr-1 text-gray-500" />
+                    <Luggage className="h-4 w-4 ml-2 mr-1 text-gray-500" />
                     <p className="text-sm">Bagages: {incomingReservation.luggage}</p>
                   </div>
                 </div>
@@ -256,74 +226,6 @@ const Home = () => {
             </div>
             <div className="text-sm text-gray-500 dark:text-gray-400 text-center py-3">
               Toutes les nouvelles réservations apparaîtront ici
-            </div>
-          </div>
-        </div>
-      )}
-      
-      {/* Upcoming reservation (24h before) */}
-      {upcomingReservation && (
-        <div className="absolute bottom-20 left-1/2 transform -translate-x-1/2 z-10 w-11/12 max-w-md">
-          <div className="bg-white dark:bg-card rounded-lg shadow-lg p-4 border-l-4 border-blue-500 dark:border-blue-400">
-            <div className="flex justify-between items-center mb-2">
-              <span className="text-base font-medium dark:text-primary">Course de demain</span>
-              <span className="text-sm bg-blue-100 text-blue-800 dark:bg-blue-900/50 dark:text-blue-300 rounded-full px-2 py-0.5">
-                {upcomingReservation.time}
-              </span>
-            </div>
-            <div className="space-y-1">
-              <div>
-                <p className="text-sm font-medium dark:text-primary">Client:</p>
-                <div className="flex items-center">
-                  <Users className="h-4 w-4 mr-1 text-gray-500" />
-                  <p className="text-sm">{upcomingReservation.clientName}</p>
-                </div>
-              </div>
-              <div>
-                <p className="text-sm font-medium dark:text-primary">Départ:</p>
-                <div className="flex items-center">
-                  <MapPin className="h-4 w-4 mr-1 text-primary" />
-                  <p className="text-sm">{upcomingReservation.pickupAddress}</p>
-                </div>
-              </div>
-              <div>
-                <p className="text-sm font-medium dark:text-primary">Destination:</p>
-                <div className="flex items-center">
-                  <MapPin className="h-4 w-4 mr-1 text-destructive" />
-                  <p className="text-sm">{upcomingReservation.destination}</p>
-                </div>
-              </div>
-              <div>
-                <p className="text-sm font-medium dark:text-primary">Type de véhicule:</p>
-                <div className="flex items-center">
-                  <CarFront className="h-4 w-4 mr-1 text-gray-500" />
-                  <p className="text-sm capitalize">{upcomingReservation.vehicleType === 'first-class' ? 'First Class' : upcomingReservation.vehicleType}</p>
-                </div>
-              </div>
-              <div>
-                <p className="text-sm font-medium dark:text-primary">Type de paiement:</p>
-                <div className="flex items-center">
-                  {renderPaymentIcon(upcomingReservation.paymentType)}
-                  <p className="text-sm ml-1">
-                    {upcomingReservation.paymentType === 'cash' && "Espèces"}
-                    {upcomingReservation.paymentType === 'card' && "Carte bleue"}
-                    {upcomingReservation.paymentType === 'transfer' && "Virement"}
-                    {upcomingReservation.paymentType === 'paypal' && "PayPal"}
-                  </p>
-                </div>
-              </div>
-              <div>
-                <p className="text-sm font-medium dark:text-primary">Prix:</p>
-                <div className="flex items-center">
-                  <DollarSign className="h-4 w-4 mr-1 text-green-500" />
-                  <p className="text-sm">
-                    {(upcomingReservation.paymentType === 'cash' || upcomingReservation.paymentType === 'card') ? 
-                      `${upcomingReservation.amount}€ client / ${upcomingReservation.commission}€ commission / ${upcomingReservation.driverAmount}€ net` : 
-                      `${upcomingReservation.driverAmount}€ net chauffeur`
-                    }
-                  </p>
-                </div>
-              </div>
             </div>
           </div>
         </div>
