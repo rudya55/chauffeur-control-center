@@ -41,7 +41,46 @@ type ReservationType = {
   route?: {lat: number, lng: number}[];
 };
 
-// Removed initialUpcomingReservations as we don't need it anymore
+const initialUpcomingReservations: ReservationType[] = [
+  {
+    id: "1",
+    clientName: "Jean Dupont",
+    pickupAddress: "1 Avenue des Champs-Élysées, Paris",
+    destination: "Aéroport Charles de Gaulle, Paris",
+    date: "2025-05-20T08:30:00",
+    phone: "+33612345678",
+    flightNumber: "AF1234",
+    dispatcher: "TaxiCorp",
+    dispatcherLogo: "🚕",
+    passengers: 2,
+    luggage: 2,
+    amount: "85.50",
+    driverAmount: "68.40",
+    commission: "17.10",
+    vehicleType: 'berline',
+    paymentType: 'card',
+    status: 'pending'
+  },
+  {
+    id: "2",
+    clientName: "Marie Lefevre",
+    pickupAddress: "15 Rue de Rivoli, Paris",
+    destination: "Gare de Lyon, Paris",
+    date: "2025-05-22T14:15:00",
+    phone: "+33687654321",
+    flightNumber: "",
+    dispatcher: "LuxDrive",
+    dispatcherLogo: "✨",
+    passengers: 1,
+    luggage: 1,
+    amount: "45.00",
+    driverAmount: "36.00",
+    commission: "9.00",
+    vehicleType: 'standard',
+    paymentType: 'cash',
+    status: 'pending'
+  },
+];
 
 const initialMyReservations: ReservationType[] = [
   {
@@ -102,13 +141,33 @@ const initialCompletedReservations: ReservationType[] = [
 const Reservations = () => {
   const { t } = useLanguage();
   const [activeTab, setActiveTab] = useState("current");
+  const [upcomingReservations, setUpcomingReservations] = useState<ReservationType[]>(initialUpcomingReservations);
   const [myReservations, setMyReservations] = useState<ReservationType[]>(initialMyReservations);
   const [completedReservations, setCompletedReservations] = useState<ReservationType[]>(initialCompletedReservations);
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [showChat, setShowChat] = useState(false);
   const [currentDispatcher, setCurrentDispatcher] = useState("");
 
-  // Removed functions related to accepting/rejecting reservations
+  // Accepter une réservation
+  const handleAcceptReservation = (id: string) => {
+    // Trouver la réservation dans la liste des réservations à venir
+    const reservation = upcomingReservations.find(res => res.id === id);
+    
+    if (reservation) {
+      // Mettre à jour le statut et déplacer vers mes réservations
+      const updatedReservation = { ...reservation, status: 'accepted' };
+      setMyReservations(prev => [...prev, updatedReservation]);
+      
+      // Retirer de la liste des réservations à venir
+      setUpcomingReservations(prev => prev.filter(res => res.id !== id));
+    }
+  };
+
+  // Refuser une réservation
+  const handleRejectReservation = (id: string) => {
+    // Simplement retirer de la liste des réservations à venir
+    setUpcomingReservations(prev => prev.filter(res => res.id !== id));
+  };
 
   // Gérer le démarrage d'une course
   const handleStartRide = (id: string) => {
@@ -218,8 +277,16 @@ const Reservations = () => {
         </div>
       </div>
       
-      <Tabs defaultValue="current" className="w-full" onValueChange={setActiveTab}>
+      <Tabs defaultValue="upcoming" className="w-full" onValueChange={setActiveTab}>
         <TabsList className="w-full">
+          <TabsTrigger value="upcoming" className="flex-1">
+            À venir
+            {upcomingReservations.length > 0 && (
+              <Badge variant="secondary" className="ml-2">
+                {upcomingReservations.length}
+              </Badge>
+            )}
+          </TabsTrigger>
           <TabsTrigger value="current" className="flex-1">
             Mes Réservations
             {myReservations.length > 0 && (
@@ -232,6 +299,24 @@ const Reservations = () => {
             Terminées
           </TabsTrigger>
         </TabsList>
+        
+        <TabsContent value="upcoming" className="mt-4">
+          {upcomingReservations.length > 0 ? (
+            upcomingReservations.map(reservation => (
+              <ReservationCard 
+                key={reservation.id} 
+                reservation={reservation} 
+                type="upcoming"
+                onAccept={handleAcceptReservation}
+                onReject={handleRejectReservation}
+              />
+            ))
+          ) : (
+            <div className="text-center py-10 text-gray-500">
+              Aucune réservation à venir
+            </div>
+          )}
+        </TabsContent>
         
         <TabsContent value="current" className="mt-4">
           {myReservations.length > 0 ? (
