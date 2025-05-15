@@ -1,6 +1,7 @@
+
 import OnlineStatusToggle from "@/components/OnlineStatusToggle";
 import Map from "@/components/Map";
-import { Check, X } from "lucide-react";
+import { Check, Menu, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
 import { useEffect, useState } from "react";
@@ -126,8 +127,19 @@ const Home = () => {
     <div className="relative h-screen w-full p-0 overflow-hidden">
       {/* Map as background */}
       <div className="absolute inset-0 z-0">
-        <Map onMenuToggle={handleMenuToggle} />
+        <Map />
       </div>
+      
+      {/* Menu button */}
+      <Button 
+        variant="ghost" 
+        size="icon" 
+        className="absolute top-4 left-4 bg-white dark:bg-background/80 shadow-md rounded-md z-10"
+        onClick={handleMenuToggle}
+      >
+        <Menu className="h-5 w-5" />
+        <span className="sr-only">Toggle menu</span>
+      </Button>
       
       {/* Status toggle at top center */}
       <div className="absolute top-4 left-1/2 transform -translate-x-1/2 z-10">

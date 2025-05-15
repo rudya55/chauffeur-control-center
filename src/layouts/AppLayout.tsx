@@ -7,10 +7,14 @@ import { SidebarProvider } from "@/components/ui/sidebar";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { Menu } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { useTheme } from "@/hooks/use-theme";
+import ThemeToggle from "@/components/ThemeToggle";
+import { cn } from "@/lib/utils";
 
 const AppLayout = () => {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const isMobile = useIsMobile();
+  const { theme } = useTheme();
 
   // Listen for custom sidebar toggle events
   useEffect(() => {
@@ -26,30 +30,33 @@ const AppLayout = () => {
 
   return (
     <SidebarProvider>
-      <div className="flex flex-col h-screen w-full bg-gray-50">
+      <div className={cn("flex flex-col h-screen w-full", theme === 'dark' ? 'dark' : '')}>
         {isMobile ? (
           <MobileHeader 
             isOpen={sidebarOpen} 
             onToggle={() => setSidebarOpen(!sidebarOpen)}
           />
         ) : (
-          <div className="h-16 border-b bg-white flex items-center px-4">
-            <Button 
-              variant="ghost" 
-              size="icon" 
-              onClick={() => setSidebarOpen(!sidebarOpen)}
-              className="mr-2"
-            >
-              <Menu className="h-5 w-5" />
-              <span className="sr-only">Toggle menu</span>
-            </Button>
+          <div className="h-16 border-b bg-background flex items-center px-4 justify-between">
+            <div className="flex items-center">
+              <Button 
+                variant="ghost" 
+                size="icon" 
+                onClick={() => setSidebarOpen(!sidebarOpen)}
+                className="mr-2"
+              >
+                <Menu className="h-5 w-5" />
+                <span className="sr-only">Toggle menu</span>
+              </Button>
+            </div>
+            <ThemeToggle />
           </div>
         )}
         
         <div className="flex flex-1 overflow-hidden">
           <AppSidebar isOpen={sidebarOpen} onClose={() => setSidebarOpen(false)} />
           
-          <main className="flex-1 overflow-auto">
+          <main className="flex-1 overflow-auto bg-background text-foreground">
             <Outlet />
           </main>
         </div>

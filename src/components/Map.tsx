@@ -1,7 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
 import { cn } from '@/lib/utils';
-import { Menu } from 'lucide-react';
-import { Button } from '@/components/ui/button';
 
 interface MapProps {
   className?: string;
@@ -139,19 +137,6 @@ const Map = ({
       className={cn("h-full w-full rounded-lg overflow-hidden relative", className)} 
     >
       <div ref={mapRef} className="h-full w-full" />
-      
-      {/* Menu toggle button */}
-      {onMenuToggle && (
-        <Button 
-          variant="ghost" 
-          size="icon" 
-          className="absolute top-4 left-4 bg-white shadow-md rounded-md z-10"
-          onClick={onMenuToggle}
-        >
-          <Menu className="h-5 w-5" />
-          <span className="sr-only">Toggle menu</span>
-        </Button>
-      )}
     </div>
   );
 };
