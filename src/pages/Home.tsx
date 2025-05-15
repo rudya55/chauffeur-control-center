@@ -1,4 +1,3 @@
-
 import OnlineStatusToggle from "@/components/OnlineStatusToggle";
 import Map from "@/components/Map";
 import { Check, X } from "lucide-react";
@@ -21,6 +20,7 @@ const Home = () => {
   const { toast } = useToast();
   const [incomingReservation, setIncomingReservation] = useState<Reservation | null>(null);
   const [upcomingReservation, setUpcomingReservation] = useState<Reservation | null>(null);
+  const [showSidebar, setShowSidebar] = useState(false);
 
   // Simulate incoming reservation after page load
   useEffect(() => {
@@ -116,11 +116,17 @@ const Home = () => {
     setIncomingReservation(null);
   };
 
+  const handleMenuToggle = () => {
+    // This will update the AppLayout's sidebar state
+    const event = new CustomEvent('toggle-sidebar');
+    window.dispatchEvent(event);
+  };
+
   return (
     <div className="relative h-screen w-full p-0 overflow-hidden">
       {/* Map as background */}
       <div className="absolute inset-0 z-0">
-        <Map />
+        <Map onMenuToggle={handleMenuToggle} />
       </div>
       
       {/* Status toggle at top center */}

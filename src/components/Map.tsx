@@ -1,15 +1,23 @@
-
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { cn } from '@/lib/utils';
+import { Menu } from 'lucide-react';
+import { Button } from '@/components/ui/button';
 
 interface MapProps {
   className?: string;
   center?: { lat: number; lng: number };
   zoom?: number;
   route?: { lat: number; lng: number }[];
+  onMenuToggle?: () => void;
 }
 
-const Map = ({ className, center = { lat: 48.8566, lng: 2.3522 }, zoom = 14, route = [] }: MapProps) => {
+const Map = ({ 
+  className, 
+  center = { lat: 48.8566, lng: 2.3522 }, 
+  zoom = 14, 
+  route = [],
+  onMenuToggle
+}: MapProps) => {
   const mapRef = useRef<HTMLDivElement>(null);
   const mapInstanceRef = useRef<any>(null);
   const markerRef = useRef<any>(null);
@@ -128,9 +136,23 @@ const Map = ({ className, center = { lat: 48.8566, lng: 2.3522 }, zoom = 14, rou
 
   return (
     <div 
-      ref={mapRef} 
       className={cn("h-full w-full rounded-lg overflow-hidden relative", className)} 
-    />
+    >
+      <div ref={mapRef} className="h-full w-full" />
+      
+      {/* Menu toggle button */}
+      {onMenuToggle && (
+        <Button 
+          variant="ghost" 
+          size="icon" 
+          className="absolute top-4 left-4 bg-white shadow-md rounded-md z-10"
+          onClick={onMenuToggle}
+        >
+          <Menu className="h-5 w-5" />
+          <span className="sr-only">Toggle menu</span>
+        </Button>
+      )}
+    </div>
   );
 };
 
