@@ -20,7 +20,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { toast } from "@/hooks/use-toast";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Plus, Car, Download, Shield, Bell, Trash2, CreditCard, Banknote } from "lucide-react";
-import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
+import { Collapsible, CollapsibleContent } from "@/components/ui/collapsible";
 import { Label } from "@/components/ui/label";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
@@ -823,24 +823,6 @@ const Settings = () => {
               </div>
               
               <div className="pt-2">
-                <Label htmlFor="payout-threshold">Seuil de versement</Label>
-                <Select defaultValue="100">
-                  <SelectTrigger id="payout-threshold" className="w-full">
-                    <SelectValue placeholder="Sélectionnez un seuil" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="50">50 €</SelectItem>
-                    <SelectItem value="100">100 €</SelectItem>
-                    <SelectItem value="200">200 €</SelectItem>
-                    <SelectItem value="500">500 €</SelectItem>
-                  </SelectContent>
-                </Select>
-                <FormDescription>
-                  Le montant minimum que votre solde doit atteindre avant un versement automatique
-                </FormDescription>
-              </div>
-              
-              <div className="pt-2">
                 <Label htmlFor="payout-frequency">Fréquence de versement</Label>
                 <Select defaultValue="weekly">
                   <SelectTrigger id="payout-frequency" className="w-full">
@@ -861,59 +843,6 @@ const Settings = () => {
             <CardFooter>
               <Button>Enregistrer les préférences de paiement</Button>
             </CardFooter>
-          </Card>
-          
-          <Card>
-            <CardHeader>
-              <CardTitle>Historique des paiements</CardTitle>
-              <CardDescription>
-                Consultez l'historique de vos paiements reçus.
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-4">
-                <div className="border rounded-md p-4">
-                  <div className="flex justify-between items-center">
-                    <div>
-                      <h3 className="font-medium">Versement vers compte bancaire</h3>
-                      <p className="text-sm text-muted-foreground">15 mai 2024</p>
-                    </div>
-                    <div className="text-right">
-                      <p className="font-medium">485,75 €</p>
-                      <p className="text-sm text-green-600">Versé</p>
-                    </div>
-                  </div>
-                </div>
-                
-                <div className="border rounded-md p-4">
-                  <div className="flex justify-between items-center">
-                    <div>
-                      <h3 className="font-medium">Versement vers compte bancaire</h3>
-                      <p className="text-sm text-muted-foreground">8 mai 2024</p>
-                    </div>
-                    <div className="text-right">
-                      <p className="font-medium">367,20 €</p>
-                      <p className="text-sm text-green-600">Versé</p>
-                    </div>
-                  </div>
-                </div>
-                
-                <div className="border rounded-md p-4">
-                  <div className="flex justify-between items-center">
-                    <div>
-                      <h3 className="font-medium">Versement vers compte bancaire</h3>
-                      <p className="text-sm text-muted-foreground">1 mai 2024</p>
-                    </div>
-                    <div className="text-right">
-                      <p className="font-medium">523,50 €</p>
-                      <p className="text-sm text-green-600">Versé</p>
-                    </div>
-                  </div>
-                </div>
-                
-                <Button variant="outline" className="w-full">Voir tout l'historique</Button>
-              </div>
-            </CardContent>
           </Card>
         </TabsContent>
         

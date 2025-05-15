@@ -1,3 +1,4 @@
+
 import * as React from "react"
 import * as LabelPrimitive from "@radix-ui/react-label"
 import { Slot } from "@radix-ui/react-slot"
@@ -58,6 +59,7 @@ const useFormField = () => {
       formItemId: `${itemContext?.id || ""}-form-item`,
       formDescriptionId: `${itemContext?.id || ""}-form-item-description`,
       formMessageId: `${itemContext?.id || ""}-form-item-message`,
+      error: undefined,
       invalid: false,
       isDirty: false,
       isTouched: false,
