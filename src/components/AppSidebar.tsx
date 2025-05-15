@@ -8,7 +8,11 @@ import {
   Settings, 
   LogOut,
   Mail,
-  FileText as FileTextIcon
+  FileText as FileTextIcon,
+  User,
+  CreditCard,
+  ShieldCheck,
+  Bell
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useIsMobile } from "@/hooks/use-mobile";
@@ -68,6 +72,15 @@ const AppSidebar = ({ isOpen = false, onClose }: AppSidebarProps) => {
     { title: "Conditions générales", url: "/terms", icon: FileTextIcon },
   ];
 
+  // Settings submenu items
+  const settingsSubmenuItems = [
+    { title: getTranslation("settings_section.tabs.profile"), url: "/settings/profile", icon: User },
+    { title: getTranslation("settings_section.tabs.documents"), url: "/settings/documents", icon: FileText },
+    { title: getTranslation("settings_section.tabs.payments"), url: "/settings/payments", icon: CreditCard },
+    { title: getTranslation("settings_section.tabs.security"), url: "/settings/security", icon: ShieldCheck },
+    { title: getTranslation("settings_section.tabs.notifications"), url: "/settings/notifications", icon: Bell },
+  ];
+
   const handleNavLinkClick = () => {
     if (isMobile && onClose) {
       onClose();
@@ -89,6 +102,9 @@ const AppSidebar = ({ isOpen = false, onClose }: AppSidebarProps) => {
         ? "bg-primary/10 text-primary font-medium" 
         : "hover:bg-muted/50 text-foreground/80"
     );
+
+  // Check if current path is a settings page
+  const isSettingsPage = location.pathname.startsWith('/settings');
 
   return (
     <Sidebar
@@ -171,6 +187,31 @@ const AppSidebar = ({ isOpen = false, onClose }: AppSidebarProps) => {
             </SidebarMenu>
           </SidebarGroupContent>
         </SidebarGroup>
+
+        {/* Settings submenu - only visible when on settings pages */}
+        {isSettingsPage && (!collapsed || isMobile) && (
+          <SidebarGroup className="mt-2 pt-2 border-t">
+            <SidebarGroupLabel>{getTranslation("settings_section.title")}</SidebarGroupLabel>
+            <SidebarGroupContent>
+              <SidebarMenu>
+                {settingsSubmenuItems.map((item) => (
+                  <SidebarMenuItem key={item.url}>
+                    <SidebarMenuButton asChild>
+                      <NavLink 
+                        to={item.url} 
+                        className={getNavClasses}
+                        onClick={handleNavLinkClick}
+                      >
+                        <item.icon className="h-4 w-4" />
+                        <span>{item.title}</span>
+                      </NavLink>
+                    </SidebarMenuButton>
+                  </SidebarMenuItem>
+                ))}
+              </SidebarMenu>
+            </SidebarGroupContent>
+          </SidebarGroup>
+        )}
 
         <SidebarGroup className="mt-auto pt-4 border-t">
           <SidebarGroupContent>

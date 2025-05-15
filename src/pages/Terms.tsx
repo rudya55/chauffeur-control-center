@@ -8,7 +8,7 @@ const Terms = () => {
         <section>
           <h2 className="text-xl font-semibold mb-3">1. Introduction</h2>
           <p className="text-sm text-gray-700 leading-relaxed">
-            Bienvenue sur l'application TaxiApp. Les présentes conditions générales régissent
+            Bienvenue sur l'application DriverDispatch. Les présentes conditions générales régissent
             votre utilisation de notre application mobile et des services associés. En utilisant notre
             application, vous acceptez d'être lié par ces conditions. Veuillez les lire attentivement.
           </p>
@@ -51,7 +51,7 @@ const Terms = () => {
         <section>
           <h2 className="text-xl font-semibold mb-3">5. Paiements</h2>
           <p className="text-sm text-gray-700 leading-relaxed">
-            Les paiements sont traités conformément aux tarifs et frais convenus dans l'application.
+            Les paiements sont traités conformément aux tarifs et frais convenus dans l'application DriverDispatch.
             Nous pouvons prélever des frais de service pour l'utilisation de notre plateforme. Vous
             recevrez un relevé détaillé de toutes les transactions.
           </p>
