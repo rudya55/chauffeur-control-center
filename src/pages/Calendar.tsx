@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { Calendar as CalendarComponent } from "@/components/ui/calendar";
 import { Button } from "@/components/ui/button";
@@ -8,6 +7,21 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { cn } from "@/lib/utils";
 import { DayContentProps } from "react-day-picker";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogFooter,
+} from "@/components/ui/dialog";
+import {
+  Clock,
+  MapPin,
+  User,
+  Luggage,
+  CalendarIcon,
+  X,
+} from "lucide-react";
 
 interface Event {
   id: string;
@@ -23,6 +37,8 @@ interface Event {
 const Calendar = () => {
   const [date, setDate] = useState<Date>(new Date());
   const [view, setView] = useState<"day" | "week" | "month">("day");
+  const [selectedEvent, setSelectedEvent] = useState<Event | null>(null);
+  const [showEventDetails, setShowEventDetails] = useState(false);
 
   // Sample events
   const events: Event[] = [
@@ -125,6 +141,82 @@ const Calendar = () => {
     }
   };
 
+  const handleEventClick = (event: Event) => {
+    setSelectedEvent(event);
+    setShowEventDetails(true);
+  };
+
+  const renderEventDetails = () => {
+    if (!selectedEvent) return null;
+    
+    return (
+      <Dialog open={showEventDetails} onOpenChange={setShowEventDetails}>
+        <DialogContent className="sm:max-w-lg">
+          <DialogHeader>
+            <DialogTitle className="flex justify-between items-center">
+              <span>{selectedEvent.title}</span>
+              <Badge className={cn(
+                selectedEvent.status === 'confirmed' ? "bg-green-100 text-green-800 border-green-500" :
+                selectedEvent.status === 'pending' ? "bg-yellow-100 text-yellow-800 border-yellow-500" :
+                selectedEvent.status === 'completed' ? "bg-blue-100 text-blue-800 border-blue-500" : "bg-red-100 text-red-800 border-red-500"
+              )}>
+                {selectedEvent.status === 'confirmed' ? "Confirmé" :
+                 selectedEvent.status === 'pending' ? "En attente" :
+                 selectedEvent.status === 'completed' ? "Terminé" : "Annulé"}
+              </Badge>
+            </DialogTitle>
+          </DialogHeader>
+          
+          <div className="space-y-4 py-4">
+            <div className="flex items-start space-x-3">
+              <User className="h-5 w-5 text-gray-500" />
+              <div>
+                <p className="font-medium text-sm">Client</p>
+                <p>{selectedEvent.client}</p>
+              </div>
+            </div>
+            
+            <div className="flex items-start space-x-3">
+              <MapPin className="h-5 w-5 text-gray-500" />
+              <div>
+                <p className="font-medium text-sm">Point de prise en charge</p>
+                <p>{selectedEvent.pickupAddress}</p>
+              </div>
+            </div>
+            
+            <div className="flex items-start space-x-3">
+              <MapPin className="h-5 w-5 text-gray-500" />
+              <div>
+                <p className="font-medium text-sm">Destination</p>
+                <p>{selectedEvent.destination}</p>
+              </div>
+            </div>
+            
+            <div className="flex items-start space-x-3">
+              <CalendarIcon className="h-5 w-5 text-gray-500" />
+              <div>
+                <p className="font-medium text-sm">Date</p>
+                <p>{format(selectedEvent.date, 'EEEE d MMMM yyyy', { locale: fr })}</p>
+              </div>
+            </div>
+            
+            <div className="flex items-start space-x-3">
+              <Clock className="h-5 w-5 text-gray-500" />
+              <div>
+                <p className="font-medium text-sm">Heure</p>
+                <p>{selectedEvent.time}</p>
+              </div>
+            </div>
+          </div>
+          
+          <DialogFooter>
+            <Button onClick={() => setShowEventDetails(false)}>Fermer</Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+    );
+  };
+
   const renderDayView = () => {
     const dayEvents = getEventsForDay(date);
     return (
@@ -135,7 +227,11 @@ const Calendar = () => {
         {dayEvents.length > 0 ? (
           <div className="space-y-3">
             {dayEvents.map((event) => (
-              <Card key={event.id} className={cn("overflow-hidden", getStatusColor(event.status))}>
+              <Card 
+                key={event.id} 
+                className={cn("overflow-hidden cursor-pointer", getStatusColor(event.status))}
+                onClick={() => handleEventClick(event)}
+              >
                 <CardHeader className="p-3">
                   <div className="flex justify-between items-center">
                     <CardTitle className="text-base">{event.title}</CardTitle>
@@ -186,7 +282,11 @@ const Calendar = () => {
               {events.length > 0 ? (
                 <div className="space-y-2 pl-2">
                   {events.map((event) => (
-                    <Card key={event.id} className={cn("overflow-hidden", getStatusColor(event.status))}>
+                    <Card 
+                      key={event.id} 
+                      className={cn("overflow-hidden cursor-pointer", getStatusColor(event.status))}
+                      onClick={() => handleEventClick(event)}
+                    >
                       <CardHeader className="p-3">
                         <div className="flex justify-between items-center">
                           <CardTitle className="text-base">{event.title}</CardTitle>
@@ -261,7 +361,11 @@ const Calendar = () => {
           {getEventsForDay(date).length > 0 ? (
             <div className="space-y-2">
               {getEventsForDay(date).map((event) => (
-                <Card key={event.id} className={cn("overflow-hidden", getStatusColor(event.status))}>
+                <Card 
+                  key={event.id} 
+                  className={cn("overflow-hidden cursor-pointer", getStatusColor(event.status))}
+                  onClick={() => handleEventClick(event)}
+                >
                   <CardHeader className="p-3">
                     <div className="flex justify-between items-center">
                       <CardTitle className="text-base">{event.title}</CardTitle>
@@ -307,6 +411,9 @@ const Calendar = () => {
         {view === "week" && renderWeekView()}
         {view === "month" && renderMonthView()}
       </div>
+
+      {/* Render event details dialog when an event is selected */}
+      {renderEventDetails()}
     </div>
   );
 };
