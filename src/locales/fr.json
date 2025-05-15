@@ -32,7 +32,7 @@
     "it": "Italien",
     "select": "Sélectionner la langue"
   },
-  "settings": {
+  "settings_section": {
     "title": "Paramètres",
     "tabs": {
       "profile": "Profil",

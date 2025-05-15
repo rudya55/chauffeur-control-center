@@ -52,12 +52,18 @@ const AppSidebar = ({ isOpen = false, onClose }: AppSidebarProps) => {
   const driverName = "Jean Dupont";
   const driverRating = 4.8;
   
+  // Make sure we're handling nested translation objects properly
+  const getTranslation = (key: string): string => {
+    const value = t(key);
+    return typeof value === 'string' ? value : key;
+  };
+  
   const menuItems = [
-    { title: t("home"), url: "/", icon: Home },
-    { title: t("reservations"), url: "/reservations", icon: Calendar },
-    { title: t("accounting"), url: "/accounting", icon: FileText },
-    { title: t("analytics"), url: "/analytics", icon: BarChart4 },
-    { title: t("settings"), url: "/settings", icon: Settings },
+    { title: getTranslation("home"), url: "/", icon: Home },
+    { title: getTranslation("reservations"), url: "/reservations", icon: Calendar },
+    { title: getTranslation("accounting"), url: "/accounting", icon: FileText },
+    { title: getTranslation("analytics"), url: "/analytics", icon: BarChart4 },
+    { title: getTranslation("settings"), url: "/settings", icon: Settings },
     { title: "Nous contacter", url: "/contact", icon: Mail },
     { title: "Conditions générales", url: "/terms", icon: FileTextIcon },
   ];
@@ -176,7 +182,7 @@ const AppSidebar = ({ isOpen = false, onClose }: AppSidebarProps) => {
                     onClick={() => alert("Déconnexion")}
                   >
                     <LogOut className="h-5 w-5" />
-                    {(!collapsed || isMobile) && <span>{t("logout")}</span>}
+                    {(!collapsed || isMobile) && <span>{typeof t("logout") === 'string' ? t("logout") : "Déconnexion"}</span>}
                   </button>
                 </SidebarMenuButton>
               </SidebarMenuItem>
