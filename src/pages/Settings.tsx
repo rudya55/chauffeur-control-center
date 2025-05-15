@@ -19,7 +19,7 @@ import { Switch } from "@/components/ui/switch";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { toast } from "@/hooks/use-toast";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
-import { Plus, Car, Download, Shield, Bell, Trash2, CreditCard, BankIcon } from "lucide-react";
+import { Plus, Car, Download, Shield, Bell, Trash2, CreditCard, Bank } from "lucide-react";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 import { Label } from "@/components/ui/label";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
@@ -663,7 +663,7 @@ const Settings = () => {
                           htmlFor="bank"
                           className="flex flex-col items-center justify-between rounded-md border-2 border-muted bg-popover p-4 hover:bg-accent hover:text-accent-foreground peer-data-[state=checked]:border-primary [&:has([data-state=checked])]:border-primary"
                         >
-                          <BankIcon className="mb-3 h-6 w-6" />
+                          <Bank className="mb-3 h-6 w-6" />
                           <span className="font-medium">Coordonnées Bancaires</span>
                         </Label>
                       </div>
