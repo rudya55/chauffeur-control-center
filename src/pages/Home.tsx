@@ -1,9 +1,9 @@
 
 import OnlineStatusToggle from "@/components/OnlineStatusToggle";
 import Map from "@/components/Map";
-import { Check, X, Bell } from "lucide-react";
+import { Check, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { useToast } from "@/components/ui/use-toast";
+import { useToast } from "@/hooks/use-toast";
 import { useEffect, useState } from "react";
 
 interface Reservation {
@@ -69,27 +69,23 @@ const Home = () => {
       if (hoursDiff === 24) {
         toast({
           title: "Rappel de réservation",
-          description: "Vous avez une course prévue demain à 10:15",
-          icon: <Bell className="h-4 w-4" />
+          description: "Vous avez une course prévue demain à 10:15"
         });
       } else if (hoursDiff === 12) {
         toast({
           title: "Rappel de réservation",
-          description: "Vous avez une course prévue dans 12 heures",
-          icon: <Bell className="h-4 w-4" />
+          description: "Vous avez une course prévue dans 12 heures"
         });
       } else if (hoursDiff === 2) {
         toast({
           title: "Rappel de réservation",
-          description: "Vous avez une course prévue dans 2 heures",
-          icon: <Bell className="h-4 w-4" />
+          description: "Vous avez une course prévue dans 2 heures"
         });
       } else if (hoursDiff === 1) {
         toast({
           title: "Attention",
           description: "Vous avez une course dans 1 heure et vous n'avez pas démarré",
-          variant: "destructive",
-          icon: <Bell className="h-4 w-4" />
+          variant: "destructive"
         });
       }
     };
@@ -219,13 +215,6 @@ const Home = () => {
           </div>
         </div>
       )}
-
-      {/* Bottom action button */}
-      <div className="absolute bottom-6 left-1/2 transform -translate-x-1/2 z-10">
-        <Button className="rounded-full bg-green-500 hover:bg-green-600 h-14 w-14 flex items-center justify-center">
-          <span className="sr-only">Action</span>
-        </Button>
-      </div>
     </div>
   );
 };
