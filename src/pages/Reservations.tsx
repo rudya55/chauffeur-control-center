@@ -1,13 +1,35 @@
 
 import { useState } from "react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Card, CardContent } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { Check, X, MapPin, Phone, Plane } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
+import ReservationCard from "@/components/ReservationCard";
+import { Menu } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 
-// Mock data for reservations
-const upcomingReservations = [
+// Type de réservation
+type ReservationType = {
+  id: string;
+  clientName: string;
+  pickupAddress: string;
+  destination: string;
+  date: string;
+  phone: string;
+  flightNumber?: string;
+  dispatcher: string;
+  passengers?: number;
+  status?: 'pending' | 'accepted' | 'started' | 'arrived' | 'onBoard' | 'completed';
+  actualPickupTime?: string;
+  dropoffTime?: string;
+  distance?: string;
+  duration?: string;
+  amount?: string;
+  rating?: number;
+  comment?: string;
+};
+
+// Données de réservations (simulations)
+const initialUpcomingReservations: ReservationType[] = [
   {
     id: "1",
     clientName: "Jean Dupont",
@@ -16,7 +38,9 @@ const upcomingReservations = [
     date: "2025-05-16T14:30:00",
     phone: "+33612345678",
     flightNumber: "AF1234",
-    dispatcher: "TaxiCorp"
+    dispatcher: "TaxiCorp",
+    passengers: 2,
+    status: 'pending'
   },
   {
     id: "2",
@@ -26,11 +50,13 @@ const upcomingReservations = [
     date: "2025-05-17T09:15:00",
     phone: "+33687654321",
     flightNumber: "",
-    dispatcher: "VTCService"
+    dispatcher: "VTCService",
+    passengers: 1,
+    status: 'pending'
   }
 ];
 
-const myReservations = [
+const initialMyReservations: ReservationType[] = [
   {
     id: "3",
     clientName: "Pierre Leroy",
@@ -39,11 +65,13 @@ const myReservations = [
     date: "2025-05-18T18:45:00",
     phone: "+33698765432",
     flightNumber: "",
-    dispatcher: "LuxDrive"
+    dispatcher: "LuxDrive",
+    passengers: 3,
+    status: 'accepted'
   }
 ];
 
-const completedReservations = [
+const initialCompletedReservations: ReservationType[] = [
   {
     id: "4",
     clientName: "Sophie Bernard",
@@ -57,138 +85,121 @@ const completedReservations = [
     phone: "+33654321987",
     flightNumber: "",
     dispatcher: "TaxiCorp",
-    amount: "25.50"
+    passengers: 2,
+    amount: "25.50",
+    rating: 4,
+    comment: "Très bon chauffeur, ponctuel et professionnel.",
+    status: 'completed'
   }
 ];
 
-const ReservationCard = ({ 
-  reservation, 
-  type 
-}: { 
-  reservation: any, 
-  type: 'upcoming' | 'current' | 'completed' 
-}) => {
-  const formattedDate = new Date(reservation.date).toLocaleString('fr-FR', {
-    weekday: 'short',
-    day: 'numeric',
-    month: 'short',
-    hour: '2-digit',
-    minute: '2-digit'
-  });
-
-  const handleShowPassenger = (name: string) => {
-    alert(`Affichage pancarte pour: ${name}`);
-  };
-
-  const handleCheckFlight = (flight: string) => {
-    if (!flight) return;
-    alert(`Vérification du vol: ${flight}`);
-  };
-
-  return (
-    <Card className="mb-4">
-      <CardContent className="pt-6">
-        <div className="flex justify-between items-start mb-2">
-          <div>
-            <h3 
-              className="text-lg font-semibold cursor-pointer hover:text-primary"
-              onClick={() => handleShowPassenger(reservation.clientName)}
-            >
-              {reservation.clientName}
-            </h3>
-            <div className="text-sm text-gray-500">
-              {formattedDate}
-            </div>
-          </div>
-          <Badge>{reservation.dispatcher}</Badge>
-        </div>
-
-        <div className="mt-4 space-y-2">
-          <div className="flex items-start gap-2">
-            <MapPin className="h-4 w-4 mt-1 text-primary shrink-0" />
-            <div>
-              <div className="text-sm font-medium">Prise en charge:</div>
-              <div className="text-sm">{reservation.pickupAddress}</div>
-            </div>
-          </div>
-          <div className="flex items-start gap-2">
-            <MapPin className="h-4 w-4 mt-1 text-destructive shrink-0" />
-            <div>
-              <div className="text-sm font-medium">Destination:</div>
-              <div className="text-sm">{reservation.destination}</div>
-            </div>
-          </div>
-        </div>
-
-        <div className="mt-4 space-y-2">
-          <div className="flex items-center gap-2">
-            <Phone className="h-4 w-4 text-gray-500" />
-            <a href={`tel:${reservation.phone}`} className="text-sm hover:text-primary">
-              {reservation.phone}
-            </a>
-          </div>
-          
-          {reservation.flightNumber && (
-            <div 
-              className="flex items-center gap-2 cursor-pointer hover:text-primary"
-              onClick={() => handleCheckFlight(reservation.flightNumber)}
-            >
-              <Plane className="h-4 w-4 text-gray-500" />
-              <span className="text-sm">{reservation.flightNumber}</span>
-            </div>
-          )}
-        </div>
-
-        {type === 'upcoming' && (
-          <div className="mt-4 flex gap-2">
-            <Button 
-              variant="outline" 
-              className="flex-1 bg-secondary/10 hover:bg-secondary/20 border-secondary/30"
-              onClick={() => alert(`Réservation ${reservation.id} acceptée`)}
-            >
-              <Check className="mr-2 h-4 w-4" />
-              Accepter
-            </Button>
-            <Button 
-              variant="outline" 
-              className="flex-1 bg-destructive/10 hover:bg-destructive/20 border-destructive/30"
-              onClick={() => alert(`Réservation ${reservation.id} refusée`)}
-            >
-              <X className="mr-2 h-4 w-4" />
-              Refuser
-            </Button>
-          </div>
-        )}
-
-        {type === 'completed' && (
-          <div className="mt-4 border-t pt-3">
-            <div className="grid grid-cols-3 gap-2">
-              <div className="text-center">
-                <div className="text-xs text-gray-500">Distance</div>
-                <div className="font-medium">{reservation.distance}</div>
-              </div>
-              <div className="text-center">
-                <div className="text-xs text-gray-500">Durée</div>
-                <div className="font-medium">{reservation.duration}</div>
-              </div>
-              <div className="text-center">
-                <div className="text-xs text-gray-500">Montant</div>
-                <div className="font-medium">{reservation.amount} €</div>
-              </div>
-            </div>
-          </div>
-        )}
-      </CardContent>
-    </Card>
-  );
-};
-
 const Reservations = () => {
   const [activeTab, setActiveTab] = useState("upcoming");
+  const [upcomingReservations, setUpcomingReservations] = useState<ReservationType[]>(initialUpcomingReservations);
+  const [myReservations, setMyReservations] = useState<ReservationType[]>(initialMyReservations);
+  const [completedReservations, setCompletedReservations] = useState<ReservationType[]>(initialCompletedReservations);
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+
+  // Gérer l'acceptation d'une réservation
+  const handleAcceptReservation = (id: string) => {
+    // Trouver la réservation
+    const reservationToAccept = upcomingReservations.find(res => res.id === id);
+    if (!reservationToAccept) return;
+
+    // Supprimer de la liste des réservations à venir
+    setUpcomingReservations(prev => prev.filter(res => res.id !== id));
+
+    // Ajouter à la liste des réservations acceptées avec le statut mis à jour
+    setMyReservations(prev => [
+      ...prev, 
+      { ...reservationToAccept, status: 'accepted' }
+    ]);
+  };
+
+  // Gérer le refus d'une réservation
+  const handleRejectReservation = (id: string) => {
+    setUpcomingReservations(prev => prev.filter(res => res.id !== id));
+  };
+
+  // Gérer le démarrage d'une course
+  const handleStartRide = (id: string) => {
+    setMyReservations(prev => prev.map(res => 
+      res.id === id ? { ...res, status: 'started' } : res
+    ));
+  };
+
+  // Gérer l'arrivée au point de prise en charge
+  const handleArrived = (id: string) => {
+    setMyReservations(prev => prev.map(res => 
+      res.id === id ? { ...res, status: 'arrived', actualPickupTime: new Date().toISOString() } : res
+    ));
+  };
+
+  // Gérer le client à bord
+  const handleClientBoarded = (id: string) => {
+    setMyReservations(prev => prev.map(res => 
+      res.id === id ? { ...res, status: 'onBoard' } : res
+    ));
+  };
+
+  // Gérer la fin d'une course
+  const handleCompleteRide = (id: string, rating: number, comment: string) => {
+    // Trouver la réservation
+    const reservationToComplete = myReservations.find(res => res.id === id);
+    if (!reservationToComplete) return;
+
+    // Supprimer de la liste des réservations en cours
+    setMyReservations(prev => prev.filter(res => res.id !== id));
+
+    // Ajouter aux réservations terminées avec les données supplémentaires
+    setCompletedReservations(prev => [
+      ...prev, 
+      { 
+        ...reservationToComplete,
+        status: 'completed',
+        dropoffTime: new Date().toISOString(),
+        distance: "12.5 km", // Ces données seraient calculées dans une vraie application
+        duration: "35 min",
+        amount: "32.00",
+        rating,
+        comment
+      }
+    ]);
+  };
 
   return (
-    <div className="space-y-4">
-      <h1 className="text-2xl font-bold tracking-tight">Réservations</h1>
+    <div className="space-y-4 p-4">
+      <div className="flex items-center justify-between">
+        <h1 className="text-2xl font-bold tracking-tight">Réservations</h1>
+        
+        {/* Menu hamburger */}
+        <Sheet open={isSidebarOpen} onOpenChange={setIsSidebarOpen}>
+          <SheetTrigger asChild>
+            <Button variant="outline" size="icon">
+              <Menu className="h-5 w-5" />
+              <span className="sr-only">Menu</span>
+            </Button>
+          </SheetTrigger>
+          <SheetContent side="left">
+            <div className="py-4">
+              <h2 className="text-lg font-medium mb-4">Menu</h2>
+              <nav className="space-y-2">
+                <a href="/" className="block px-4 py-2 hover:bg-muted rounded-md">Accueil</a>
+                <a href="/reservations" className="block px-4 py-2 bg-muted rounded-md font-medium">Réservations</a>
+                <a href="/accounting" className="block px-4 py-2 hover:bg-muted rounded-md">Comptabilité</a>
+                <a href="/analytics" className="block px-4 py-2 hover:bg-muted rounded-md">Analyse</a>
+                <a href="/settings" className="block px-4 py-2 hover:bg-muted rounded-md">Paramètres</a>
+                <button 
+                  className="block w-full text-left px-4 py-2 hover:bg-muted rounded-md text-destructive"
+                  onClick={() => alert("Déconnexion")}
+                >
+                  Déconnexion
+                </button>
+              </nav>
+            </div>
+          </SheetContent>
+        </Sheet>
+      </div>
       
       <Tabs defaultValue="upcoming" className="w-full" onValueChange={setActiveTab}>
         <TabsList className="w-full">
@@ -219,7 +230,9 @@ const Reservations = () => {
               <ReservationCard 
                 key={reservation.id} 
                 reservation={reservation} 
-                type="upcoming" 
+                type="upcoming"
+                onAccept={handleAcceptReservation}
+                onReject={handleRejectReservation}
               />
             ))
           ) : (
@@ -235,7 +248,11 @@ const Reservations = () => {
               <ReservationCard 
                 key={reservation.id} 
                 reservation={reservation} 
-                type="current" 
+                type="current"
+                onStartRide={handleStartRide}
+                onArrived={handleArrived}
+                onClientBoarded={handleClientBoarded}
+                onComplete={handleCompleteRide}
               />
             ))
           ) : (
