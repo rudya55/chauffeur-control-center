@@ -27,10 +27,10 @@ const MobileHeader = ({ isOpen, onToggle }: MobileHeaderProps) => {
         <div className="flex items-center gap-2">
           <Avatar className="h-8 w-8">
             <AvatarImage src="/profile-photo.jpg" alt="Driver" />
-            <AvatarFallback>CH</AvatarFallback>
+            <AvatarFallback>JD</AvatarFallback>
           </Avatar>
           <div className="flex flex-col items-start leading-none">
-            <span className="text-sm font-medium">Chauffeur</span>
+            <span className="text-sm font-medium">Jean Dupont</span>
             <div className="flex items-center">
               <span className="text-xs font-medium text-yellow-500">{driverRating}</span>
               <span className="text-xs text-yellow-500 ml-1">★</span>
