@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
 import { Button } from "@/components/ui/button";
@@ -187,7 +188,7 @@ const ReservationActions = ({
             <div className="flex justify-end items-center">
               <span className="text-xs text-muted-foreground mr-2">Auto-accept dans:</span>
               <CircularTimer 
-                targetDate={testTimerDate}
+                targetTime={testTimerDate}
                 size={22}
               />
             </div>

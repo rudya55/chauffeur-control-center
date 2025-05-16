@@ -9,7 +9,7 @@ import ReservationTabHeader from "@/components/reservation/ReservationTabHeader"
 import { useMobile } from "@/hooks/use-mobile";
 import { ReservationType } from "@/types/reservation";
 import { Dialog, DialogContent } from "@/components/ui/dialog";
-import { Drawer, DrawerContent, DrawerTrigger } from "@/components/ui/drawer";
+import { Drawer, DrawerContent } from "@/components/ui/drawer";
 import ReservationDetails from "@/components/reservation/ReservationDetails";
 import ReservationActions from "@/components/reservation/ReservationActions";
 import { Button } from "@/components/ui/button";

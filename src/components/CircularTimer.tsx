@@ -6,18 +6,26 @@ interface CircularTimerProps {
   targetTime: Date;
   onTimeReached?: () => void;
   durationInSeconds?: number;
+  size?: number;
 }
 
 const CircularTimer = ({ 
   targetTime, 
   onTimeReached, 
-  durationInSeconds = 10
+  durationInSeconds = 10,
+  size = 16
 }: CircularTimerProps) => {
   const [timeLeft, setTimeLeft] = useState<string>("00:00:00");
   const [progress, setProgress] = useState(100);
   const [timerCompleted, setTimerCompleted] = useState(false);
 
   useEffect(() => {
+    // Guard clause to ensure targetTime is defined
+    if (!targetTime || !(targetTime instanceof Date)) {
+      console.error("CircularTimer: targetTime is undefined or not a Date object");
+      return;
+    }
+    
     const targetTimeMs = targetTime.getTime();
     const totalDurationMs = durationInSeconds * 1000;
     const startTimeMs = targetTimeMs - totalDurationMs;
@@ -34,7 +42,9 @@ const CircularTimer = ({
       if (timeLeftMs <= 0) {
         setTimeLeft("00:00:00");
         setTimerCompleted(true);
-        // Removed the toast notification call to fix the bug
+        if (onTimeReached) {
+          onTimeReached();
+        }
         return;
       }
       
@@ -58,9 +68,13 @@ const CircularTimer = ({
     return () => clearInterval(interval);
   }, [targetTime, onTimeReached, durationInSeconds]);
 
+  // Size calculation for the component
+  const width = size;
+  const height = size;
+
   return (
     <div className="flex flex-col items-center justify-center">
-      <div className="relative w-16 h-16">
+      <div className={`relative w-${width} h-${height}`} style={{ width: `${width}px`, height: `${height}px` }}>
         {/* Circular progress background */}
         <div className="absolute inset-0 rounded-full bg-gray-100 border border-gray-200"></div>
         
@@ -90,11 +104,11 @@ const CircularTimer = ({
         
         {/* Center clock icon */}
         <div className="absolute inset-0 flex items-center justify-center">
-          <Clock className="h-4 w-4 text-primary" />
+          <Clock className={`h-${Math.max(width/4, 4)} w-${Math.max(width/4, 4)} text-primary`} style={{ width: `${Math.max(width/4, 4)}px`, height: `${Math.max(width/4, 4)}px` }} />
         </div>
       </div>
       
-      <div className="text-sm font-medium text-primary">
+      <div className="text-sm font-medium text-primary mt-1">
         {timeLeft}
       </div>
     </div>
