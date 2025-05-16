@@ -5,19 +5,11 @@ import { useState } from "react";
 import PageHeader from "@/components/PageHeader";
 
 const Home = () => {
-  const [sidebarOpen, setSidebarOpen] = useState(false);
-
-  const handleMenuToggle = () => {
-    setSidebarOpen(!sidebarOpen);
-    // Dispatch event to toggle sidebar
-    window.dispatchEvent(new CustomEvent('toggle-sidebar'));
-  };
-
   return (
     <div className="relative h-screen w-full p-0 overflow-hidden">
       {/* Map as background */}
       <div className="absolute inset-0 z-0">
-        <Map onMenuToggle={handleMenuToggle} />
+        <Map />
       </div>
       
       {/* Status toggle at top center */}
@@ -30,8 +22,7 @@ const Home = () => {
         <PageHeader 
           title="" 
           showBackButton={false} 
-          className="mb-0 px-2 py-1" 
-          onMenuToggle={handleMenuToggle}
+          className="mb-0 px-2 py-1"
         />
       </div>
     </div>

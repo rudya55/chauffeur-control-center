@@ -22,17 +22,15 @@ const PageHeader = ({ title, showBackButton = true, className, onMenuToggle }: P
   return (
     <div className={`flex justify-between items-center mb-6 ${className}`}>
       <div className="flex items-center gap-2">
-        {/* Menu hamburger button */}
-        {onMenuToggle && (
-          <Button 
-            variant="ghost" 
-            size="icon" 
-            onClick={onMenuToggle}
-            className="mr-2"
-          >
-            <Menu className="h-5 w-5" />
-          </Button>
-        )}
+        {/* Menu hamburger button - toujours visible */}
+        <Button 
+          variant="ghost" 
+          size="icon" 
+          onClick={() => window.dispatchEvent(new CustomEvent('toggle-sidebar'))}
+          className="mr-2"
+        >
+          <Menu className="h-5 w-5" />
+        </Button>
         
         {showBackButton && (
           <Button 
