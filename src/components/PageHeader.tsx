@@ -1,6 +1,6 @@
 
 import { Button } from "@/components/ui/button";
-import { ArrowLeft, MoreVertical } from "lucide-react";
+import { ArrowLeft, Menu, MoreVertical } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import {
   DropdownMenu,
@@ -15,9 +15,10 @@ interface PageHeaderProps {
   title: string;
   showBackButton?: boolean;
   className?: string;
+  onMenuToggle?: () => void;
 }
 
-const PageHeader = ({ title, showBackButton = true, className }: PageHeaderProps) => {
+const PageHeader = ({ title, showBackButton = true, className, onMenuToggle }: PageHeaderProps) => {
   const { t } = useLanguage();
   const navigate = useNavigate();
   
@@ -28,10 +29,31 @@ const PageHeader = ({ title, showBackButton = true, className }: PageHeaderProps
   const handleMenuAction = (action: string) => {
     toast.success(`Action "${action}" clicked`);
   };
+
+  const handleMenuToggle = () => {
+    // Trigger sidebar toggle event
+    const event = new CustomEvent('toggle-sidebar');
+    window.dispatchEvent(event);
+    
+    if (onMenuToggle) {
+      onMenuToggle();
+    }
+  };
   
   return (
     <div className={`flex justify-between items-center mb-6 ${className}`}>
       <div className="flex items-center gap-2">
+        {/* Menu hamburger button */}
+        <Button 
+          variant="ghost" 
+          size="icon" 
+          onClick={handleMenuToggle}
+          className="mr-2"
+          aria-label="Toggle Menu"
+        >
+          <Menu className="h-5 w-5" />
+        </Button>
+        
         {showBackButton && (
           <Button 
             variant="ghost" 
