@@ -8,6 +8,7 @@ import NotificationBell from "@/components/NotificationBell";
 import { SidebarProvider } from "@/components/ui/sidebar";
 import { useAuth } from "@/hooks/use-auth";
 import { useEffect } from "react";
+import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 
 const AppLayout = () => {
   const isMobile = useIsMobile();
@@ -33,6 +34,15 @@ const AppLayout = () => {
     <SidebarProvider>
       <div className="flex h-screen w-full">
         {!isMobile && <AppSidebar />}
+        
+        {isMobile && (
+          <Sheet open={isSidebarOpen} onOpenChange={setIsSidebarOpen}>
+            <SheetContent side="left" className="w-64 p-0" onClick={(e) => e.stopPropagation()}>
+              <AppSidebar isOpen={isSidebarOpen} onClose={() => setIsSidebarOpen(false)} />
+            </SheetContent>
+          </Sheet>
+        )}
+        
         <div className="flex-1 flex flex-col overflow-hidden">
           {isMobile && (
             <div className="flex justify-between items-center px-4 py-2 border-b">

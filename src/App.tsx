@@ -16,6 +16,7 @@ import Contact from "@/pages/Contact";
 import Settings from "@/pages/Settings";
 import Terms from "@/pages/Terms";
 import NotFound from "@/pages/NotFound";
+import Accounting from "@/pages/Accounting";
 
 function App() {
   return (
@@ -40,6 +41,7 @@ function App() {
                 <Route path="calendar" element={<Calendar />} />
                 <Route path="reservations" element={<Reservations />} />
                 <Route path="contact" element={<Contact />} />
+                <Route path="accounting" element={<Accounting />} />
                 <Route path="settings" element={<Settings />} />
                 <Route path="terms" element={<Terms />} />
                 <Route path="*" element={<NotFound />} />
