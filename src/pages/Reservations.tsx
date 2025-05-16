@@ -289,7 +289,7 @@ const Reservations = () => {
           <TabsTrigger value="upcoming" className="flex-1">
             À venir
             {upcomingReservations.length > 0 && (
-              <Badge variant="secondary" className="ml-2">
+              <Badge variant="destructive" className="ml-2 bg-red-600 text-white">
                 {upcomingReservations.length}
               </Badge>
             )}

@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -259,7 +258,7 @@ const ReservationCard = ({
               </div>
 
               <div className="mt-4 pt-3 border-t border-gray-200 flex justify-between items-center">
-                <div className="text-lg font-bold text-emerald-600">
+                <div className="text-lg font-bold text-red-600">
                   {reservation.driverAmount}€ <span className="text-xs text-gray-500">(NET)</span>
                 </div>
                 
@@ -534,7 +533,7 @@ const ReservationCard = ({
               
               {/* Price at the bottom for current and completed */}
               <div className="mt-4 pt-3 border-t border-gray-200 text-center">
-                <div className="text-lg font-bold text-emerald-600">
+                <div className="text-lg font-bold text-red-600">
                   {reservation.driverAmount}€ <span className="text-xs text-gray-500">(NET)</span>
                 </div>
                 {(reservation.amount && reservation.commission) && (
