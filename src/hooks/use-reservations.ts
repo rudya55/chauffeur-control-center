@@ -1,6 +1,7 @@
 
 import { useState, useEffect } from "react";
 import { ReservationType } from "@/types/reservation";
+import { toast } from "sonner";
 
 // Sample data for development
 const initialUpcomingReservations: ReservationType[] = [
@@ -135,13 +136,25 @@ export const useReservations = () => {
       
       // Retirer de la liste des réservations à venir
       setUpcomingReservations(prev => prev.filter(res => res.id !== id));
+      
+      // Ajouter la réservation au localStorage pour le calendrier
+      const calendarReservations = JSON.parse(localStorage.getItem('calendarReservations') || '[]');
+      calendarReservations.push(updatedReservation);
+      localStorage.setItem('calendarReservations', JSON.stringify(calendarReservations));
+      
+      toast.success(`Réservation pour ${reservation.clientName} acceptée`);
     }
   };
 
   // Refuser une réservation
   const handleRejectReservation = (id: string) => {
     // Simplement retirer de la liste des réservations à venir
+    const reservation = upcomingReservations.find(res => res.id === id);
     setUpcomingReservations(prev => prev.filter(res => res.id !== id));
+    
+    if (reservation) {
+      toast.info(`Réservation pour ${reservation.clientName} refusée`);
+    }
   };
 
   // Gérer le démarrage d'une course
@@ -149,6 +162,9 @@ export const useReservations = () => {
     setMyReservations(prev => prev.map(res => 
       res.id === id ? { ...res, status: 'started' } : res
     ));
+    
+    // Mettre à jour les données dans localStorage pour le calendrier
+    updateCalendarReservation(id, 'started');
   };
 
   // Gérer l'arrivée au point de prise en charge
@@ -156,6 +172,9 @@ export const useReservations = () => {
     setMyReservations(prev => prev.map(res => 
       res.id === id ? { ...res, status: 'arrived', actualPickupTime: new Date().toISOString() } : res
     ));
+    
+    // Mettre à jour les données dans localStorage pour le calendrier
+    updateCalendarReservation(id, 'arrived');
   };
 
   // Gérer le client à bord
@@ -163,6 +182,9 @@ export const useReservations = () => {
     setMyReservations(prev => prev.map(res => 
       res.id === id ? { ...res, status: 'onBoard' } : res
     ));
+    
+    // Mettre à jour les données dans localStorage pour le calendrier
+    updateCalendarReservation(id, 'onBoard');
   };
 
   // Gérer la fin d'une course
@@ -195,6 +217,22 @@ export const useReservations = () => {
     };
     
     setCompletedReservations(prev => [...prev, completedReservation]);
+    
+    // Mettre à jour les données dans localStorage pour le calendrier
+    const calendarReservations = JSON.parse(localStorage.getItem('calendarReservations') || '[]');
+    const updatedCalendarReservations = calendarReservations.filter((res: ReservationType) => res.id !== id);
+    localStorage.setItem('calendarReservations', JSON.stringify(updatedCalendarReservations));
+    
+    toast.success(`Course pour ${reservationToComplete.clientName} terminée`);
+  };
+  
+  // Mettre à jour une réservation dans le localStorage pour le calendrier
+  const updateCalendarReservation = (id: string, newStatus: string) => {
+    const calendarReservations = JSON.parse(localStorage.getItem('calendarReservations') || '[]');
+    const updatedCalendarReservations = calendarReservations.map((res: ReservationType) => 
+      res.id === id ? { ...res, status: newStatus } : res
+    );
+    localStorage.setItem('calendarReservations', JSON.stringify(updatedCalendarReservations));
   };
   
   // Ouvrir le chat avec un dispatcher
@@ -211,12 +249,21 @@ export const useReservations = () => {
 
   // Load reservations from localStorage on initial load
   useEffect(() => {
-    const storedMyReservations = localStorage.getItem('myReservations');
+    // Si pas de données dans le localStorage, initialiser avec les données par défaut
+    if (!localStorage.getItem('calendarReservations')) {
+      localStorage.setItem('calendarReservations', JSON.stringify(initialMyReservations));
+    }
     
+    const storedMyReservations = localStorage.getItem('myReservations');
     if (storedMyReservations) {
       setMyReservations(JSON.parse(storedMyReservations));
     }
   }, []);
+
+  // Sauvegarder les réservations dans localStorage à chaque changement
+  useEffect(() => {
+    localStorage.setItem('myReservations', JSON.stringify(myReservations));
+  }, [myReservations]);
 
   return {
     upcomingReservations,

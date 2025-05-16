@@ -1,6 +1,5 @@
 import { NavLink, useLocation } from "react-router-dom";
 import { 
-  Home, 
   Calendar, 
   BarChart4, 
   FileText, 
@@ -55,7 +54,6 @@ const AppSidebar = ({ isOpen = false, onClose }: AppSidebarProps) => {
   const driverRating = 4.8;
   
   const menuItems = [
-    { title: t("home"), url: "/", icon: Home },
     { title: t("planning"), url: "/calendar", icon: Calendar },
     { title: t("reservations"), url: "/reservations", icon: FileText },
     { title: t("analytics"), url: "/analytics", icon: BarChart4 },
@@ -135,7 +133,7 @@ const AppSidebar = ({ isOpen = false, onClose }: AppSidebarProps) => {
           </DialogContent>
         </Dialog>
         
-        {/* Add a global back button at the top of the sidebar */}
+        {/* Keep the back button */}
         <Button 
           variant="ghost" 
           size="sm" 

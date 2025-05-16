@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import PageHeader from "@/components/PageHeader";
 import { Button } from "@/components/ui/button";
@@ -16,7 +15,9 @@ import {
   Building, 
   Mail, 
   Phone, 
-  AlertCircle 
+  AlertCircle,
+  FileText,
+  Download 
 } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { toast } from "sonner";
@@ -51,6 +52,12 @@ const Settings = () => {
   const [pushNotifications, setPushNotifications] = useState(true);
   const [showPaymentDialog, setShowPaymentDialog] = useState(false);
   const [paymentMethod, setPaymentMethod] = useState("card");
+  const [documentFile, setDocumentFile] = useState<File | null>(null);
+  const [documents, setDocuments] = useState([
+    { id: "1", name: "Permis de conduire", type: "pdf", date: "2025-04-15", size: "2.3 MB" },
+    { id: "2", name: "Assurance véhicule", type: "pdf", date: "2025-03-22", size: "1.5 MB" },
+    { id: "3", name: "Carte grise", type: "pdf", date: "2025-01-10", size: "650 KB" },
+  ]);
   
   const handleSaveProfile = (e: React.FormEvent) => {
     e.preventDefault();
@@ -76,18 +83,51 @@ const Settings = () => {
     toast.success(`Nouvelle méthode de paiement ajoutée`);
     setShowPaymentDialog(false);
   };
+
+  const handleDocumentUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      setDocumentFile(file);
+      // En production, vous enverriez le fichier à un serveur ici
+      const newDocument = {
+        id: (documents.length + 1).toString(),
+        name: file.name,
+        type: file.name.split('.').pop() || "unknown",
+        date: new Date().toISOString().split('T')[0],
+        size: `${(file.size / 1024).toFixed(1)} KB`
+      };
+      setDocuments([...documents, newDocument]);
+      toast.success("Document téléchargé avec succès");
+    }
+  };
+
+  const handleDeleteDocument = (id: string) => {
+    setDocuments(documents.filter(doc => doc.id !== id));
+    toast.success("Document supprimé");
+  };
+
+  const handleViewDocument = (id: string) => {
+    // En production, vous récupéreriez le document depuis votre serveur
+    toast.info(`Affichage du document ${id}`);
+  };
+
+  const handleDownloadDocument = (id: string) => {
+    // En production, vous téléchargeriez le document depuis votre serveur
+    toast.info(`Téléchargement du document ${id}`);
+  };
   
   return (
     <div className="p-4 sm:p-6">
       <PageHeader title="settings" />
       
       <Tabs defaultValue="profile" className="w-full">
-        <TabsList className="grid w-full grid-cols-5 mb-6">
+        <TabsList className="grid w-full grid-cols-6 mb-6">
           <TabsTrigger value="profile">Profil</TabsTrigger>
           <TabsTrigger value="notifications">Notifications</TabsTrigger>
           <TabsTrigger value="payment">Paiement</TabsTrigger>
           <TabsTrigger value="security">Sécurité</TabsTrigger>
           <TabsTrigger value="language">Langues</TabsTrigger>
+          <TabsTrigger value="documents">Documents</TabsTrigger>
         </TabsList>
         
         <TabsContent value="profile" className="bg-white rounded-lg shadow p-4 md:p-6">
@@ -520,6 +560,99 @@ const Settings = () => {
               </div>
               <p className="text-sm text-muted-foreground mt-2">
                 Nous nous efforçons d'améliorer constamment nos traductions. Si vous remarquez des erreurs, n'hésitez pas à nous les signaler.
+              </p>
+            </div>
+          </div>
+        </TabsContent>
+
+        <TabsContent value="documents" className="bg-white rounded-lg shadow p-4 md:p-6">
+          <div className="space-y-6">
+            <h3 className="text-lg font-medium mb-4 flex items-center">
+              <FileText className="mr-2 h-5 w-5" />
+              Documents
+            </h3>
+            
+            <div className="border rounded-lg p-6 bg-gray-50">
+              <div className="text-center">
+                <FileText className="mx-auto h-12 w-12 text-gray-400 mb-2" />
+                <h4 className="font-medium mb-1">Télécharger un document</h4>
+                <p className="text-sm text-muted-foreground mb-4">
+                  Formats supportés: PDF, JPG, PNG (max 10MB)
+                </p>
+                
+                <Label 
+                  htmlFor="document-upload" 
+                  className="cursor-pointer bg-primary text-primary-foreground px-4 py-2 rounded-md inline-block"
+                >
+                  Sélectionner un fichier
+                </Label>
+                <Input 
+                  id="document-upload" 
+                  type="file" 
+                  accept=".pdf,.jpg,.jpeg,.png" 
+                  className="hidden" 
+                  onChange={handleDocumentUpload}
+                />
+              </div>
+            </div>
+            
+            <h4 className="font-medium mt-8 mb-2">Documents téléchargés</h4>
+            <div className="border rounded-lg overflow-hidden">
+              <div className="grid grid-cols-5 bg-muted/50 p-3 border-b font-medium text-sm">
+                <div className="col-span-2">Nom</div>
+                <div>Type</div>
+                <div>Date</div>
+                <div className="text-right">Actions</div>
+              </div>
+              
+              {documents.length === 0 ? (
+                <div className="p-6 text-center text-muted-foreground">
+                  Aucun document téléchargé
+                </div>
+              ) : (
+                documents.map((doc) => (
+                  <div key={doc.id} className="grid grid-cols-5 p-3 border-b items-center text-sm">
+                    <div className="col-span-2 font-medium">{doc.name}</div>
+                    <div className="uppercase">{doc.type}</div>
+                    <div>{doc.date}</div>
+                    <div className="flex gap-2 justify-end">
+                      <Button 
+                        variant="ghost" 
+                        size="sm" 
+                        onClick={() => handleViewDocument(doc.id)}
+                      >
+                        Voir
+                      </Button>
+                      <Button 
+                        variant="ghost" 
+                        size="sm"
+                        onClick={() => handleDownloadDocument(doc.id)}
+                      >
+                        <Download className="h-4 w-4" />
+                      </Button>
+                      <Button 
+                        variant="ghost" 
+                        size="sm"
+                        className="text-destructive hover:bg-destructive/10" 
+                        onClick={() => handleDeleteDocument(doc.id)}
+                      >
+                        Supprimer
+                      </Button>
+                    </div>
+                  </div>
+                ))
+              )}
+            </div>
+            
+            <div className="bg-amber-50 border border-amber-200 p-4 rounded-lg">
+              <div className="flex items-center gap-2 text-amber-600">
+                <AlertCircle className="h-5 w-5" />
+                <p className="text-sm font-medium">
+                  Les documents sont uniquement visibles par vous et l'administration.
+                </p>
+              </div>
+              <p className="text-sm text-amber-700 mt-2">
+                Veuillez vous assurer que tous les documents sont à jour et lisibles.
               </p>
             </div>
           </div>
