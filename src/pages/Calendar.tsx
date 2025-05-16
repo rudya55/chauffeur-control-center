@@ -124,7 +124,7 @@ const Calendar = () => {
   };
 
   // Fonction pour styliser les jours dans le calendrier
-  const getDayStyle = (date: Date) => {
+  const getDayStyle = (date: Date): React.CSSProperties => {
     const dateString = format(date, 'yyyy-MM-dd');
     const status = daysWithReservations[dateString];
     
@@ -177,12 +177,14 @@ const Calendar = () => {
                 booked: (date) => Boolean(daysWithReservations[format(date, 'yyyy-MM-dd')])
               }}
               modifiersStyles={{
-                booked: (date) => getDayStyle(date)
+                booked: { 
+                  textDecoration: 'none'
+                }
               }}
               components={{
-                DayContent: ({ date, ...props }) => (
-                  <div className="relative w-full h-full flex items-center justify-center">
-                    <div {...props} />
+                DayContent: ({ date }) => (
+                  <div className="relative w-full h-full flex items-center justify-center" style={getDayStyle(date)}>
+                    <div>{format(date, 'd')}</div>
                     {renderDayContent(date)}
                   </div>
                 )
