@@ -20,16 +20,11 @@ export default defineConfig(({ mode }) => ({
       "@": path.resolve(__dirname, "./src"),
     },
   },
-  // Adding base URL config to ensure assets are loaded correctly on Netlify
+  // Adding base URL config to ensure assets are loaded correctly
   base: './',
   // Optimizations for production build
   build: {
     minify: 'terser',
-    terserOptions: {
-      compress: {
-        drop_console: true,
-      },
-    },
     sourcemap: false,
     rollupOptions: {
       output: {
