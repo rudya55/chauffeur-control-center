@@ -1,5 +1,5 @@
 
-import { NavLink, useLocation } from "react-router-dom";
+import { NavLink, useLocation, useNavigate } from "react-router-dom";
 import { 
   Home, 
   Calendar, 
@@ -7,7 +7,8 @@ import {
   FileText, 
   Settings,
   Mail,
-  FileText as FileTextIcon
+  FileText as FileTextIcon,
+  LogOut
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useIsMobile } from "@/hooks/use-mobile";
@@ -33,6 +34,9 @@ import {
   DialogTrigger 
 } from "@/components/ui/dialog";
 import { useLanguage } from "@/hooks/use-language";
+import { useAuth } from "@/hooks/use-auth";
+import { toast } from "sonner";
+import { Button } from "./ui/button";
 
 interface AppSidebarProps {
   isOpen?: boolean;
@@ -46,6 +50,8 @@ const AppSidebar = ({ isOpen = false, onClose }: AppSidebarProps) => {
   const isMobile = useIsMobile();
   const [avatarUrl, setAvatarUrl] = useState("/profile-photo.jpg");
   const { t } = useLanguage();
+  const { logout } = useAuth();
+  const navigate = useNavigate();
   
   // Driver information
   const driverName = "Jean Dupont";
@@ -74,6 +80,12 @@ const AppSidebar = ({ isOpen = false, onClose }: AppSidebarProps) => {
       const url = URL.createObjectURL(file);
       setAvatarUrl(url);
     }
+  };
+
+  const handleLogout = () => {
+    logout();
+    toast.success("Déconnexion réussie");
+    navigate('/login');
   };
 
   const getNavClasses = ({ isActive }: { isActive: boolean }) =>
@@ -130,7 +142,7 @@ const AppSidebar = ({ isOpen = false, onClose }: AppSidebarProps) => {
         </Dialog>
       </div>
 
-      <SidebarContent className="p-2">
+      <SidebarContent className="p-2 flex-1">
         <SidebarGroup>
           <SidebarGroupContent>
             <SidebarMenu>
@@ -153,6 +165,18 @@ const AppSidebar = ({ isOpen = false, onClose }: AppSidebarProps) => {
           </SidebarGroupContent>
         </SidebarGroup>
       </SidebarContent>
+      
+      {/* Bouton de déconnexion en bas */}
+      <div className="p-4 border-t mt-auto">
+        <Button 
+          variant="outline" 
+          className="w-full flex items-center justify-center gap-2"
+          onClick={handleLogout}
+        >
+          <LogOut className="h-4 w-4" />
+          <span>Déconnexion</span>
+        </Button>
+      </div>
     </div>
   );
 };
