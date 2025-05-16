@@ -9,7 +9,13 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { useLanguage } from "@/hooks/use-language";
 
-const AccountingHeader = () => {
+interface PageHeaderProps {
+  title: string;
+  showBackButton?: boolean;
+  className?: string;
+}
+
+const PageHeader = ({ title, showBackButton = true, className }: PageHeaderProps) => {
   const { t } = useLanguage();
   const navigate = useNavigate();
   
@@ -18,17 +24,19 @@ const AccountingHeader = () => {
   };
   
   return (
-    <div className="flex justify-between items-center mb-6">
+    <div className={`flex justify-between items-center mb-6 ${className}`}>
       <div className="flex items-center gap-2">
-        <Button 
-          variant="ghost" 
-          size="icon" 
-          onClick={handleGoBack} 
-          className="mr-2"
-        >
-          <ArrowLeft className="h-5 w-5" />
-        </Button>
-        <h1 className="text-2xl font-bold tracking-tight">{t("accounting")}</h1>
+        {showBackButton && (
+          <Button 
+            variant="ghost" 
+            size="icon" 
+            onClick={handleGoBack} 
+            className="mr-2"
+          >
+            <ArrowLeft className="h-5 w-5" />
+          </Button>
+        )}
+        <h1 className="text-2xl font-bold tracking-tight">{t(title.toLowerCase()) || title}</h1>
       </div>
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
@@ -37,11 +45,11 @@ const AccountingHeader = () => {
           </Button>
         </DropdownMenuTrigger>
         <DropdownMenuContent>
-          {/* Menu content removed as requested */}
+          {/* Empty menu content as requested */}
         </DropdownMenuContent>
       </DropdownMenu>
     </div>
   );
 };
 
-export default AccountingHeader;
+export default PageHeader;

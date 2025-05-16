@@ -8,7 +8,7 @@ import {
   Settings,
   Mail,
   FileText as FileTextIcon,
-  MoreVertical
+  ArrowLeft
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useIsMobile } from "@/hooks/use-mobile";
@@ -24,6 +24,7 @@ import {
   SidebarTrigger,
   useSidebar,
 } from "@/components/ui/sidebar";
+import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { useState } from "react";
 import { 
@@ -34,13 +35,7 @@ import {
   DialogTrigger 
 } from "@/components/ui/dialog";
 import { useLanguage } from "@/hooks/use-language";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
-import { toast } from "sonner";
+import { useNavigate } from "react-router-dom";
 
 interface AppSidebarProps {
   isOpen?: boolean;
@@ -54,6 +49,7 @@ const AppSidebar = ({ isOpen = false, onClose }: AppSidebarProps) => {
   const isMobile = useIsMobile();
   const [avatarUrl, setAvatarUrl] = useState("/profile-photo.jpg");
   const { t } = useLanguage();
+  const navigate = useNavigate();
   
   // Driver information
   const driverName = "Jean Dupont";
@@ -76,6 +72,10 @@ const AppSidebar = ({ isOpen = false, onClose }: AppSidebarProps) => {
     }
   };
 
+  const handleGoBack = () => {
+    navigate("/");
+  };
+
   const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     if (file) {
@@ -91,11 +91,6 @@ const AppSidebar = ({ isOpen = false, onClose }: AppSidebarProps) => {
         ? "bg-primary/10 text-primary font-medium" 
         : "hover:bg-muted/50 text-foreground/80"
     );
-
-  // Function to handle demo actions
-  const handleMenuAction = (action: string) => {
-    toast.success(`Action "${action}" clicked`);
-  };
 
   return (
     <div className="h-full flex flex-col bg-background border-r">
@@ -141,6 +136,17 @@ const AppSidebar = ({ isOpen = false, onClose }: AppSidebarProps) => {
             </div>
           </DialogContent>
         </Dialog>
+        
+        {/* Add a global back button at the top of the sidebar */}
+        <Button 
+          variant="ghost" 
+          size="sm" 
+          onClick={handleGoBack}
+          className="flex items-center gap-2 mb-2 w-full justify-start"
+        >
+          <ArrowLeft className="h-4 w-4" />
+          <span>{t("back_to_home")}</span>
+        </Button>
       </div>
 
       <SidebarContent className="p-2 flex-1">
@@ -149,37 +155,17 @@ const AppSidebar = ({ isOpen = false, onClose }: AppSidebarProps) => {
             <SidebarMenu>
               {menuItems.map((item) => (
                 <SidebarMenuItem key={item.url}>
-                  <div className="flex items-center justify-between w-full">
-                    <SidebarMenuButton asChild className="flex-grow">
-                      <NavLink 
-                        to={item.url} 
-                        end 
-                        className={getNavClasses}
-                        onClick={handleNavLinkClick}
-                      >
-                        <item.icon className="h-5 w-5" />
-                        <span>{item.title}</span>
-                      </NavLink>
-                    </SidebarMenuButton>
-                    <DropdownMenu>
-                      <DropdownMenuTrigger asChild>
-                        <button className="p-2 hover:bg-muted rounded-md">
-                          <MoreVertical className="h-4 w-4" />
-                        </button>
-                      </DropdownMenuTrigger>
-                      <DropdownMenuContent>
-                        <DropdownMenuItem onClick={() => handleMenuAction("Option 1")}>
-                          Option 1
-                        </DropdownMenuItem>
-                        <DropdownMenuItem onClick={() => handleMenuAction("Option 2")}>
-                          Option 2
-                        </DropdownMenuItem>
-                        <DropdownMenuItem onClick={() => handleMenuAction("Option 3")}>
-                          Option 3
-                        </DropdownMenuItem>
-                      </DropdownMenuContent>
-                    </DropdownMenu>
-                  </div>
+                  <SidebarMenuButton asChild className="flex-grow">
+                    <NavLink 
+                      to={item.url} 
+                      end 
+                      className={getNavClasses}
+                      onClick={handleNavLinkClick}
+                    >
+                      <item.icon className="h-5 w-5" />
+                      <span>{item.title}</span>
+                    </NavLink>
+                  </SidebarMenuButton>
                 </SidebarMenuItem>
               ))}
             </SidebarMenu>
