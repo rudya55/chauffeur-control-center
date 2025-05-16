@@ -3,7 +3,7 @@ import { useState, useEffect } from "react";
 import { format, parseISO, isValid } from "date-fns";
 import { fr } from "date-fns/locale";
 import PageHeader from "@/components/PageHeader";
-import { Calendar as CalendarIcon } from "lucide-react";
+import { Calendar as CalendarIcon, CircleDot } from "lucide-react";
 import { Calendar as CalendarComponent } from "@/components/ui/calendar";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { ReservationType } from "@/types/reservation";
@@ -42,13 +42,30 @@ const Calendar = () => {
 
   // Fonction pour obtenir toutes les dates avec des réservations
   const getDaysWithReservations = () => {
-    const daysWithReservations: Record<string, boolean> = {};
+    const daysWithReservations: Record<string, string> = {};
     
     reservations.forEach(reservation => {
       const reservationDate = parseISO(reservation.date);
       if (isValid(reservationDate)) {
         const dateString = format(reservationDate, 'yyyy-MM-dd');
-        daysWithReservations[dateString] = true;
+        // Stocker le statut de la réservation la plus prioritaire pour cette date
+        // Priorité: started > arrived > onBoard > accepted > completed
+        const currentStatus = daysWithReservations[dateString];
+        const newStatus = reservation.status || 'pending';
+        
+        if (!currentStatus) {
+          daysWithReservations[dateString] = newStatus;
+        } else {
+          if (newStatus === 'started') {
+            daysWithReservations[dateString] = 'started';
+          } else if (newStatus === 'arrived' && currentStatus !== 'started') {
+            daysWithReservations[dateString] = 'arrived';
+          } else if (newStatus === 'onBoard' && currentStatus !== 'started' && currentStatus !== 'arrived') {
+            daysWithReservations[dateString] = 'onBoard';
+          } else if (newStatus === 'accepted' && !['started', 'arrived', 'onBoard'].includes(currentStatus)) {
+            daysWithReservations[dateString] = 'accepted';
+          }
+        }
       }
     });
     
@@ -56,6 +73,37 @@ const Calendar = () => {
   };
 
   const daysWithReservations = getDaysWithReservations();
+
+  // Rendu personnalisé pour les jours avec des réservations
+  const renderDayContent = (day: Date) => {
+    const dateString = format(day, 'yyyy-MM-dd');
+    const status = daysWithReservations[dateString];
+
+    if (!status) return null;
+
+    // Nombre de réservations pour cette date
+    const count = reservations.filter(res => {
+      const resDate = parseISO(res.date);
+      return isValid(resDate) && format(resDate, 'yyyy-MM-dd') === dateString;
+    }).length;
+
+    // Couleurs en fonction du statut
+    let dotColor = "bg-gray-400";
+    if (status === 'started') dotColor = "bg-amber-500";
+    else if (status === 'arrived') dotColor = "bg-purple-500";
+    else if (status === 'onBoard') dotColor = "bg-teal-500";
+    else if (status === 'accepted') dotColor = "bg-blue-500";
+    else if (status === 'completed') dotColor = "bg-green-500";
+
+    return (
+      <div className="absolute bottom-0.5 left-0 right-0 flex justify-center">
+        <div className="flex items-center gap-0.5">
+          <span className={`h-1.5 w-1.5 rounded-full ${dotColor}`}></span>
+          {count > 1 && <span className="text-[10px] font-medium">{count}</span>}
+        </div>
+      </div>
+    );
+  };
 
   // Couleur en fonction du statut
   const getStatusColor = (status?: string) => {
@@ -72,6 +120,30 @@ const Calendar = () => {
         return 'bg-green-100 text-green-800 border-green-300';
       default:
         return 'bg-gray-100 text-gray-800 border-gray-300';
+    }
+  };
+
+  // Fonction pour styliser les jours dans le calendrier
+  const getDayStyle = (date: Date) => {
+    const dateString = format(date, 'yyyy-MM-dd');
+    const status = daysWithReservations[dateString];
+    
+    if (!status) return {};
+
+    // Styles pour les différents statuts
+    switch (status) {
+      case 'accepted':
+        return { backgroundColor: 'rgba(59, 130, 246, 0.15)' };
+      case 'started':
+        return { backgroundColor: 'rgba(245, 158, 11, 0.15)' };
+      case 'arrived':
+        return { backgroundColor: 'rgba(168, 85, 247, 0.15)' };
+      case 'onBoard':
+        return { backgroundColor: 'rgba(20, 184, 166, 0.15)' };
+      case 'completed':
+        return { backgroundColor: 'rgba(34, 197, 94, 0.15)' };
+      default:
+        return {};
     }
   };
 
@@ -105,7 +177,15 @@ const Calendar = () => {
                 booked: (date) => Boolean(daysWithReservations[format(date, 'yyyy-MM-dd')])
               }}
               modifiersStyles={{
-                booked: { fontWeight: 'bold', backgroundColor: 'rgba(59, 130, 246, 0.1)' }
+                booked: (date) => getDayStyle(date)
+              }}
+              components={{
+                DayContent: ({ date, ...props }) => (
+                  <div className="relative w-full h-full flex items-center justify-center">
+                    <div {...props} />
+                    {renderDayContent(date)}
+                  </div>
+                )
               }}
             />
           </CardContent>
