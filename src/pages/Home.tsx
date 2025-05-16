@@ -9,6 +9,7 @@ const Home = () => {
 
   const handleMenuToggle = () => {
     setSidebarOpen(!sidebarOpen);
+    // The PageHeader component now handles the dispatch of the toggle-sidebar event
   };
 
   return (

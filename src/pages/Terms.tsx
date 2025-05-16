@@ -1,10 +1,12 @@
 
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import PageHeader from "@/components/PageHeader";
 
 const Terms = () => {
   return (
     <div className="container mx-auto p-4">
-      <h1 className="text-2xl font-bold mb-6">Conditions General</h1>
+      <PageHeader title="general_conditions" />
+      
       <Card className="mb-6">
         <CardHeader>
           <CardTitle>Conditions General</CardTitle>

@@ -31,6 +31,7 @@ const PageHeader = ({ title, showBackButton = true, className, onMenuToggle }: P
   };
 
   const handleMenuToggle = () => {
+    console.log("Toggling sidebar from PageHeader");
     // Trigger sidebar toggle event
     const event = new CustomEvent('toggle-sidebar');
     window.dispatchEvent(event);

@@ -1,98 +1,35 @@
 
-import { useState } from "react";
-import { Tabs, TabsContent } from "@/components/ui/tabs";
+import PageHeader from "@/components/PageHeader";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useReservations } from "@/hooks/use-reservations";
-import ReservationHeader from "@/components/reservation/ReservationHeader";
-import ReservationTabHeader from "@/components/reservation/ReservationTabHeader";
 import ReservationList from "@/components/reservation/ReservationList";
-import { ChatDialog } from "@/components/ChatDialog";
-import OrderFormDialog from "@/components/OrderFormDialog";
 
 const Reservations = () => {
-  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
-  const {
-    upcomingReservations,
-    myReservations,
-    completedReservations,
-    activeTab,
-    setActiveTab,
-    showChat,
-    setShowChat,
-    currentDispatcher,
-    showOrderForm,
-    setShowOrderForm,
-    selectedReservation,
-    handleAcceptReservation,
-    handleRejectReservation,
-    handleStartRide,
-    handleArrived,
-    handleClientBoarded,
-    handleCompleteRide,
-    openChatWithDispatcher,
-    handleShowOrderForm
-  } = useReservations();
+  const { pendingReservations, activeReservations, completedReservations } = useReservations();
 
   return (
-    <div className="space-y-4 p-4">
-      <ReservationHeader 
-        isSidebarOpen={isSidebarOpen}
-        setIsSidebarOpen={setIsSidebarOpen}
-      />
+    <div className="p-4 sm:p-6">
+      <PageHeader title="reservations" />
       
-      <Tabs defaultValue="upcoming" className="w-full" onValueChange={setActiveTab} value={activeTab}>
-        <ReservationTabHeader 
-          upcomingCount={upcomingReservations.length}
-          currentCount={myReservations.length}
-        />
+      <Tabs defaultValue="pending" className="w-full">
+        <TabsList className="grid w-full grid-cols-3 mb-4">
+          <TabsTrigger value="pending">En attente ({pendingReservations.length})</TabsTrigger>
+          <TabsTrigger value="active">Actives ({activeReservations.length})</TabsTrigger>
+          <TabsTrigger value="completed">Terminées ({completedReservations.length})</TabsTrigger>
+        </TabsList>
         
-        <TabsContent value="upcoming" className="mt-4">
-          <ReservationList 
-            reservations={upcomingReservations}
-            type="upcoming"
-            onAccept={handleAcceptReservation}
-            onReject={handleRejectReservation}
-            emptyMessage="Aucune réservation à venir"
-          />
+        <TabsContent value="pending">
+          <ReservationList reservations={pendingReservations} type="pending" />
         </TabsContent>
         
-        <TabsContent value="current" className="mt-4">
-          <ReservationList 
-            reservations={myReservations}
-            type="current"
-            onStartRide={handleStartRide}
-            onArrived={handleArrived}
-            onClientBoarded={handleClientBoarded}
-            onComplete={handleCompleteRide}
-            onChatWithDispatcher={openChatWithDispatcher}
-            onShowOrderForm={handleShowOrderForm}
-            emptyMessage="Aucune réservation en cours"
-          />
+        <TabsContent value="active">
+          <ReservationList reservations={activeReservations} type="active" />
         </TabsContent>
         
-        <TabsContent value="completed" className="mt-4">
-          <ReservationList 
-            reservations={completedReservations}
-            type="completed"
-            emptyMessage="Aucune réservation terminée"
-          />
+        <TabsContent value="completed">
+          <ReservationList reservations={completedReservations} type="completed" />
         </TabsContent>
       </Tabs>
-
-      {/* Dialog de chat avec traduction */}
-      <ChatDialog 
-        open={showChat} 
-        onOpenChange={setShowChat} 
-        dispatcher={currentDispatcher}
-      />
-
-      {/* Order Form Dialog */}
-      {selectedReservation && (
-        <OrderFormDialog
-          open={showOrderForm}
-          onOpenChange={setShowOrderForm}
-          reservation={selectedReservation}
-        />
-      )}
     </div>
   );
 };
