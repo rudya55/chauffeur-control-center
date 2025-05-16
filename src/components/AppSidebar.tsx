@@ -54,13 +54,13 @@ const AppSidebar = ({ isOpen = false, onClose }: AppSidebarProps) => {
   
   const menuItems = [
     { title: t("home"), url: "/", icon: Home },
-    { title: t("calendar"), url: "/calendar", icon: Calendar },
+    { title: t("planning"), url: "/calendar", icon: Calendar },
     { title: t("reservations"), url: "/reservations", icon: FileText },
     { title: t("accounting"), url: "/accounting", icon: FileText },
     { title: t("analytics"), url: "/analytics", icon: BarChart4 },
     { title: t("settings"), url: "/settings", icon: Settings },
     { title: t("contact"), url: "/contact", icon: Mail },
-    { title: t("terms"), url: "/terms", icon: FileTextIcon },
+    { title: t("general_conditions"), url: "/terms", icon: FileTextIcon },
   ];
 
   const handleNavLinkClick = () => {

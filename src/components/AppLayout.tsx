@@ -12,6 +12,7 @@ import Calendar from "@/pages/Calendar";
 import Reservations from "@/pages/Reservations";
 import Contact from "@/pages/Contact";
 import Settings from "@/pages/Settings";
+import Terms from "@/pages/Terms";
 import NotFound from "@/pages/NotFound";
 
 const AppLayout = () => {
@@ -44,6 +45,7 @@ const AppLayout = () => {
                 <Route path="/reservations" element={<Reservations />} />
                 <Route path="/contact" element={<Contact />} />
                 <Route path="/settings" element={<Settings />} />
+                <Route path="/terms" element={<Terms />} />
                 <Route path="*" element={<NotFound />} />
               </Routes>
             </main>
