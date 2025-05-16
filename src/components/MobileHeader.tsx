@@ -2,7 +2,6 @@
 import { Menu } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { useAuth } from "@/hooks/use-auth";
 
 interface MobileHeaderProps {
   isOpen: boolean;
@@ -10,7 +9,6 @@ interface MobileHeaderProps {
 }
 
 const MobileHeader = ({ isOpen, onToggle }: MobileHeaderProps) => {
-  const { logout } = useAuth();
   // Driver rating
   const driverRating = 4.8;
 

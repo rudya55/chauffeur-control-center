@@ -1,37 +1,20 @@
 
-import { useState, useEffect } from "react";
-import { Outlet, useNavigate } from "react-router-dom";
+import { useState } from "react";
+import { Outlet } from "react-router-dom";
 import AppSidebar from "@/components/AppSidebar";
 import MobileHeader from "@/components/MobileHeader";
 import { useIsMobile } from "@/hooks/use-mobile";
 import NotificationBell from "@/components/NotificationBell";
 import { SidebarProvider } from "@/components/ui/sidebar";
-import { useAuth } from "@/hooks/use-auth";
 import { Sheet, SheetContent } from "@/components/ui/sheet";
 
 const AppLayout = () => {
   const isMobile = useIsMobile();
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
-  const { isAuthenticated } = useAuth();
-  const navigate = useNavigate();
-
-  useEffect(() => {
-    console.log("AppLayout useEffect, isAuthenticated:", isAuthenticated);
-    if (!isAuthenticated) {
-      navigate('/login');
-    }
-  }, [isAuthenticated, navigate]);
 
   const toggleSidebar = () => {
     setIsSidebarOpen(!isSidebarOpen);
   };
-
-  console.log("AppLayout render, isAuthenticated:", isAuthenticated);
-
-  if (!isAuthenticated) {
-    console.log("AppLayout rendering null due to not authenticated");
-    return null;
-  }
 
   return (
     <SidebarProvider>
