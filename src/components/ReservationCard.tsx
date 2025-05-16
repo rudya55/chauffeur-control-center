@@ -6,6 +6,7 @@ import ReservationDetails from "@/components/reservation/ReservationDetails";
 import ReservationActions from "@/components/reservation/ReservationActions";
 import ReservationDispatcher from "@/components/reservation/ReservationDispatcher";
 import ReservationRating from "@/components/reservation/ReservationRating";
+import { format } from "date-fns";
 
 interface ReservationCardProps {
   reservation: ReservationType;
@@ -41,6 +42,12 @@ const ReservationCard: React.FC<ReservationCardProps> = ({
     minute: '2-digit',
   });
 
+  // Format timestamps for completed reservations
+  const formatTimestamp = (timestamp: string | undefined) => {
+    if (!timestamp) return "--";
+    return format(new Date(timestamp), 'HH:mm');
+  };
+
   // Create a date 10 seconds in the future for the test timer
   const testTimerDate = new Date();
   testTimerDate.setSeconds(testTimerDate.getSeconds() + 10);
@@ -52,6 +59,13 @@ const ReservationCard: React.FC<ReservationCardProps> = ({
         <div className="flex items-start justify-between mb-4">
           <div>
             <p className="text-sm text-gray-500">{formattedDate}</p>
+            {type === 'completed' && reservation.actualPickupTime && reservation.dropoffTime && (
+              <div className="text-xs text-gray-500 mt-1">
+                <span>Départ: {formatTimestamp(reservation.actualPickupTime)}</span>
+                <span className="mx-2">•</span>
+                <span>Arrivée: {formatTimestamp(reservation.dropoffTime)}</span>
+              </div>
+            )}
           </div>
           <div className="flex items-center gap-2">
             {type === 'current' && (

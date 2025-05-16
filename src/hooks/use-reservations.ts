@@ -171,7 +171,7 @@ export const useReservations = () => {
   // Gérer le démarrage d'une course
   const handleStartRide = (id: string) => {
     setMyReservations(prev => prev.map(res => 
-      res.id === id ? { ...res, status: 'started' } : res
+      res.id === id ? { ...res, status: 'started', actualPickupTime: new Date().toISOString() } : res
     ));
     
     // Mettre à jour les données dans localStorage pour le calendrier
@@ -215,10 +215,14 @@ export const useReservations = () => {
       {lat: 48.858, lng: 2.340} // Destination
     ];
 
+    // S'assurer que nous avons une heure de départ, sinon utiliser l'heure actuelle
+    const actualPickupTime = reservationToComplete.actualPickupTime || new Date().toISOString();
+
     // Ajouter aux réservations terminées avec les données supplémentaires
     const completedReservation: ReservationType = { 
       ...reservationToComplete,
       status: 'completed',
+      actualPickupTime: actualPickupTime,
       dropoffTime: new Date().toISOString(),
       distance: "12.5 km", // Ces données seraient calculées dans une vraie application
       duration: "35 min",
