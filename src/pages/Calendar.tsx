@@ -202,9 +202,9 @@ const Calendar = () => {
         <h2 className="text-xl font-semibold">Calendrier</h2>
       </div>
       
-      <div className="grid grid-cols-1 md:grid-cols-12 gap-6">
+      <div className="flex flex-col gap-6">
         {/* Calendrier */}
-        <Card className="md:col-span-7">
+        <Card>
           <CardHeader className="pb-2">
             <div className="flex justify-between items-center">
               <CardTitle className="flex items-center">
@@ -252,7 +252,7 @@ const Calendar = () => {
         </Card>
         
         {/* Liste des réservations du jour */}
-        <Card className="md:col-span-5">
+        <Card>
           <CardHeader className="pb-2">
             <CardTitle>
               {getViewTitle()}
