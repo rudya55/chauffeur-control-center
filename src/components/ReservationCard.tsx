@@ -46,9 +46,6 @@ const ReservationCard: React.FC<ReservationCardProps> = ({
   const testTimerDate = new Date();
   testTimerDate.setSeconds(testTimerDate.getSeconds() + 10);
 
-  // Simplify placard text to just show client name
-  const simplifiedPlacardText = reservation.clientName;
-
   return (
     <Card className="mb-4">
       <CardContent className="p-4">
@@ -74,13 +71,13 @@ const ReservationCard: React.FC<ReservationCardProps> = ({
           pickupAddress={reservation.pickupAddress}
           destination={reservation.destination}
           flightNumber={reservation.flightNumber}
-          clientName={type === 'upcoming' ? undefined : reservation.clientName}
+          clientName={type === 'upcoming' || type === 'completed' ? undefined : reservation.clientName}
           amount={reservation.amount}
           driverAmount={reservation.driverAmount}
           commission={reservation.commission}
           paymentType={reservation.paymentType}
           flightStatus={reservation.flightStatus}
-          placardText={simplifiedPlacardText}
+          placardText={reservation.clientName}
           pickupGPS={reservation.pickupGPS}
           destinationGPS={reservation.destinationGPS}
           dispatcherLogo={reservation.dispatcherLogo}
@@ -108,7 +105,9 @@ const ReservationCard: React.FC<ReservationCardProps> = ({
           {type === 'completed' && (
             <ReservationRating 
               rating={reservation.rating} 
-              comment={reservation.comment} 
+              comment={reservation.comment}
+              distance={reservation.distance}
+              duration={reservation.duration}
             />
           )}
         </div>

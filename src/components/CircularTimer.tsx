@@ -6,14 +6,12 @@ interface CircularTimerProps {
   targetTime: Date;
   onTimeReached?: () => void;
   durationInSeconds?: number;
-  autoStart?: boolean;
 }
 
 const CircularTimer = ({ 
   targetTime, 
   onTimeReached, 
-  durationInSeconds = 10,
-  autoStart = false
+  durationInSeconds = 10
 }: CircularTimerProps) => {
   const [timeLeft, setTimeLeft] = useState<string>("00:00:00");
   const [progress, setProgress] = useState(100);
@@ -36,7 +34,7 @@ const CircularTimer = ({
       if (timeLeftMs <= 0) {
         setTimeLeft("00:00:00");
         setTimerCompleted(true);
-        if (onTimeReached && autoStart) {
+        if (onTimeReached) {
           onTimeReached();
         }
         return;
@@ -60,7 +58,7 @@ const CircularTimer = ({
     const interval = setInterval(updateTimer, 1000);
     
     return () => clearInterval(interval);
-  }, [targetTime, onTimeReached, durationInSeconds, autoStart]);
+  }, [targetTime, onTimeReached, durationInSeconds]);
 
   return (
     <div className="flex flex-col items-center justify-center">

@@ -3,7 +3,7 @@ import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
 import { ReservationType } from "@/types/reservation";
-import { Check, X, MessageCircle } from "lucide-react";
+import { Check, X, MessageCircle, Car, Van, Bus, Star } from "lucide-react";
 import { toast } from "sonner";
 import CircularTimer from "@/components/CircularTimer";
 
@@ -36,36 +36,39 @@ const ReservationActions = ({
 }: ReservationActionsProps) => {
   const [rating, setRating] = useState(5);
   const [comment, setComment] = useState("");
+  const [showTimer, setShowTimer] = useState(true);
 
-  // Handle start ride after timer ends
-  const handleStartRide = () => {
-    if (onStartRide) {
-      toast.success("Course démarrée");
-      onStartRide(reservation.id);
-    }
+  // Timer notification when completed
+  const handleTimerComplete = () => {
+    toast.info("Le temps d'attente est terminé");
   };
 
   if (type === 'upcoming' && reservation.status === 'pending') {
     return (
-      <div className="flex justify-between mt-4">
-        <Button 
-          variant="outline" 
-          size="sm" 
-          className="border-primary text-primary hover:bg-primary hover:text-white"
-          onClick={() => onAccept && onAccept(reservation.id)}
-        >
-          <Check className="mr-2 h-4 w-4" />
-          Accepter
-        </Button>
-        <Button 
-          variant="outline" 
-          size="sm"
-          className="border-destructive text-destructive hover:bg-destructive hover:text-white"
-          onClick={() => onReject && onReject(reservation.id)}
-        >
-          <X className="mr-2 h-4 w-4" />
-          Refuser
-        </Button>
+      <div className="flex justify-between items-center mt-4">
+        <div className="flex items-center">
+          {renderVehicleIcon(reservation.vehicleType)}
+        </div>
+        <div className="flex gap-2">
+          <Button 
+            variant="outline" 
+            size="sm" 
+            className="border-primary text-primary hover:bg-primary hover:text-white"
+            onClick={() => onAccept && onAccept(reservation.id)}
+          >
+            <Check className="mr-2 h-4 w-4" />
+            Accepter
+          </Button>
+          <Button 
+            variant="outline" 
+            size="sm"
+            className="border-destructive text-destructive hover:bg-destructive hover:text-white"
+            onClick={() => onReject && onReject(reservation.id)}
+          >
+            <X className="mr-2 h-4 w-4" />
+            Refuser
+          </Button>
+        </div>
       </div>
     );
   }
@@ -73,32 +76,33 @@ const ReservationActions = ({
   if (type === 'current' && reservation.status === 'accepted') {
     return (
       <div className="flex justify-between items-center gap-2 mt-4">
-        <Button 
-          variant="ghost" 
-          size="sm" 
-          onClick={() => onChatWithDispatcher && onChatWithDispatcher(reservation.dispatcher)}
-          className="p-2"
-        >
-          <MessageCircle className="h-4 w-4" />
-        </Button>
-        
         <div className="flex items-center gap-2">
           <Button 
-            variant="default" 
+            variant="ghost" 
             size="sm" 
-            onClick={handleStartRide}
+            onClick={() => onChatWithDispatcher && onChatWithDispatcher(reservation.dispatcher)}
+            className="p-2"
           >
-            Démarrer
+            <MessageCircle className="h-4 w-4" />
           </Button>
-          
-          {testTimerDate && (
+          {renderVehicleIcon(reservation.vehicleType)}
+        </div>
+        
+        <div className="flex items-center gap-2">
+          {showTimer && testTimerDate && (
             <CircularTimer 
               targetTime={testTimerDate} 
               durationInSeconds={10}
-              onTimeReached={handleStartRide}
-              autoStart={true}
+              onTimeReached={handleTimerComplete}
             />
           )}
+          <Button 
+            variant="default" 
+            size="sm" 
+            onClick={() => onStartRide && onStartRide(reservation.id)}
+          >
+            Démarrer
+          </Button>
         </div>
       </div>
     );
@@ -107,14 +111,17 @@ const ReservationActions = ({
   if (type === 'current' && reservation.status === 'started') {
     return (
       <div className="flex justify-between items-center mt-4">
-        <Button 
-          variant="ghost" 
-          size="sm" 
-          onClick={() => onChatWithDispatcher && onChatWithDispatcher(reservation.dispatcher)}
-          className="p-2"
-        >
-          <MessageCircle className="h-4 w-4" />
-        </Button>
+        <div className="flex items-center gap-2">
+          <Button 
+            variant="ghost" 
+            size="sm" 
+            onClick={() => onChatWithDispatcher && onChatWithDispatcher(reservation.dispatcher)}
+            className="p-2"
+          >
+            <MessageCircle className="h-4 w-4" />
+          </Button>
+          {renderVehicleIcon(reservation.vehicleType)}
+        </div>
         
         <Button 
           variant="default" 
@@ -130,14 +137,17 @@ const ReservationActions = ({
   if (type === 'current' && reservation.status === 'arrived') {
     return (
       <div className="flex justify-between items-center mt-4">
-        <Button 
-          variant="ghost" 
-          size="sm" 
-          onClick={() => onChatWithDispatcher && onChatWithDispatcher(reservation.dispatcher)}
-          className="p-2"
-        >
-          <MessageCircle className="h-4 w-4" />
-        </Button>
+        <div className="flex items-center gap-2">
+          <Button 
+            variant="ghost" 
+            size="sm" 
+            onClick={() => onChatWithDispatcher && onChatWithDispatcher(reservation.dispatcher)}
+            className="p-2"
+          >
+            <MessageCircle className="h-4 w-4" />
+          </Button>
+          {renderVehicleIcon(reservation.vehicleType)}
+        </div>
         
         <Button 
           variant="default" 
@@ -153,14 +163,17 @@ const ReservationActions = ({
   if (type === 'current' && reservation.status === 'onBoard') {
     return (
       <div className="flex justify-between items-center mt-4">
-        <Button 
-          variant="ghost" 
-          size="sm" 
-          onClick={() => onChatWithDispatcher && onChatWithDispatcher(reservation.dispatcher)}
-          className="p-2"
-        >
-          <MessageCircle className="h-4 w-4" />
-        </Button>
+        <div className="flex items-center gap-2">
+          <Button 
+            variant="ghost" 
+            size="sm" 
+            onClick={() => onChatWithDispatcher && onChatWithDispatcher(reservation.dispatcher)}
+            className="p-2"
+          >
+            <MessageCircle className="h-4 w-4" />
+          </Button>
+          {renderVehicleIcon(reservation.vehicleType)}
+        </div>
         
         <AlertDialog>
           <AlertDialogTrigger asChild>
@@ -172,7 +185,7 @@ const ReservationActions = ({
             <AlertDialogHeader>
               <AlertDialogTitle>Évaluer la course</AlertDialogTitle>
               <AlertDialogDescription>
-                Comment s'est déroulée la course avec {reservation.clientName} ?
+                Comment s'est déroulée cette course ?
               </AlertDialogDescription>
             </AlertDialogHeader>
             <div className="flex flex-col space-y-4 py-2">
@@ -216,6 +229,23 @@ const ReservationActions = ({
   }
 
   return null;
+};
+
+// Helper function to render the appropriate vehicle icon based on vehicle type
+const renderVehicleIcon = (vehicleType?: string) => {
+  switch (vehicleType) {
+    case 'berline':
+      return <Car className="h-4 w-4 text-primary" />;
+    case 'van':
+      return <Van className="h-4 w-4 text-primary" />;
+    case 'mini-bus':
+      return <Bus className="h-4 w-4 text-primary" />;
+    case 'first-class':
+      return <Star className="h-4 w-4 text-primary" />;
+    case 'standard':
+    default:
+      return <Car className="h-4 w-4 text-primary" />;
+  }
 };
 
 export default ReservationActions;

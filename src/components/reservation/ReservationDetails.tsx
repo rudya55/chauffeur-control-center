@@ -1,6 +1,6 @@
 
 import { useState } from "react";
-import { Navigation, PhoneCall, FileText, MapPin, User, Plane, Users, Luggage } from "lucide-react";
+import { Navigation, FileText, MapPin, User, Plane, Users, Luggage } from "lucide-react";
 import { 
   Dialog, 
   DialogContent, 
@@ -9,6 +9,7 @@ import {
   DialogTrigger 
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
+import { AlertDialog, AlertDialogContent, AlertDialogHeader, AlertDialogTitle, AlertDialogFooter, AlertDialogAction } from "@/components/ui/alert-dialog";
 import Map from "@/components/Map";
 
 type ReservationDetailsProps = {
@@ -50,37 +51,38 @@ const ReservationDetails = ({
   passengers,
   luggage,
   status,
-  showAddressLabels = false
+  showAddressLabels = true
 }: ReservationDetailsProps) => {
   const [showPickupMap, setShowPickupMap] = useState(false);
   const [showDestinationMap, setShowDestinationMap] = useState(false);
   const [showPlacard, setShowPlacard] = useState(false);
   const [showFlightInfo, setShowFlightInfo] = useState(false);
+  const [showGPSOptions, setShowGPSOptions] = useState(false);
+  const [currentAddress, setCurrentAddress] = useState("");
+  const [isPickupAddress, setIsPickupAddress] = useState(false);
+  
+  // Simulated GPS app options for navigation
+  const gpsApps = [
+    { name: "Google Maps", icon: "🗺️", url: (address: string, lat?: number, lng?: number) => `https://www.google.com/maps/search/?api=1&query=${lat && lng ? `${lat},${lng}` : encodeURIComponent(address)}` },
+    { name: "Waze", icon: "📱", url: (address: string, lat?: number, lng?: number) => `https://waze.com/ul?q=${encodeURIComponent(address)}&ll=${lat && lng ? `${lat},${lng}` : ""}&navigate=yes` },
+    { name: "Apple Plans", icon: "🍏", url: (address: string, lat?: number, lng?: number) => `https://maps.apple.com/?q=${encodeURIComponent(address)}${lat && lng ? `&ll=${lat},${lng}` : ""}` },
+  ];
 
-  // Handler for navigating to address
-  const handleNavigateTo = (address: string, isPickup: boolean) => {
-    // Check if we can use the native map app
-    if (navigator.geolocation) {
-      try {
-        // Try to use the Web Share API with geo coordinates if available
-        const geoData = isPickup ? pickupGPS : destinationGPS;
-        if (geoData) {
-          const mapUrl = `https://www.google.com/maps/search/?api=1&query=${geoData.lat},${geoData.lng}`;
-          window.open(mapUrl, '_blank');
-        } else {
-          // Fallback to using the address
-          const mapUrl = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(address)}`;
-          window.open(mapUrl, '_blank');
-        }
-      } catch (error) {
-        console.error("Navigation error:", error);
-        // Fallback
-        window.open(
-          `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(address)}`,
-          '_blank'
-        );
-      }
-    }
+  // Handler for opening GPS selection dialog
+  const handleAddressClick = (address: string, isPickup: boolean) => {
+    setCurrentAddress(address);
+    setIsPickupAddress(isPickup);
+    setShowGPSOptions(true);
+  };
+
+  // Handler for navigating to address with selected app
+  const handleNavigateWithApp = (appIndex: number) => {
+    const app = gpsApps[appIndex];
+    const geoData = isPickupAddress ? pickupGPS : destinationGPS;
+    const url = app.url(currentAddress, geoData?.lat, geoData?.lng);
+    
+    window.open(url, '_blank');
+    setShowGPSOptions(false);
   };
 
   // Show different price information based on status and payment type
@@ -135,45 +137,29 @@ const ReservationDetails = ({
       {/* Pickup address with map option */}
       <div className="flex items-center">
         <MapPin className="mr-2 h-4 w-4 text-primary" />
-        {showAddressLabels && <span className="text-sm font-medium mr-1">Départ:</span>}
+        <span className="text-sm font-medium mr-1">Départ:</span>
         <button 
           className="text-sm underline hover:text-primary"
-          onClick={() => setShowPickupMap(true)}
+          onClick={() => handleAddressClick(pickupAddress, true)}
         >
           {pickupAddress}
         </button>
-        <Button 
-          variant="ghost" 
-          size="sm" 
-          className="ml-2 px-2"
-          onClick={() => handleNavigateTo(pickupAddress, true)}
-        >
-          <Navigation className="h-4 w-4 text-primary" />
-        </Button>
       </div>
       
       {/* Destination with map option */}
       <div className="flex items-center">
         <MapPin className="mr-2 h-4 w-4 text-primary" />
-        {showAddressLabels && <span className="text-sm font-medium mr-1">Destination:</span>}
+        <span className="text-sm font-medium mr-1">Destination:</span>
         <button 
           className="text-sm underline hover:text-primary"
-          onClick={() => setShowDestinationMap(true)}
+          onClick={() => handleAddressClick(destination, false)}
         >
           {destination}
         </button>
-        <Button 
-          variant="ghost" 
-          size="sm" 
-          className="ml-2 px-2"
-          onClick={() => handleNavigateTo(destination, false)}
-        >
-          <Navigation className="h-4 w-4 text-primary" />
-        </Button>
       </div>
       
       {/* Client name with placard option */}
-      {clientName && (
+      {clientName && status !== 'completed' && (
         <div className="flex items-center">
           <User className="mr-2 h-4 w-4 text-primary" />
           <button 
@@ -204,16 +190,6 @@ const ReservationDetails = ({
           </div>
         )}
       </div>
-      
-      {/* Phone number */}
-      {phone && (
-        <div className="flex items-center">
-          <PhoneCall className="mr-2 h-4 w-4 text-primary" />
-          <a href={`tel:${phone}`} className="text-sm underline">
-            {phone}
-          </a>
-        </div>
-      )}
       
       {/* Flight number with status */}
       {flightNumber && (
@@ -248,27 +224,48 @@ const ReservationDetails = ({
       {/* Price information */}
       {renderPriceInfo()}
 
+      {/* Completed ride details with distance and route map */}
+      {status === 'completed' && (
+        <div className="mt-3">
+          <button 
+            className="flex items-center w-full justify-between p-3 bg-slate-50 rounded-md hover:bg-slate-100"
+            onClick={() => setShowPickupMap(true)}
+          >
+            <div className="flex items-center">
+              <Navigation className="mr-2 h-4 w-4 text-primary" />
+              <span>Voir l'itinéraire</span>
+            </div>
+            <span className="font-medium text-primary">{destination}</span>
+          </button>
+        </div>
+      )}
+
       {/* Pickup map dialog */}
       <Dialog open={showPickupMap} onOpenChange={setShowPickupMap}>
         <DialogContent className="sm:max-w-[600px] h-[400px]">
           <DialogHeader>
-            <DialogTitle>Point de départ: {pickupAddress}</DialogTitle>
+            <DialogTitle>Itinéraire de la course</DialogTitle>
           </DialogHeader>
           <div className="h-[300px] w-full">
             <Map 
               center={pickupGPS || { lat: 48.8566, lng: 2.3522 }}
-              zoom={15}
+              zoom={13}
+              route={status === 'completed' ? [
+                {lat: 48.870, lng: 2.330}, // Point de départ
+                {lat: 48.865, lng: 2.334},
+                {lat: 48.862, lng: 2.338},
+                {lat: 48.858, lng: 2.340} // Destination
+              ] : undefined}
             />
           </div>
-          <div className="flex justify-end">
-            <Button 
-              onClick={() => handleNavigateTo(pickupAddress, true)}
-              className="flex items-center gap-2"
-            >
-              <Navigation size={16} />
-              Y aller
-            </Button>
-          </div>
+          {status === 'completed' && (
+            <div className="flex justify-between items-center pt-2">
+              <div>
+                <p className="text-sm font-medium">Distance: 12.5 km</p>
+                <p className="text-sm text-gray-500">Durée: 35 min</p>
+              </div>
+            </div>
+          )}
         </DialogContent>
       </Dialog>
 
@@ -284,15 +281,6 @@ const ReservationDetails = ({
               zoom={15}
             />
           </div>
-          <div className="flex justify-end">
-            <Button 
-              onClick={() => handleNavigateTo(destination, false)}
-              className="flex items-center gap-2"
-            >
-              <Navigation size={16} />
-              Y aller
-            </Button>
-          </div>
         </DialogContent>
       </Dialog>
 
@@ -300,11 +288,11 @@ const ReservationDetails = ({
       <Dialog open={showPlacard} onOpenChange={setShowPlacard}>
         <DialogContent className="sm:max-w-[400px]">
           <DialogHeader>
-            <DialogTitle>Pancarte pour {clientName}</DialogTitle>
+            <DialogTitle>Pancarte</DialogTitle>
           </DialogHeader>
           <div className="bg-primary text-white p-8 rounded-lg text-center">
             {dispatcherLogo && <div className="text-3xl mb-3">{dispatcherLogo}</div>}
-            <h2 className="text-2xl font-bold">{placardText || clientName}</h2>
+            <h2 className="text-2xl font-bold">{clientName}</h2>
           </div>
         </DialogContent>
       </Dialog>
@@ -355,6 +343,32 @@ const ReservationDetails = ({
           </div>
         </DialogContent>
       </Dialog>
+
+      {/* GPS options dialog */}
+      <AlertDialog open={showGPSOptions} onOpenChange={setShowGPSOptions}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Choisir l'application GPS</AlertDialogTitle>
+          </AlertDialogHeader>
+          <div className="py-4 space-y-2">
+            {gpsApps.map((app, index) => (
+              <button
+                key={app.name}
+                className="flex items-center w-full p-3 rounded-lg border hover:bg-gray-50"
+                onClick={() => handleNavigateWithApp(index)}
+              >
+                <span className="text-xl mr-2">{app.icon}</span>
+                <span>{app.name}</span>
+              </button>
+            ))}
+          </div>
+          <AlertDialogFooter>
+            <AlertDialogAction onClick={() => setShowGPSOptions(false)}>
+              Annuler
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 };
