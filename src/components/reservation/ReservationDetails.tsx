@@ -1,6 +1,5 @@
-
 import { useState } from "react";
-import { Navigation, FileText, MapPin, User, Plane, Users, Luggage } from "lucide-react";
+import { Navigation, FileText, MapPin, User, Plane, Users, Luggage, CreditCard, EuroIcon } from "lucide-react";
 import { 
   Dialog, 
   DialogContent, 
@@ -11,6 +10,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { AlertDialog, AlertDialogContent, AlertDialogHeader, AlertDialogTitle, AlertDialogFooter, AlertDialogAction } from "@/components/ui/alert-dialog";
 import Map from "@/components/Map";
+import { renderVehicleIcon } from "./ReservationUtils";
 
 type ReservationDetailsProps = {
   pickupAddress: string;
@@ -31,6 +31,7 @@ type ReservationDetailsProps = {
   luggage?: number;
   status?: string;
   showAddressLabels?: boolean;
+  vehicleType?: string;
 };
 
 const ReservationDetails = ({ 
@@ -51,7 +52,8 @@ const ReservationDetails = ({
   passengers,
   luggage,
   status,
-  showAddressLabels = true
+  showAddressLabels = true,
+  vehicleType
 }: ReservationDetailsProps) => {
   const [showPickupMap, setShowPickupMap] = useState(false);
   const [showDestinationMap, setShowDestinationMap] = useState(false);
@@ -64,7 +66,7 @@ const ReservationDetails = ({
   // Simulated GPS app options for navigation
   const gpsApps = [
     { name: "Google Maps", icon: "🗺️", url: (address: string, lat?: number, lng?: number) => `https://www.google.com/maps/search/?api=1&query=${lat && lng ? `${lat},${lng}` : encodeURIComponent(address)}` },
-    { name: "Waze", icon: "📱", url: (address: string, lat?: number, lng?: number) => `https://waze.com/ul?q=${encodeURIComponent(address)}&ll=${lat && lng ? `${lat},${lng}` : ""}&navigate=yes` },
+    { name: "Waze", icon: "📱", url: (address: string, lat?: number, lng?: number) => `https://waze.com/ul?q=${encodeURIComponent(address)}&ll=${lat && lng ? `&ll=${lat},${lng}` : ""}&navigate=yes` },
     { name: "Apple Plans", icon: "🍏", url: (address: string, lat?: number, lng?: number) => `https://maps.apple.com/?q=${encodeURIComponent(address)}${lat && lng ? `&ll=${lat},${lng}` : ""}` },
   ];
 
@@ -85,51 +87,45 @@ const ReservationDetails = ({
     setShowGPSOptions(false);
   };
 
+  // Helper function to render payment type icon
+  const renderPaymentTypeIcon = (type?: string) => {
+    switch (type) {
+      case 'card':
+        return <CreditCard className="h-4 w-4 text-primary" />;
+      case 'cash':
+      case 'transfer':
+      case 'paypal':
+      default:
+        return <EuroIcon className="h-4 w-4 text-primary" />;
+    }
+  };
+
   // Show different price information based on status and payment type
   const renderPriceInfo = () => {
-    if (!amount) return null;
+    if (!driverAmount) return null;
     
-    if (status === 'pending') {
-      return null; // No price info for pending reservations
-    }
-
-    if (paymentType === 'cash' || paymentType === 'card') {
-      return (
-        <div className="mt-3 p-3 bg-slate-50 rounded-md">
+    return (
+      <div className="mt-3 p-3 bg-slate-50 rounded-md">
+        {amount && (
           <div className="flex justify-between">
             <span className="text-sm text-gray-500">Montant client:</span>
             <span className="font-semibold">{amount} €</span>
           </div>
-          
-          {commission && (
-            <div className="flex justify-between">
-              <span className="text-sm text-gray-500">Commission:</span>
-              <span className="text-red-500">{commission} €</span>
-            </div>
-          )}
-          
-          {driverAmount && (
-            <div className="flex justify-between border-t pt-2 mt-2">
-              <span className="text-sm font-medium">Net chauffeur:</span>
-              <span className="font-bold text-primary">{driverAmount} €</span>
-            </div>
-          )}
-        </div>
-      );
-    }
-    
-    if (paymentType === 'transfer' || paymentType === 'paypal') {
-      return (
-        <div className="mt-3 p-3 bg-slate-50 rounded-md">
-          <div className="flex justify-between border-t pt-2 mt-2">
-            <span className="text-sm font-medium">Net chauffeur:</span>
-            <span className="font-bold text-primary">{driverAmount} €</span>
+        )}
+        
+        {commission && (
+          <div className="flex justify-between">
+            <span className="text-sm text-gray-500">Commission:</span>
+            <span className="text-red-500">{commission} €</span>
           </div>
+        )}
+        
+        <div className="flex justify-between border-t pt-2 mt-2">
+          <span className="text-sm font-medium">Net chauffeur:</span>
+          <span className="font-bold text-primary">{driverAmount} €</span>
         </div>
-      );
-    }
-    
-    return null;
+      </div>
+    );
   };
 
   return (
@@ -174,8 +170,16 @@ const ReservationDetails = ({
         </div>
       )}
       
-      {/* Passengers and luggage info */}
+      {/* Vehicle type, Passengers and luggage info */}
       <div className="flex items-center space-x-4">
+        {/* Vehicle type icon */}
+        {vehicleType && (
+          <div className="flex items-center">
+            {renderVehicleIcon(vehicleType)}
+            <span className="text-xs ml-1">{vehicleType}</span>
+          </div>
+        )}
+        
         {passengers !== undefined && (
           <div className="flex items-center">
             <Users className="mr-1 h-4 w-4 text-primary" />
@@ -187,6 +191,14 @@ const ReservationDetails = ({
           <div className="flex items-center">
             <Luggage className="mr-1 h-4 w-4 text-primary" />
             <span className="text-sm">{luggage}</span>
+          </div>
+        )}
+        
+        {/* Payment type icon */}
+        {paymentType && (
+          <div className="flex items-center">
+            {renderPaymentTypeIcon(paymentType)}
+            <span className="text-xs ml-1">{paymentType}</span>
           </div>
         )}
       </div>

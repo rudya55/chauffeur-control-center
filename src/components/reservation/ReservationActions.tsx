@@ -3,9 +3,10 @@ import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
 import { ReservationType } from "@/types/reservation";
-import { Check, X, MessageCircle, Car, Truck, Bus, Star } from "lucide-react";
+import { Check, X, MessageCircle } from "lucide-react";
 import { toast } from "sonner";
 import CircularTimer from "@/components/CircularTimer";
+import { renderVehicleIcon } from "./ReservationUtils";
 
 interface ReservationActionsProps {
   reservation: ReservationType;
@@ -229,23 +230,6 @@ const ReservationActions = ({
   }
 
   return null;
-};
-
-// Helper function to render the appropriate vehicle icon based on vehicle type
-const renderVehicleIcon = (vehicleType?: string) => {
-  switch (vehicleType) {
-    case 'berline':
-      return <Car className="h-4 w-4 text-primary" />;
-    case 'van':
-      return <Truck className="h-4 w-4 text-primary" />; // Changed from Van to Truck
-    case 'mini-bus':
-      return <Bus className="h-4 w-4 text-primary" />;
-    case 'first-class':
-      return <Star className="h-4 w-4 text-primary" />;
-    case 'standard':
-    default:
-      return <Car className="h-4 w-4 text-primary" />;
-  }
 };
 
 export default ReservationActions;

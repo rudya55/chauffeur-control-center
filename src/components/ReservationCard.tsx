@@ -6,7 +6,6 @@ import ReservationDetails from "@/components/reservation/ReservationDetails";
 import ReservationActions from "@/components/reservation/ReservationActions";
 import ReservationDispatcher from "@/components/reservation/ReservationDispatcher";
 import ReservationRating from "@/components/reservation/ReservationRating";
-import CircularTimer from "@/components/CircularTimer";
 
 interface ReservationCardProps {
   reservation: ReservationType;
@@ -84,6 +83,7 @@ const ReservationCard: React.FC<ReservationCardProps> = ({
           passengers={reservation.passengers}
           luggage={reservation.luggage}
           status={reservation.status}
+          vehicleType={reservation.vehicleType}
           showAddressLabels={true}
         />
 
