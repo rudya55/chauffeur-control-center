@@ -14,11 +14,14 @@ import ReservationDetails from "@/components/reservation/ReservationDetails";
 import ReservationActions from "@/components/reservation/ReservationActions";
 import { Button } from "@/components/ui/button";
 import { X } from "lucide-react";
+import { ChatDialog } from "@/components/ChatDialog";
 
 const Reservations = () => {
   const isMobile = useMobile();
   const [selectedViewReservation, setSelectedViewReservation] = useState<ReservationType | null>(null);
   const [openFullscreenView, setOpenFullscreenView] = useState(false);
+  const [openChatDialog, setOpenChatDialog] = useState(false);
+  const [currentDispatcher, setCurrentDispatcher] = useState("");
   
   const { 
     upcomingReservations, 
@@ -46,6 +49,11 @@ const Reservations = () => {
       setSelectedViewReservation(reservation);
       setOpenFullscreenView(true);
     }
+  };
+
+  const handleOpenChat = (dispatcher: string) => {
+    setCurrentDispatcher(dispatcher);
+    setOpenChatDialog(true);
   };
 
   const renderMobileReservationView = () => {
@@ -102,7 +110,7 @@ const Reservations = () => {
             onClientBoarded={handleClientBoarded}
             onComplete={handleCompleteRide}
             testTimerDate={testTimerDate}
-            onChatWithDispatcher={openChatWithDispatcher}
+            onChatWithDispatcher={handleOpenChat}
             fullscreenMode={true}
           />
         </div>
@@ -142,7 +150,7 @@ const Reservations = () => {
             onArrived={handleArrived}
             onClientBoarded={handleClientBoarded}
             onComplete={handleCompleteRide}
-            onChatWithDispatcher={openChatWithDispatcher}
+            onChatWithDispatcher={handleOpenChat}
             onReservationClick={handleReservationClick}
           />
         </TabsContent>
@@ -164,6 +172,12 @@ const Reservations = () => {
           reservation={selectedReservation}
         />
       )}
+
+      <ChatDialog
+        open={openChatDialog}
+        onOpenChange={setOpenChatDialog}
+        dispatcher={currentDispatcher}
+      />
 
       {isMobile ? (
         <Drawer open={openFullscreenView} onOpenChange={setOpenFullscreenView}>

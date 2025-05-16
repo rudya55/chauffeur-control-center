@@ -4,6 +4,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/u
 import { Button } from "@/components/ui/button";
 import { Send } from "lucide-react";
 import { toast } from "@/hooks/use-toast";
+import { useLanguage } from "@/hooks/use-language";
 
 interface Message {
   id: string;
@@ -26,6 +27,7 @@ export const ChatDialog = ({ open, onOpenChange, dispatcher }: ChatDialogProps) 
   const [autoTranslate, setAutoTranslate] = useState(true);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
+  const { t } = useLanguage();
 
   // Simuler des messages initiaux
   useEffect(() => {
@@ -45,7 +47,7 @@ export const ChatDialog = ({ open, onOpenChange, dispatcher }: ChatDialogProps) 
         inputRef.current?.focus();
       }, 100);
     }
-  }, [open, dispatcher]);
+  }, [open, dispatcher, messages.length]);
 
   // Scroll vers le bas quand de nouveaux messages arrivent
   useEffect(() => {
@@ -65,7 +67,12 @@ export const ChatDialog = ({ open, onOpenChange, dispatcher }: ChatDialogProps) 
         'Je suis en route': 'I am on my way',
         'Je serai là dans 5 minutes': 'I will be there in 5 minutes',
         'Merci': 'Thank you',
-        'Au revoir': 'Goodbye'
+        'Au revoir': 'Goodbye',
+        'Le client est informé de votre arrivée imminente.': 'The client has been informed of your imminent arrival.',
+        'J\'informe le client du retard. Merci.': 'I am informing the client about the delay. Thank you.',
+        'L\'adresse a été confirmée avec le client.': 'The address has been confirmed with the client.',
+        'Bonjour ! Comment puis-je vous aider aujourd\'hui ?': 'Hello! How can I help you today?',
+        'Je vous réponds dès que possible.': 'I will respond to you as soon as possible.'
       };
       
       // Vérifier si le texte est dans notre dictionnaire de traduction
@@ -84,7 +91,12 @@ export const ChatDialog = ({ open, onOpenChange, dispatcher }: ChatDialogProps) 
         'I am on my way': 'Je suis en route',
         'I will be there in 5 minutes': 'Je serai là dans 5 minutes',
         'Thank you': 'Merci',
-        'Goodbye': 'Au revoir'
+        'Goodbye': 'Au revoir',
+        'The client has been informed of your imminent arrival.': 'Le client est informé de votre arrivée imminente.',
+        'I am informing the client about the delay. Thank you.': 'J\'informe le client du retard. Merci.',
+        'The address has been confirmed with the client.': 'L\'adresse a été confirmée avec le client.',
+        'Hello! How can I help you today?': 'Bonjour ! Comment puis-je vous aider aujourd\'hui ?',
+        'I will respond to you as soon as possible.': 'Je vous réponds dès que possible.'
       };
       
       for (const [en, fr] of Object.entries(translations)) {
