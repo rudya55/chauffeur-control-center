@@ -85,60 +85,49 @@ const AppSidebar = ({ isOpen = false, onClose }: AppSidebarProps) => {
     );
 
   return (
-    <Sidebar
-      className={cn(
-        "border-r transition-all duration-300",
-        isMobile 
-          ? isOpen ? "translate-x-0" : "-translate-x-full fixed z-50 h-full" 
-          : collapsed ? "w-16" : "w-64",
-        isOpen && isMobile ? "translate-x-0" : isMobile ? "-translate-x-full" : ""
-      )}
-    >
+    <div className="h-full flex flex-col bg-background border-r">
       <div className="flex flex-col p-4 border-b">
-        {(!collapsed || isMobile) && (
-          <Dialog>
-            <DialogTrigger asChild>
-              <div className="flex flex-col items-center mb-2 cursor-pointer">
-                <Avatar className="h-16 w-16 mb-2">
-                  <AvatarImage src={avatarUrl} alt="Driver" />
-                  <AvatarFallback>JD</AvatarFallback>
-                </Avatar>
-                <h3 className="font-medium text-base">{driverName}</h3>
-                <div className="flex items-center">
-                  <span className="text-sm font-medium text-yellow-500">{driverRating}</span>
-                  <span className="text-sm text-yellow-500 ml-1">★</span>
-                </div>
+        <Dialog>
+          <DialogTrigger asChild>
+            <div className="flex flex-col items-center mb-2 cursor-pointer">
+              <Avatar className="h-16 w-16 mb-2">
+                <AvatarImage src={avatarUrl} alt="Driver" />
+                <AvatarFallback>JD</AvatarFallback>
+              </Avatar>
+              <h3 className="font-medium text-base">{driverName}</h3>
+              <div className="flex items-center">
+                <span className="text-sm font-medium text-yellow-500">{driverRating}</span>
+                <span className="text-sm text-yellow-500 ml-1">★</span>
               </div>
-            </DialogTrigger>
-            <DialogContent>
-              <DialogHeader>
-                <DialogTitle>Modifier votre photo de profil</DialogTitle>
-              </DialogHeader>
-              <div className="flex flex-col items-center gap-4">
-                <Avatar className="h-24 w-24">
-                  <AvatarImage src={avatarUrl} alt="Driver" />
-                  <AvatarFallback>JD</AvatarFallback>
-                </Avatar>
-                <div className="flex flex-col gap-2 w-full">
-                  <label 
-                    htmlFor="profile-upload" 
-                    className="cursor-pointer bg-primary text-white py-2 px-4 rounded text-center"
-                  >
-                    Choisir une photo
-                  </label>
-                  <input 
-                    id="profile-upload" 
-                    type="file" 
-                    accept="image/*" 
-                    className="hidden" 
-                    onChange={handleFileChange}
-                  />
-                </div>
+            </div>
+          </DialogTrigger>
+          <DialogContent>
+            <DialogHeader>
+              <DialogTitle>Modifier votre photo de profil</DialogTitle>
+            </DialogHeader>
+            <div className="flex flex-col items-center gap-4">
+              <Avatar className="h-24 w-24">
+                <AvatarImage src={avatarUrl} alt="Driver" />
+                <AvatarFallback>JD</AvatarFallback>
+              </Avatar>
+              <div className="flex flex-col gap-2 w-full">
+                <label 
+                  htmlFor="profile-upload" 
+                  className="cursor-pointer bg-primary text-white py-2 px-4 rounded text-center"
+                >
+                  Choisir une photo
+                </label>
+                <input 
+                  id="profile-upload" 
+                  type="file" 
+                  accept="image/*" 
+                  className="hidden" 
+                  onChange={handleFileChange}
+                />
               </div>
-            </DialogContent>
-          </Dialog>
-        )}
-        {!isMobile && <SidebarTrigger className="ml-auto" />}
+            </div>
+          </DialogContent>
+        </Dialog>
       </div>
 
       <SidebarContent className="p-2">
@@ -155,9 +144,7 @@ const AppSidebar = ({ isOpen = false, onClose }: AppSidebarProps) => {
                       onClick={handleNavLinkClick}
                     >
                       <item.icon className="h-5 w-5" />
-                      {(!collapsed || isMobile) && (
-                        <span>{item.title}</span>
-                      )}
+                      <span>{item.title}</span>
                     </NavLink>
                   </SidebarMenuButton>
                 </SidebarMenuItem>
@@ -166,7 +153,7 @@ const AppSidebar = ({ isOpen = false, onClose }: AppSidebarProps) => {
           </SidebarGroupContent>
         </SidebarGroup>
       </SidebarContent>
-    </Sidebar>
+    </div>
   );
 };
 

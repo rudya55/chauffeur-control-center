@@ -36,10 +36,8 @@ const AppLayout = () => {
       <div className="flex h-screen w-full">
         {/* Mobile sidebar as a sheet - only opens when toggled */}
         <Sheet open={isSidebarOpen} onOpenChange={setIsSidebarOpen}>
-          <SheetContent side="left" className="p-0 w-[85%]" onClick={(e) => e.stopPropagation()}>
-            <div className="h-full">
-              <AppSidebar isOpen={isSidebarOpen} onClose={() => setIsSidebarOpen(false)} />
-            </div>
+          <SheetContent side="left" className="p-0 w-[240px] max-w-[75vw]" onClick={(e) => e.stopPropagation()}>
+            <AppSidebar isOpen={isSidebarOpen} onClose={() => setIsSidebarOpen(false)} />
           </SheetContent>
         </Sheet>
         
