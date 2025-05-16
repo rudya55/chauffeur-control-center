@@ -52,7 +52,6 @@ const Reservations = () => {
             reservations={myReservations} 
             type="current" 
             emptyMessage="Aucune réservation active"
-            onShowOrderForm={handleShowOrderForm}
           />
         </TabsContent>
         

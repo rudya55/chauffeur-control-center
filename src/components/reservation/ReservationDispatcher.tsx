@@ -22,16 +22,7 @@ const ReservationDispatcher = ({
           <span className="text-xl mr-2">{reservation.dispatcherLogo}</span>
           <span className="font-medium text-sm">{reservation.dispatcher}</span>
         </div>
-        {onShowOrderForm && (
-          <Button 
-            variant="subtle" 
-            size="sm" 
-            onClick={() => onShowOrderForm(reservation)}
-            className="text-xs"
-          >
-            Bon de commande
-          </Button>
-        )}
+        {/* Removed the button from here as it's now in the Reservations page */}
       </div>
     );
   }
