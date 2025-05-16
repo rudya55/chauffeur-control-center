@@ -9,7 +9,7 @@ type ReservationStatusProps = {
 const ReservationStatus = ({ status }: ReservationStatusProps) => {
   if (status === 'pending') {
     return (
-      <Badge variant="secondary" className="bg-primary text-white">
+      <Badge variant="secondary" className="bg-blue-500 text-white">
         <Clock3 className="mr-2 h-4 w-4" />
         En attente
       </Badge>
@@ -27,7 +27,7 @@ const ReservationStatus = ({ status }: ReservationStatusProps) => {
   
   if (status === 'started') {
     return (
-      <Badge variant="outline">
+      <Badge variant="outline" className="bg-blue-500 text-white">
         <Navigation className="mr-2 h-4 w-4" />
         Démarré la course
       </Badge>
