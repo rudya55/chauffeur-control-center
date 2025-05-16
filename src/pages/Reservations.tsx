@@ -5,29 +5,41 @@ import { useReservations } from "@/hooks/use-reservations";
 import ReservationList from "@/components/reservation/ReservationList";
 
 const Reservations = () => {
-  const { pendingReservations, activeReservations, completedReservations } = useReservations();
+  const { upcomingReservations, myReservations, completedReservations } = useReservations();
 
   return (
     <div className="p-4 sm:p-6">
       <PageHeader title="reservations" />
       
-      <Tabs defaultValue="pending" className="w-full">
+      <Tabs defaultValue="upcoming" className="w-full">
         <TabsList className="grid w-full grid-cols-3 mb-4">
-          <TabsTrigger value="pending">En attente ({pendingReservations.length})</TabsTrigger>
-          <TabsTrigger value="active">Actives ({activeReservations.length})</TabsTrigger>
+          <TabsTrigger value="upcoming">En attente ({upcomingReservations.length})</TabsTrigger>
+          <TabsTrigger value="current">Actives ({myReservations.length})</TabsTrigger>
           <TabsTrigger value="completed">Terminées ({completedReservations.length})</TabsTrigger>
         </TabsList>
         
-        <TabsContent value="pending">
-          <ReservationList reservations={pendingReservations} type="pending" />
+        <TabsContent value="upcoming">
+          <ReservationList 
+            reservations={upcomingReservations} 
+            type="upcoming" 
+            emptyMessage="Aucune réservation en attente"
+          />
         </TabsContent>
         
-        <TabsContent value="active">
-          <ReservationList reservations={activeReservations} type="active" />
+        <TabsContent value="current">
+          <ReservationList 
+            reservations={myReservations} 
+            type="current" 
+            emptyMessage="Aucune réservation active"
+          />
         </TabsContent>
         
         <TabsContent value="completed">
-          <ReservationList reservations={completedReservations} type="completed" />
+          <ReservationList 
+            reservations={completedReservations} 
+            type="completed"
+            emptyMessage="Aucune réservation terminée" 
+          />
         </TabsContent>
       </Tabs>
     </div>
