@@ -1,11 +1,10 @@
 
 import PageHeader from "@/components/PageHeader";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Tabs, TabsContent } from "@/components/ui/tabs";
 import { useReservations } from "@/hooks/use-reservations";
 import ReservationList from "@/components/reservation/ReservationList";
-import { Button } from "@/components/ui/button";
-import { FileText } from "lucide-react";
 import OrderFormDialog from "@/components/OrderFormDialog";
+import ReservationTabHeader from "@/components/reservation/ReservationTabHeader";
 
 const Reservations = () => {
   const { 
@@ -30,11 +29,11 @@ const Reservations = () => {
       <PageHeader title="reservations" />
       
       <Tabs defaultValue="upcoming" className="w-full">
-        <TabsList className="grid w-full grid-cols-3 mb-4">
-          <TabsTrigger value="upcoming">Nouvelles réservations ({upcomingReservations.length})</TabsTrigger>
-          <TabsTrigger value="current">Mes réservations ({myReservations.length})</TabsTrigger>
-          <TabsTrigger value="completed">Terminées ({completedReservations.length})</TabsTrigger>
-        </TabsList>
+        <ReservationTabHeader
+          upcomingCount={upcomingReservations.length}
+          currentCount={myReservations.length}
+          completedCount={completedReservations.length}
+        />
         
         <TabsContent value="upcoming">
           <ReservationList 
