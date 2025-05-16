@@ -28,4 +28,8 @@ export type ReservationType = {
   rating?: number;
   comment?: string;
   route?: {lat: number, lng: number}[];
+  pickupGPS?: {lat: number, lng: number};
+  destinationGPS?: {lat: number, lng: number};
+  flightStatus?: 'on-time' | 'delayed' | 'landed' | 'boarding' | 'cancelled';
+  placardText?: string;
 };

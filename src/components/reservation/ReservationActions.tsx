@@ -1,8 +1,10 @@
 
+import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
-import { useState } from "react";
 import { ReservationType } from "@/types/reservation";
+import { Check, X } from "lucide-react";
+import { toast } from "sonner";
 
 interface ReservationActionsProps {
   reservation: ReservationType;
@@ -28,6 +30,16 @@ const ReservationActions = ({
   const [rating, setRating] = useState(5);
   const [comment, setComment] = useState("");
 
+  // Check if ride can be started (2 hours before scheduled time)
+  const canStartRide = () => {
+    const now = new Date();
+    const rideTime = new Date(reservation.date);
+    const twoHoursBefore = new Date(rideTime);
+    twoHoursBefore.setHours(twoHoursBefore.getHours() - 2);
+    
+    return now >= twoHoursBefore;
+  };
+
   // Gestion de la soumission de l'évaluation
   const handleSubmitRating = () => {
     if (onComplete) {
@@ -35,13 +47,37 @@ const ReservationActions = ({
     }
   };
 
+  // Handle start ride with time check
+  const handleStartRide = () => {
+    if (!canStartRide()) {
+      toast.error("Vous ne pouvez pas démarrer cette course plus de 2h avant l'heure prévue");
+      return;
+    }
+    
+    if (onStartRide) {
+      onStartRide(reservation.id);
+    }
+  };
+
   if (type === 'upcoming' && reservation.status === 'pending') {
     return (
-      <div className="flex justify-between">
-        <Button variant="secondary" size="sm" onClick={() => onAccept && onAccept(reservation.id)}>
+      <div className="flex justify-between mt-4">
+        <Button 
+          variant="outline" 
+          size="sm" 
+          className="border-primary text-primary hover:bg-primary hover:text-white"
+          onClick={() => onAccept && onAccept(reservation.id)}
+        >
+          <Check className="mr-2 h-4 w-4" />
           Accepter
         </Button>
-        <Button variant="destructive" size="sm" onClick={() => onReject && onReject(reservation.id)}>
+        <Button 
+          variant="outline" 
+          size="sm"
+          className="border-destructive text-destructive hover:bg-destructive hover:text-white"
+          onClick={() => onReject && onReject(reservation.id)}
+        >
+          <X className="mr-2 h-4 w-4" />
           Refuser
         </Button>
       </div>
@@ -50,18 +86,29 @@ const ReservationActions = ({
 
   if (type === 'current' && reservation.status === 'accepted') {
     return (
-      <div className="flex justify-end gap-2">
-        <Button variant="secondary" size="sm" onClick={() => onStartRide && onStartRide(reservation.id)}>
+      <div className="flex justify-end gap-2 mt-4">
+        <Button 
+          variant="default" 
+          size="sm" 
+          onClick={handleStartRide}
+          disabled={!canStartRide()}
+          className={canStartRide() ? "" : "opacity-50 cursor-not-allowed"}
+        >
           Démarrer la course
         </Button>
+        {!canStartRide() && (
+          <div className="text-xs text-amber-600 italic mt-1">
+            La course ne peut être démarrée que 2h avant l'heure prévue
+          </div>
+        )}
       </div>
     );
   }
 
   if (type === 'current' && reservation.status === 'started') {
     return (
-      <div className="flex justify-end gap-2">
-        <Button variant="secondary" size="sm" onClick={() => onArrived && onArrived(reservation.id)}>
+      <div className="flex justify-end gap-2 mt-4">
+        <Button variant="default" size="sm" onClick={() => onArrived && onArrived(reservation.id)}>
           Je suis arrivé
         </Button>
       </div>
@@ -70,8 +117,8 @@ const ReservationActions = ({
 
   if (type === 'current' && reservation.status === 'arrived') {
     return (
-      <div className="flex justify-end gap-2">
-        <Button variant="secondary" size="sm" onClick={() => onClientBoarded && onClientBoarded(reservation.id)}>
+      <div className="flex justify-end gap-2 mt-4">
+        <Button variant="default" size="sm" onClick={() => onClientBoarded && onClientBoarded(reservation.id)}>
           Client à bord
         </Button>
       </div>
@@ -80,7 +127,7 @@ const ReservationActions = ({
 
   if (type === 'current' && reservation.status === 'onBoard') {
     return (
-      <div className="flex justify-end gap-2">
+      <div className="flex justify-end gap-2 mt-4">
         <AlertDialog>
           <AlertDialogTrigger asChild>
             <Button variant="default" size="sm">

@@ -59,6 +59,12 @@ const ReservationCard: React.FC<ReservationCardProps> = ({
           destination={reservation.destination}
           phone={reservation.phone}
           flightNumber={reservation.flightNumber}
+          clientName={reservation.clientName}
+          amount={reservation.amount}
+          flightStatus={reservation.flightStatus as any}
+          placardText={reservation.placardText}
+          pickupGPS={reservation.pickupGPS}
+          destinationGPS={reservation.destinationGPS}
         />
 
         {/* Actions spécifiques selon le type de réservation */}

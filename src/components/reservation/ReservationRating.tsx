@@ -15,8 +15,13 @@ const ReservationRating = ({ rating, comment }: ReservationRatingProps) => {
     <div className="mt-2">
       {rating && (
         <div className="flex items-center">
-          <Star className="mr-1 h-4 w-4 text-yellow-500" />
-          <span>{rating} étoiles</span>
+          {Array.from({ length: 5 }).map((_, i) => (
+            <Star
+              key={i}
+              className={`h-4 w-4 ${i < (rating || 0) ? 'text-yellow-500 fill-yellow-500' : 'text-gray-300'}`}
+            />
+          ))}
+          <span className="ml-1 text-sm">{rating}/5</span>
         </div>
       )}
       
