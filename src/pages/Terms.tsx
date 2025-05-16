@@ -4,10 +4,10 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 const Terms = () => {
   return (
     <div className="container mx-auto p-4">
-      <h1 className="text-2xl font-bold mb-6">Conditions Générales</h1>
+      <h1 className="text-2xl font-bold mb-6">Conditions General</h1>
       <Card className="mb-6">
         <CardHeader>
-          <CardTitle>Conditions Générales</CardTitle>
+          <CardTitle>Conditions General</CardTitle>
         </CardHeader>
         <CardContent>
           <div className="prose max-w-none">

@@ -29,7 +29,7 @@ const ReservationStatus = ({ status }: ReservationStatusProps) => {
     return (
       <Badge variant="outline">
         <Navigation className="mr-2 h-4 w-4" />
-        Course démarrée
+        Démarré la course
       </Badge>
     );
   }
