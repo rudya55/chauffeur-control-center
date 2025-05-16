@@ -66,16 +66,16 @@ const ReservationActions = ({
       <div className={cn("flex justify-end gap-2", fullscreenMode && "flex-col mt-6")}>
         {onAccept && (
           <Button 
-            variant="default" 
-            onClick={() => onAccept(reservation.id)} 
             className={getButtonClass("w-1/2")}
+            onClick={() => onAccept(reservation.id)}
+            style={{ backgroundColor: "#22c55e" }} // Green color for Accept button
           >
             <CheckCircle className="mr-1 h-4 w-4" /> Accepter
           </Button>
         )}
         {onReject && (
           <Button 
-            variant="outline" 
+            variant="destructive"
             onClick={() => onReject(reservation.id)}
             className={getButtonClass("w-1/2")}
           >
