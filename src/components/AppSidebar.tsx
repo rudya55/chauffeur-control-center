@@ -1,3 +1,4 @@
+
 import { NavLink, useLocation } from "react-router-dom";
 import { 
   Calendar, 
@@ -7,7 +8,10 @@ import {
   Mail,
   FileText as FileTextIcon,
   ArrowLeft,
-  Home
+  Home,
+  Moon,
+  Sun,
+  Bell
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useIsMobile } from "@/hooks/use-mobile";
@@ -34,6 +38,9 @@ import {
 } from "@/components/ui/dialog";
 import { useLanguage } from "@/hooks/use-language";
 import { useNavigate } from "react-router-dom";
+import { useTheme } from "next-themes";
+import ThemeToggle from "./ThemeToggle";
+import NotificationBell from "./NotificationBell";
 
 interface AppSidebarProps {
   isOpen?: boolean;
@@ -144,6 +151,12 @@ const AppSidebar = ({ isOpen = false, onClose }: AppSidebarProps) => {
           <ArrowLeft className="h-4 w-4" />
           <span>{t("back_to_home")}</span>
         </Button>
+
+        {/* Add theme toggle and notification buttons */}
+        <div className="flex justify-between items-center mt-2 mb-4">
+          <ThemeToggle className="mr-2" />
+          <NotificationBell />
+        </div>
       </div>
 
       <SidebarContent className="p-2 flex-1">
