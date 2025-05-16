@@ -1,9 +1,10 @@
+
 import { useState, useEffect } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { CheckCircle, Clock3, Navigation, PhoneCall, MessageCircle, AlertCircle, Star, FileText } from "lucide-react";
-import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
 import { cn } from "@/lib/utils";
 
 // Type de réservation
@@ -182,51 +183,48 @@ const ReservationCard: React.FC<ReservationCardProps> = ({ reservation, type, on
             <div className="flex justify-end gap-2">
               <AlertDialog>
                 <AlertDialogTrigger asChild>
-                  <Button variant="primary" size="sm">
+                  <Button variant="default" size="sm">
                     Terminer la course
                   </Button>
                 </AlertDialogTrigger>
-                <AlertDialogPortal>
-                  <AlertDialogOverlay />
-                  <AlertDialogContent>
-                    <AlertDialogHeader>
-                      <AlertDialogTitle>Évaluer la course</AlertDialogTitle>
-                      <AlertDialogDescription>
-                        Comment s'est déroulée la course avec {reservation.clientName} ?
-                      </AlertDialogDescription>
-                    </AlertDialogHeader>
-                    <div className="flex items-center space-x-2">
-                      <label htmlFor="rating">Note :</label>
-                      <select
-                        id="rating"
-                        value={rating}
-                        onChange={(e) => setRating(parseInt(e.target.value))}
-                        className="border rounded px-2 py-1"
-                      >
-                        <option value="5">5 Étoiles</option>
-                        <option value="4">4 Étoiles</option>
-                        <option value="3">3 Étoiles</option>
-                        <option value="2">2 Étoiles</option>
-                        <option value="1">1 Étoile</option>
-                      </select>
-                    </div>
-                    <div className="mt-2">
-                      <label htmlFor="comment">Commentaire :</label>
-                      <textarea
-                        id="comment"
-                        value={comment}
-                        onChange={(e) => setComment(e.target.value)}
-                        className="border rounded w-full px-2 py-1"
-                      />
-                    </div>
-                    <AlertDialogFooter>
-                      <AlertDialogCancel>Annuler</AlertDialogCancel>
-                      <AlertDialogAction onClick={handleSubmitRating}>
-                        Soumettre
-                      </AlertDialogAction>
-                    </AlertDialogFooter>
-                  </AlertDialogContent>
-                </AlertDialogPortal>
+                <AlertDialogContent>
+                  <AlertDialogHeader>
+                    <AlertDialogTitle>Évaluer la course</AlertDialogTitle>
+                    <AlertDialogDescription>
+                      Comment s'est déroulée la course avec {reservation.clientName} ?
+                    </AlertDialogDescription>
+                  </AlertDialogHeader>
+                  <div className="flex items-center space-x-2">
+                    <label htmlFor="rating">Note :</label>
+                    <select
+                      id="rating"
+                      value={rating}
+                      onChange={(e) => setRating(parseInt(e.target.value))}
+                      className="border rounded px-2 py-1"
+                    >
+                      <option value="5">5 Étoiles</option>
+                      <option value="4">4 Étoiles</option>
+                      <option value="3">3 Étoiles</option>
+                      <option value="2">2 Étoiles</option>
+                      <option value="1">1 Étoile</option>
+                    </select>
+                  </div>
+                  <div className="mt-2">
+                    <label htmlFor="comment">Commentaire :</label>
+                    <textarea
+                      id="comment"
+                      value={comment}
+                      onChange={(e) => setComment(e.target.value)}
+                      className="border rounded w-full px-2 py-1"
+                    />
+                  </div>
+                  <AlertDialogFooter>
+                    <AlertDialogCancel>Annuler</AlertDialogCancel>
+                    <AlertDialogAction onClick={handleSubmitRating}>
+                      Soumettre
+                    </AlertDialogAction>
+                  </AlertDialogFooter>
+                </AlertDialogContent>
               </AlertDialog>
             </div>
           )}
