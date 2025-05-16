@@ -1,7 +1,6 @@
-
 import { useEffect, useRef, useState } from 'react';
 import { cn } from '@/lib/utils';
-import { useTheme } from '@/hooks/use-theme';
+import { useTheme as useNextTheme } from 'next-themes';
 import { Menu } from 'lucide-react';
 
 interface MapProps {
@@ -23,7 +22,7 @@ const Map = ({
   const mapInstanceRef = useRef<any>(null);
   const markerRef = useRef<any>(null);
   const polylineRef = useRef<any>(null);
-  const { theme } = useTheme();
+  const { theme } = useNextTheme();
 
   useEffect(() => {
     // Load Google Maps API script
@@ -187,13 +186,13 @@ const Map = ({
     // Update map when theme changes
     if (mapInstanceRef.current) {
       const darkMapStyles = [
-        { elementType: 'geometry', stylers: [{ color: '#1a2639' }] }, // Darker blue background
+        { elementType: 'geometry', stylers: [{ color: '#1a2639' }] },
         { elementType: 'labels.text.stroke', stylers: [{ color: '#1a2639' }] },
-        { elementType: 'labels.text.fill', stylers: [{ color: '#d4af37' }] }, // Gold text
+        { elementType: 'labels.text.fill', stylers: [{ color: '#d4af37' }] },
         {
           featureType: 'administrative.locality',
           elementType: 'labels.text.fill',
-          stylers: [{ color: '#d4af37' }] // Gold for localities
+          stylers: [{ color: '#d4af37' }]
         },
         {
           featureType: 'poi',
@@ -203,27 +202,27 @@ const Map = ({
         {
           featureType: 'road',
           elementType: 'geometry',
-          stylers: [{ color: '#4a6491' }] // Lighter blue for roads
+          stylers: [{ color: '#4a6491' }]
         },
         {
           featureType: 'road',
           elementType: 'geometry.stroke',
-          stylers: [{ color: '#6a84b1' }] // Even lighter blue for road strokes
+          stylers: [{ color: '#6a84b1' }]
         },
         {
           featureType: 'road',
           elementType: 'labels.text.fill',
-          stylers: [{ color: '#d4af37' }] // Gold text for roads
+          stylers: [{ color: '#d4af37' }]
         },
         {
           featureType: 'road.highway',
           elementType: 'geometry',
-          stylers: [{ color: '#5d7bb0' }] // Light blue for highways
+          stylers: [{ color: '#5d7bb0' }]
         },
         {
           featureType: 'road.highway',
           elementType: 'geometry.stroke',
-          stylers: [{ color: '#8fa8d5' }] // Even lighter blue for highway strokes
+          stylers: [{ color: '#8fa8d5' }]
         },
         {
           featureType: 'transit',
@@ -233,7 +232,7 @@ const Map = ({
         {
           featureType: 'water',
           elementType: 'geometry',
-          stylers: [{ color: '#0e1626' }] // Darker blue for water
+          stylers: [{ color: '#0e1626' }]
         },
         {
           featureType: 'water',
