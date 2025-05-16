@@ -1,5 +1,5 @@
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Outlet, useNavigate } from "react-router-dom";
 import AppSidebar from "@/components/AppSidebar";
 import MobileHeader from "@/components/MobileHeader";
@@ -7,7 +7,6 @@ import { useIsMobile } from "@/hooks/use-mobile";
 import NotificationBell from "@/components/NotificationBell";
 import { SidebarProvider } from "@/components/ui/sidebar";
 import { useAuth } from "@/hooks/use-auth";
-import { useEffect } from "react";
 import { Sheet, SheetContent } from "@/components/ui/sheet";
 
 const AppLayout = () => {
@@ -17,6 +16,7 @@ const AppLayout = () => {
   const navigate = useNavigate();
 
   useEffect(() => {
+    console.log("AppLayout useEffect, isAuthenticated:", isAuthenticated);
     if (!isAuthenticated) {
       navigate('/login');
     }
@@ -26,7 +26,10 @@ const AppLayout = () => {
     setIsSidebarOpen(!isSidebarOpen);
   };
 
+  console.log("AppLayout render, isAuthenticated:", isAuthenticated);
+
   if (!isAuthenticated) {
+    console.log("AppLayout rendering null due to not authenticated");
     return null;
   }
 

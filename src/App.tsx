@@ -31,11 +31,7 @@ function App() {
           <LanguageProvider>
             <Routes>
               <Route path="/login" element={<Login />} />
-              <Route path="/" element={
-                <ProtectedRoute>
-                  <AppLayout />
-                </ProtectedRoute>
-              }>
+              <Route path="/" element={<ProtectedRoute><AppLayout /></ProtectedRoute>}>
                 <Route index element={<Home />} />
                 <Route path="analytics" element={<Analytics />} />
                 <Route path="calendar" element={<Calendar />} />

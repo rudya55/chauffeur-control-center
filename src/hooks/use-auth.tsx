@@ -18,6 +18,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   useEffect(() => {
     const authStatus = localStorage.getItem('isAuthenticated');
     setIsAuthenticated(authStatus === 'true');
+    console.log("Auth status loaded:", authStatus === 'true');
   }, []);
 
   const login = async (email: string, password: string): Promise<boolean> => {
@@ -25,6 +26,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     if (email === 'admin@example.com' && password === 'password123') {
       localStorage.setItem('isAuthenticated', 'true');
       setIsAuthenticated(true);
+      console.log("Login successful, auth state set to true");
       return true;
     }
     return false;
@@ -35,6 +37,8 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     setIsAuthenticated(false);
     navigate('/login');
   };
+
+  console.log("AuthProvider render, isAuthenticated:", isAuthenticated);
 
   return (
     <AuthContext.Provider value={{ isAuthenticated, login, logout }}>
