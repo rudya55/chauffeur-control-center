@@ -7,13 +7,26 @@ interface ReservationDispatcherProps {
   reservation: ReservationType;
   onChatWithDispatcher?: (dispatcher: string) => void;
   onShowOrderForm?: (reservation: ReservationType) => void;
+  showAsHeader?: boolean;
 }
 
 const ReservationDispatcher = ({ 
   reservation, 
   onChatWithDispatcher, 
-  onShowOrderForm 
+  onShowOrderForm,
+  showAsHeader = false 
 }: ReservationDispatcherProps) => {
+  if (showAsHeader) {
+    return (
+      <div className="flex items-center justify-end mb-2">
+        <div className="flex items-center bg-slate-50 rounded-md px-3 py-1">
+          <span className="text-xl mr-2">{reservation.dispatcherLogo}</span>
+          <span className="font-medium text-sm">{reservation.dispatcher}</span>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <>
       <div className="flex items-center justify-between mt-4 p-3 bg-slate-50 rounded-md">

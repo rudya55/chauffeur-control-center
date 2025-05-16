@@ -45,25 +45,52 @@ const ReservationCard: React.FC<ReservationCardProps> = ({
   // Create a date 10 seconds in the future for the test timer
   const testTimerDate = new Date();
   testTimerDate.setSeconds(testTimerDate.getSeconds() + 10);
+  
+  // Check if ride can be started (2 hours before scheduled time)
+  const canStartRide = () => {
+    const now = new Date();
+    const rideTime = new Date(reservation.date);
+    const twoHoursBefore = new Date(rideTime);
+    twoHoursBefore.setHours(twoHoursBefore.getHours() - 2);
+    
+    return now >= twoHoursBefore;
+  };
 
   return (
     <Card className="mb-4">
       <CardContent className="p-4">
-        {/* En-tête avec le nom du client et le statut */}
+        {/* Show dispatcher at the top right for current reservations */}
+        {type === 'current' && (
+          <ReservationDispatcher 
+            reservation={reservation}
+            showAsHeader={true}
+          />
+        )}
+        
+        {/* Date and status header */}
         <div className="flex items-start justify-between mb-4">
           <div>
-            {type !== 'upcoming' && <h2 className="text-lg font-semibold">{reservation.clientName}</h2>}
             <p className="text-sm text-gray-500">{formattedDate}</p>
             
-            {/* Test timer - for testing purposes */}
-            {type === 'upcoming' && (
+            {/* Timer for current reservations with "accepted" status */}
+            {type === 'current' && reservation.status === 'accepted' && !canStartRide() && (
+              <div className="mt-2">
+                <CircularTimer 
+                  targetTime={new Date(reservation.date)} 
+                  durationInSeconds={7200} // 2 hours in seconds
+                />
+              </div>
+            )}
+            
+            {/* Test timer - only for testing */}
+            {/* {type === 'current' && (
               <div className="mt-2">
                 <CircularTimer 
                   targetTime={testTimerDate} 
                   durationInSeconds={10}
                 />
               </div>
-            )}
+            )} */}
           </div>
           <ReservationStatus status={reservation.status} />
         </div>
@@ -72,9 +99,9 @@ const ReservationCard: React.FC<ReservationCardProps> = ({
         <ReservationDetails 
           pickupAddress={reservation.pickupAddress}
           destination={reservation.destination}
-          phone={reservation.phone}
+          phone={type === 'upcoming' ? undefined : reservation.phone}
           flightNumber={reservation.flightNumber}
-          clientName={reservation.clientName}
+          clientName={type === 'upcoming' ? undefined : reservation.clientName}
           amount={reservation.amount}
           driverAmount={reservation.driverAmount}
           commission={reservation.commission}
