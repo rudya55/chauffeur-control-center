@@ -11,11 +11,11 @@ type AuthContextType = {
 const AuthContext = createContext<AuthContextType | null>(null);
 
 export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [isAuthenticated, setIsAuthenticated] = useState<boolean>(false);
   const navigate = useNavigate();
 
+  // Load authentication state when the component mounts
   useEffect(() => {
-    // Check if user is authenticated on component mount
     const authStatus = localStorage.getItem('isAuthenticated');
     setIsAuthenticated(authStatus === 'true');
   }, []);

@@ -47,10 +47,10 @@ function App() {
                 <Route path="*" element={<NotFound />} />
               </Route>
             </Routes>
+            <Toaster position="top-center" />
           </LanguageProvider>
         </AuthProvider>
       </Router>
-      <Toaster position="top-center" />
     </ThemeProvider>
   )
 }

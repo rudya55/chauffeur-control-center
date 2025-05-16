@@ -8,7 +8,7 @@ import NotificationBell from "@/components/NotificationBell";
 import { SidebarProvider } from "@/components/ui/sidebar";
 import { useAuth } from "@/hooks/use-auth";
 import { useEffect } from "react";
-import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
+import { Sheet, SheetContent } from "@/components/ui/sheet";
 
 const AppLayout = () => {
   const isMobile = useIsMobile();
