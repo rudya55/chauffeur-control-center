@@ -1,6 +1,6 @@
 
 import { Button } from "@/components/ui/button";
-import { ArrowLeft } from "lucide-react";
+import { ArrowLeft, Menu } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useLanguage } from "@/hooks/use-language";
 
@@ -11,7 +11,7 @@ interface PageHeaderProps {
   onMenuToggle?: () => void;
 }
 
-const PageHeader = ({ title, showBackButton = true, className }: PageHeaderProps) => {
+const PageHeader = ({ title, showBackButton = true, className, onMenuToggle }: PageHeaderProps) => {
   const { t } = useLanguage();
   const navigate = useNavigate();
   
@@ -22,7 +22,17 @@ const PageHeader = ({ title, showBackButton = true, className }: PageHeaderProps
   return (
     <div className={`flex justify-between items-center mb-6 ${className}`}>
       <div className="flex items-center gap-2">
-        {/* Menu hamburger button supprimé comme demandé */}
+        {/* Add back the menu hamburger button */}
+        {onMenuToggle && (
+          <Button 
+            variant="ghost" 
+            size="icon" 
+            onClick={onMenuToggle}
+            className="mr-2"
+          >
+            <Menu className="h-5 w-5" />
+          </Button>
+        )}
         
         {showBackButton && (
           <Button 

@@ -9,7 +9,8 @@ const Home = () => {
 
   const handleMenuToggle = () => {
     setSidebarOpen(!sidebarOpen);
-    // The PageHeader component now handles the dispatch of the toggle-sidebar event
+    // Dispatch event to toggle sidebar
+    window.dispatchEvent(new CustomEvent('toggle-sidebar'));
   };
 
   return (
@@ -24,10 +25,10 @@ const Home = () => {
         <OnlineStatusToggle />
       </div>
 
-      {/* Page header with menu button */}
+      {/* Page header with menu button only, no title */}
       <div className="absolute top-4 left-4 z-10 bg-white/80 backdrop-blur-sm rounded-md">
         <PageHeader 
-          title="home" 
+          title="" 
           showBackButton={false} 
           className="mb-0 px-2 py-1" 
           onMenuToggle={handleMenuToggle}
