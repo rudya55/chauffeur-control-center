@@ -13,13 +13,20 @@ import Contact from "@/pages/Contact";
 import Settings from "@/pages/Settings";
 import Terms from "@/pages/Terms";
 import NotFound from "@/pages/NotFound";
+import { useEffect } from "react";
 
 function App() {
+  // Force dark mode at the document level
+  useEffect(() => {
+    document.documentElement.classList.add('dark');
+    document.body.classList.add('dark');
+  }, []);
+  
   return (
     <ThemeProvider
       attribute="class"
-      defaultTheme="system"
-      enableSystem
+      defaultTheme="dark"
+      forcedTheme="dark"
       disableTransitionOnChange
     >
       <Router>
