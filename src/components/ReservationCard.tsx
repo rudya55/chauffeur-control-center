@@ -245,15 +245,15 @@ const ReservationCard: React.FC<ReservationCardProps> = ({ reservation, type, on
 
         {/* Infos du dispatcher et Bon de commande */}
         {type === 'current' && (
-          <div className="flex items-center justify-between">
-            <div>
-              <span className="text-sm font-medium">De: {reservation.dispatcherLogo} {reservation.dispatcher}</span>
+          <div className="flex items-center justify-between mt-4">
+            <div className="text-sm">
+              <span className="font-medium">De: {reservation.dispatcherLogo} {reservation.dispatcher}</span>
             </div>
             <Button 
               variant="subtle" 
-              size="xs" 
+              size="sm" 
               onClick={() => onShowOrderForm && onShowOrderForm(reservation)}
-              className="text-xs font-normal"
+              className="text-xs"
             >
               Bon de commande
             </Button>
@@ -262,7 +262,12 @@ const ReservationCard: React.FC<ReservationCardProps> = ({ reservation, type, on
 
         {/* Bouton de contact avec le dispatcher */}
         {type === 'current' && (
-          <Button variant="ghost" size="sm" onClick={() => onChatWithDispatcher && onChatWithDispatcher(reservation.dispatcher)}>
+          <Button 
+            variant="ghost" 
+            size="sm" 
+            onClick={() => onChatWithDispatcher && onChatWithDispatcher(reservation.dispatcher)}
+            className="mt-2"
+          >
             <MessageCircle className="mr-2 h-4 w-4" />
             Contacter {reservation.dispatcher}
           </Button>
