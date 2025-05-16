@@ -34,9 +34,7 @@ const CircularTimer = ({
       if (timeLeftMs <= 0) {
         setTimeLeft("00:00:00");
         setTimerCompleted(true);
-        if (onTimeReached) {
-          onTimeReached();
-        }
+        // Removed the toast notification call to fix the bug
         return;
       }
       

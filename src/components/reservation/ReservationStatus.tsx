@@ -9,7 +9,7 @@ type ReservationStatusProps = {
 const ReservationStatus = ({ status }: ReservationStatusProps) => {
   if (status === 'pending') {
     return (
-      <Badge variant="secondary">
+      <Badge variant="secondary" className="bg-primary text-white">
         <Clock3 className="mr-2 h-4 w-4" />
         En attente
       </Badge>

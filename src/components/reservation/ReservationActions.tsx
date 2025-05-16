@@ -38,11 +38,6 @@ const ReservationActions = ({
   const [comment, setComment] = useState("");
   const [showTimer, setShowTimer] = useState(true);
 
-  // Timer notification when completed
-  const handleTimerComplete = () => {
-    toast.info("Le temps d'attente est terminé");
-  };
-
   if (type === 'upcoming' && reservation.status === 'pending') {
     return (
       <div className="flex justify-between items-center mt-4">
@@ -93,7 +88,6 @@ const ReservationActions = ({
             <CircularTimer 
               targetTime={testTimerDate} 
               durationInSeconds={10}
-              onTimeReached={handleTimerComplete}
             />
           )}
           <Button 
