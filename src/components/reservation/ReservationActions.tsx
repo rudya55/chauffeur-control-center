@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
@@ -48,7 +47,7 @@ const ReservationActions = ({
     return (
       <div className="flex justify-between items-center mt-4">
         <div className="flex items-center">
-          {renderVehicleIcon(reservation.vehicleType)}
+          {/* Removed duplicate vehicle icon here */}
         </div>
         <div className="flex gap-2">
           <Button 

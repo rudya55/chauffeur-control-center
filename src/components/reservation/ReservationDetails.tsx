@@ -104,6 +104,19 @@ const ReservationDetails = ({
   const renderPriceInfo = () => {
     if (!driverAmount) return null;
     
+    // Always show at least net driver amount, even for upcoming reservations
+    if (status === 'pending') {
+      return (
+        <div className="mt-3 p-3 bg-slate-50 rounded-md">
+          <div className="flex justify-between">
+            <span className="text-sm font-medium">Net chauffeur:</span>
+            <span className="font-bold text-primary">{driverAmount} €</span>
+          </div>
+        </div>
+      );
+    }
+    
+    // For accepted or other statuses, show the full price breakdown
     return (
       <div className="mt-3 p-3 bg-slate-50 rounded-md">
         {amount && (
@@ -172,7 +185,7 @@ const ReservationDetails = ({
       
       {/* Vehicle type, Passengers and luggage info */}
       <div className="flex items-center space-x-4">
-        {/* Vehicle type icon */}
+        {/* Vehicle type icon - always show this for all reservation types */}
         {vehicleType && (
           <div className="flex items-center">
             {renderVehicleIcon(vehicleType)}
@@ -194,7 +207,7 @@ const ReservationDetails = ({
           </div>
         )}
         
-        {/* Payment type icon */}
+        {/* Payment type icon - always show this for all reservation types */}
         {paymentType && (
           <div className="flex items-center">
             {renderPaymentTypeIcon(paymentType)}
@@ -233,7 +246,7 @@ const ReservationDetails = ({
         </div>
       )}
       
-      {/* Price information */}
+      {/* Price information - adjusted to show for all reservation types */}
       {renderPriceInfo()}
 
       {/* Completed ride details with distance and route map */}
