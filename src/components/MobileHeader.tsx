@@ -2,7 +2,7 @@
 import { Menu } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { useState } from "react";
+import { useAuth } from "@/hooks/use-auth";
 
 interface MobileHeaderProps {
   isOpen: boolean;
@@ -10,11 +10,12 @@ interface MobileHeaderProps {
 }
 
 const MobileHeader = ({ isOpen, onToggle }: MobileHeaderProps) => {
+  const { logout } = useAuth();
   // Driver rating
   const driverRating = 4.8;
 
   return (
-    <header className="sticky top-0 z-40 flex h-14 items-center gap-4 border-b bg-background px-4 sm:static md:hidden">
+    <header className="sticky top-0 z-40 flex h-14 items-center gap-4 border-b bg-background px-4 sm:static md:hidden w-full">
       <Button
         variant="ghost"
         size="icon"

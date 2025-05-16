@@ -3,7 +3,7 @@ import { ThemeProvider } from "@/components/theme-provider"
 import "./globals.css"
 import { LanguageProvider } from "@/hooks/use-language";
 import { Toaster } from "sonner";
-import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import { AuthProvider } from "@/hooks/use-auth";
 import ProtectedRoute from "@/components/ProtectedRoute";
 import Login from "@/pages/Login";

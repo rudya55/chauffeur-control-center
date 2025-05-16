@@ -35,6 +35,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const logout = () => {
     localStorage.removeItem('isAuthenticated');
     setIsAuthenticated(false);
+    console.log("Logout executed, auth state set to false");
     navigate('/login');
   };
 
