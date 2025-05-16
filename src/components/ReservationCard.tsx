@@ -71,26 +71,6 @@ const ReservationCard: React.FC<ReservationCardProps> = ({
         <div className="flex items-start justify-between mb-4">
           <div>
             <p className="text-sm text-gray-500">{formattedDate}</p>
-            
-            {/* Timer for current reservations with "accepted" status */}
-            {type === 'current' && reservation.status === 'accepted' && !canStartRide() && (
-              <div className="mt-2">
-                <CircularTimer 
-                  targetTime={new Date(reservation.date)} 
-                  durationInSeconds={7200} // 2 hours in seconds
-                />
-              </div>
-            )}
-            
-            {/* Test timer - only for testing */}
-            {/* {type === 'current' && (
-              <div className="mt-2">
-                <CircularTimer 
-                  targetTime={testTimerDate} 
-                  durationInSeconds={10}
-                />
-              </div>
-            )} */}
           </div>
           <ReservationStatus status={reservation.status} />
         </div>
@@ -139,11 +119,33 @@ const ReservationCard: React.FC<ReservationCardProps> = ({
 
         {/* Infos du dispatcher et Bon de commande */}
         {type === 'current' && (
-          <ReservationDispatcher 
-            reservation={reservation}
-            onChatWithDispatcher={onChatWithDispatcher}
-            onShowOrderForm={onShowOrderForm}
-          />
+          <>
+            <ReservationDispatcher 
+              reservation={reservation}
+              onChatWithDispatcher={onChatWithDispatcher}
+              onShowOrderForm={onShowOrderForm}
+            />
+            
+            {/* Test timer for current rides - displayed at the bottom */}
+            {reservation.status === 'accepted' && (
+              <div className="mt-4 flex justify-center">
+                <CircularTimer 
+                  targetTime={testTimerDate} 
+                  durationInSeconds={10}
+                />
+              </div>
+            )}
+            
+            {/* Real timer (commented for now) */}
+            {/* {reservation.status === 'accepted' && !canStartRide() && (
+              <div className="mt-4 flex justify-center">
+                <CircularTimer 
+                  targetTime={new Date(reservation.date)} 
+                  durationInSeconds={7200} // 2 hours in seconds
+                />
+              </div>
+            )} */}
+          </>
         )}
       </CardContent>
     </Card>

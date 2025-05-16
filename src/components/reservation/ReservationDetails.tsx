@@ -1,6 +1,6 @@
 
 import { useState } from "react";
-import { Navigation, PhoneCall, FileText, MapPin, User, Plane, Users, Package } from "lucide-react";
+import { Navigation, PhoneCall, FileText, MapPin, User, Plane, Users, Luggage } from "lucide-react";
 import { 
   Dialog, 
   DialogContent, 
@@ -169,18 +169,20 @@ const ReservationDetails = ({
       </div>
       
       {/* Client name with placard option */}
-      <div className="flex items-center">
-        <User className="mr-2 h-4 w-4 text-primary" />
-        <button 
-          className="text-sm underline hover:text-primary"
-          onClick={() => setShowPlacard(true)}
-        >
-          {clientName}
-        </button>
-        <span className="text-xs ml-2 bg-primary/10 text-primary px-2 py-1 rounded">
-          Pancarte
-        </span>
-      </div>
+      {clientName && (
+        <div className="flex items-center">
+          <User className="mr-2 h-4 w-4 text-primary" />
+          <button 
+            className="text-sm underline hover:text-primary"
+            onClick={() => setShowPlacard(true)}
+          >
+            {clientName}
+          </button>
+          <span className="text-xs ml-2 bg-primary/10 text-primary px-2 py-1 rounded">
+            Pancarte
+          </span>
+        </div>
+      )}
       
       {/* Passengers and luggage info */}
       <div className="flex items-center space-x-4">
@@ -193,19 +195,21 @@ const ReservationDetails = ({
         
         {luggage !== undefined && (
           <div className="flex items-center">
-            <Package className="mr-1 h-4 w-4 text-primary" />
+            <Luggage className="mr-1 h-4 w-4 text-primary" />
             <span className="text-sm">{luggage}</span>
           </div>
         )}
       </div>
       
       {/* Phone number */}
-      <div className="flex items-center">
-        <PhoneCall className="mr-2 h-4 w-4 text-primary" />
-        <a href={`tel:${phone}`} className="text-sm underline">
-          {phone}
-        </a>
-      </div>
+      {phone && (
+        <div className="flex items-center">
+          <PhoneCall className="mr-2 h-4 w-4 text-primary" />
+          <a href={`tel:${phone}`} className="text-sm underline">
+            {phone}
+          </a>
+        </div>
+      )}
       
       {/* Flight number with status */}
       {flightNumber && (
@@ -296,8 +300,7 @@ const ReservationDetails = ({
           </DialogHeader>
           <div className="bg-primary text-white p-8 rounded-lg text-center">
             {dispatcherLogo && <div className="text-3xl mb-3">{dispatcherLogo}</div>}
-            <h2 className="text-2xl font-bold mb-4">{placardText || clientName}</h2>
-            <p className="text-lg">Votre chauffeur vous attend</p>
+            <h2 className="text-2xl font-bold">{placardText || clientName}</h2>
           </div>
         </DialogContent>
       </Dialog>
