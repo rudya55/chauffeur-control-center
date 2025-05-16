@@ -1,6 +1,7 @@
 
 import { Button } from "@/components/ui/button";
 import { ReservationType } from "@/types/reservation";
+import { FileText } from "lucide-react";
 
 interface ReservationDispatcherProps {
   reservation: ReservationType;
@@ -22,7 +23,17 @@ const ReservationDispatcher = ({
           <span className="text-xl mr-2">{reservation.dispatcherLogo}</span>
           <span className="font-medium text-sm">{reservation.dispatcher}</span>
         </div>
-        {/* Removed the button from here as it's now in the Reservations page */}
+        {onShowOrderForm && (
+          <Button 
+            variant="destructive"
+            size="xs"
+            className="flex items-center gap-1"
+            onClick={() => onShowOrderForm(reservation)}
+          >
+            <FileText className="w-3 h-3" />
+            Bon Commande
+          </Button>
+        )}
       </div>
     );
   }

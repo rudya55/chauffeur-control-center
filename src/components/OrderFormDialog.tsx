@@ -1,3 +1,4 @@
+
 import React from "react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
@@ -127,11 +128,11 @@ const OrderFormDialog = ({ open, onOpenChange, reservation }: OrderFormDialogPro
     <Table>
       <TableBody>
         <TableRow>
-          <TableCell className="font-semibold">👩‍✈️ Nom du chauffeur</TableCell>
+          <TableCell className="font-semibold">👩‍✈️ Driver</TableCell>
           <TableCell>{driverInfo.name}</TableCell>
         </TableRow>
         <TableRow>
-          <TableCell className="font-semibold">Téléphone</TableCell>
+          <TableCell className="font-semibold">Phone Number</TableCell>
           <TableCell>{driverInfo.phone}</TableCell>
         </TableRow>
         <TableRow>
@@ -139,7 +140,7 @@ const OrderFormDialog = ({ open, onOpenChange, reservation }: OrderFormDialogPro
           <TableCell>{driverInfo.vehicle}</TableCell>
         </TableRow>
         <TableRow>
-          <TableCell className="font-semibold">Plaque d'immatriculation</TableCell>
+          <TableCell className="font-semibold">Registration</TableCell>
           <TableCell>{driverInfo.licensePlate}</TableCell>
         </TableRow>
       </TableBody>
@@ -151,7 +152,7 @@ const OrderFormDialog = ({ open, onOpenChange, reservation }: OrderFormDialogPro
     <Table>
       <TableBody>
         <TableRow>
-          <TableCell className="font-semibold">Nom et prénom</TableCell>
+          <TableCell className="font-semibold">Infos du client non prenon</TableCell>
           <TableCell>{reservation.clientName}</TableCell>
         </TableRow>
         <TableRow>
@@ -166,7 +167,7 @@ const OrderFormDialog = ({ open, onOpenChange, reservation }: OrderFormDialogPro
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="max-w-3xl overflow-auto max-h-[90vh]">
         <DialogHeader>
-          <DialogTitle className="text-center text-2xl font-bold">BON DE MISSION</DialogTitle>
+          <DialogTitle className="text-center text-2xl font-bold">Information société</DialogTitle>
         </DialogHeader>
         
         <div className="bg-white rounded-md print:shadow-none" id="printable-content">
@@ -186,7 +187,7 @@ const OrderFormDialog = ({ open, onOpenChange, reservation }: OrderFormDialogPro
                 </div>
 
                 <AccordionItem value="reservation">
-                  <AccordionTrigger className="font-bold">Informations de la course</AccordionTrigger>
+                  <AccordionTrigger className="font-bold">Les infos de la course</AccordionTrigger>
                   <AccordionContent>{renderReservationInfo()}</AccordionContent>
                 </AccordionItem>
 
@@ -207,7 +208,7 @@ const OrderFormDialog = ({ open, onOpenChange, reservation }: OrderFormDialogPro
               </div>
             </div>
           ) : (
-            // Desktop view (unchanged)
+            // Desktop view
             <div className="p-4">
               <div className="mb-6">
                 <h2 className="text-xl font-bold border-b-2 border-gray-300 pb-2">Information société</h2>
@@ -221,7 +222,7 @@ const OrderFormDialog = ({ open, onOpenChange, reservation }: OrderFormDialogPro
               </div>
 
               <div className="mb-6">
-                <h2 className="text-xl font-bold border-b-2 border-gray-300 pb-2">Informations de la course</h2>
+                <h2 className="text-xl font-bold border-b-2 border-gray-300 pb-2">Les infos de la course</h2>
                 {renderReservationInfo()}
               </div>
 

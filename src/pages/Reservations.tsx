@@ -5,13 +5,17 @@ import { useReservations } from "@/hooks/use-reservations";
 import ReservationList from "@/components/reservation/ReservationList";
 import { Button } from "@/components/ui/button";
 import { FileText } from "lucide-react";
+import OrderFormDialog from "@/components/OrderFormDialog";
 
 const Reservations = () => {
   const { 
     upcomingReservations, 
     myReservations, 
     completedReservations, 
-    handleShowOrderForm
+    handleShowOrderForm,
+    showOrderForm,
+    setShowOrderForm,
+    selectedReservation
   } = useReservations();
 
   return (
@@ -34,24 +38,11 @@ const Reservations = () => {
         </TabsContent>
         
         <TabsContent value="current">
-          <div className="mb-4 flex justify-end">
-            <Button 
-              variant="destructive" 
-              className="bg-red-600 hover:bg-red-700 text-white flex items-center gap-2"
-              onClick={() => {
-                if (myReservations.length > 0) {
-                  handleShowOrderForm(myReservations[0]);
-                }
-              }}
-            >
-              <FileText className="w-4 h-4" />
-              Bon Commande
-            </Button>
-          </div>
           <ReservationList 
             reservations={myReservations} 
             type="current" 
             emptyMessage="Aucune réservation active"
+            onShowOrderForm={handleShowOrderForm}
           />
         </TabsContent>
         
@@ -63,6 +54,14 @@ const Reservations = () => {
           />
         </TabsContent>
       </Tabs>
+      
+      {selectedReservation && (
+        <OrderFormDialog 
+          open={showOrderForm}
+          onOpenChange={setShowOrderForm}
+          reservation={selectedReservation}
+        />
+      )}
     </div>
   );
 };
