@@ -138,6 +138,7 @@ export const useReservations = () => {
       setUpcomingReservations(prev => prev.filter(res => res.id !== id));
       
       // Ajouter la réservation au localStorage pour le calendrier
+      // S'assurer que nous utilisons la date exacte de la réservation originale
       const calendarReservations = JSON.parse(localStorage.getItem('calendarReservations') || '[]');
       calendarReservations.push(updatedReservation);
       localStorage.setItem('calendarReservations', JSON.stringify(calendarReservations));
