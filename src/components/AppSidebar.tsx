@@ -152,9 +152,9 @@ const AppSidebar = ({ isOpen = false, onClose }: AppSidebarProps) => {
           <span>{t("back_to_home")}</span>
         </Button>
 
-        {/* Add theme toggle and notification buttons */}
+        {/* Add theme toggle and notification buttons - removed white background */}
         <div className="flex justify-between items-center mt-2 mb-4">
-          <ThemeToggle className="mr-2" />
+          <ThemeToggle className="mr-2 hover:bg-transparent" />
           <NotificationBell />
         </div>
       </div>
