@@ -1,5 +1,5 @@
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Outlet } from "react-router-dom";
 import AppSidebar from "@/components/AppSidebar";
 import MobileHeader from "@/components/MobileHeader";
@@ -17,34 +17,34 @@ const AppLayout = () => {
     setIsSidebarOpen(!isSidebarOpen);
   };
 
+  // Listen for custom events from the Map component
+  useEffect(() => {
+    const handleToggleSidebar = () => {
+      console.log("Event received: toggle-sidebar");
+      setIsSidebarOpen(prev => !prev);
+    };
+
+    window.addEventListener('toggle-sidebar', handleToggleSidebar);
+    
+    return () => {
+      window.removeEventListener('toggle-sidebar', handleToggleSidebar);
+    };
+  }, []);
+
   return (
     <SidebarProvider>
       <div className="flex h-screen w-full">
-        {/* Desktop sidebar - only visible on desktop */}
-        {!isMobile && <AppSidebar />}
-        
         {/* Mobile sidebar as a sheet - only opens when toggled */}
-        {isMobile && (
-          <Sheet open={isSidebarOpen} onOpenChange={setIsSidebarOpen}>
-            <SheetContent side="left" className="p-0 w-[85%]" onClick={(e) => e.stopPropagation()}>
-              <div className="h-full">
-                <AppSidebar isOpen={isSidebarOpen} onClose={() => setIsSidebarOpen(false)} />
-              </div>
-            </SheetContent>
-          </Sheet>
-        )}
+        <Sheet open={isSidebarOpen} onOpenChange={setIsSidebarOpen}>
+          <SheetContent side="left" className="p-0 w-[85%]" onClick={(e) => e.stopPropagation()}>
+            <div className="h-full">
+              <AppSidebar isOpen={isSidebarOpen} onClose={() => setIsSidebarOpen(false)} />
+            </div>
+          </SheetContent>
+        </Sheet>
         
         <div className="flex-1 flex flex-col overflow-hidden">
-          {/* Mobile header with hamburger menu */}
-          {isMobile && (
-            <div className="flex justify-between items-center w-full border-b">
-              <MobileHeader isOpen={isSidebarOpen} onToggle={toggleSidebar} />
-              <div className="flex items-center gap-2 pr-4">
-                <NotificationBell />
-              </div>
-            </div>
-          )}
-          
+          {/* Remove mobile header to match the design in the image */}
           <main className="flex-1 overflow-auto bg-muted/30">
             <Outlet />
           </main>

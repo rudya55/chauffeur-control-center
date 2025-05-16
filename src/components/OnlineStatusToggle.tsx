@@ -2,6 +2,7 @@
 import { useState } from 'react';
 import { cn } from '@/lib/utils';
 import { Switch } from '@/components/ui/switch';
+import { CarTaxiFront } from 'lucide-react';
 
 interface OnlineStatusToggleProps {
   className?: string;
@@ -16,6 +17,10 @@ const OnlineStatusToggle = ({ className }: OnlineStatusToggleProps) => {
 
   return (
     <div className={cn("flex items-center px-6 py-2 bg-white rounded-full shadow-md", className)}>
+      <CarTaxiFront size={18} className={cn(
+        "mr-2",
+        isOnline ? "text-green-600" : "text-gray-500"
+      )} />
       <span className={cn(
         "text-lg font-medium",
         isOnline ? "text-green-600" : "text-gray-500"

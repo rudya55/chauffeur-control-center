@@ -1,3 +1,4 @@
+
 import { useEffect, useRef, useState } from 'react';
 import { cn } from '@/lib/utils';
 import { useTheme as useNextTheme } from 'next-themes';
@@ -295,9 +296,9 @@ const Map = ({
     >
       <div ref={mapRef} className="h-full w-full" />
       
-      {/* Menu toggle button for mobile */}
+      {/* Menu toggle button - more visible with higher z-index and styling */}
       <button 
-        className="absolute top-4 left-4 z-50 bg-white/80 dark:bg-background/80 p-2 rounded-md shadow-md"
+        className="absolute top-4 left-4 z-50 bg-white dark:bg-background p-2 rounded-md shadow-md"
         onClick={handleMenuToggle}
         aria-label="Toggle menu"
       >
