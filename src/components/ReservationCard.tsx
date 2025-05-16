@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -52,6 +53,7 @@ interface ReservationCardProps {
   onClientBoarded?: (id: string) => void;
   onComplete?: (id: string, rating: number, comment: string) => void;
   onChatWithDispatcher?: (dispatcher: string) => void;
+  onShowOrderForm?: (reservation: ReservationType) => void; // New prop for order form
 }
 
 const ReservationCard = ({ 
@@ -63,7 +65,8 @@ const ReservationCard = ({
   onArrived,
   onClientBoarded,
   onComplete,
-  onChatWithDispatcher
+  onChatWithDispatcher,
+  onShowOrderForm
 }: ReservationCardProps) => {
   const [showRatingDialog, setShowRatingDialog] = useState(false);
   const [rating, setRating] = useState(0);
@@ -283,7 +286,6 @@ const ReservationCard = ({
           
           {/* For current and completed reservations */}
           {(type === 'current' || type === 'completed') && (
-            // ... keep existing code (current and completed reservation rendering) the same
             <>
               <div className="flex justify-between items-start mb-2">
                 <div>
@@ -296,6 +298,19 @@ const ReservationCard = ({
                     <Flag className="h-3 w-3" />
                     {reservation.dispatcher}
                   </Badge>
+                  
+                  {/* Add "Bon de commande" button for accepted/active reservations */}
+                  {type === 'current' && reservation.status !== 'pending' && onShowOrderForm && (
+                    <Button 
+                      variant="outline" 
+                      size="sm"
+                      className="text-xs bg-red-50 hover:bg-red-100 border-red-200 text-red-600 dark:bg-red-900/20 dark:border-red-800 dark:text-red-400 dark:hover:bg-red-900/30"
+                      style={{ backgroundColor: "#ea384c", color: "white", borderColor: "#ea384c" }}
+                      onClick={() => onShowOrderForm(reservation)}
+                    >
+                      Bon de commande
+                    </Button>
+                  )}
                   
                   {/* Chat button - only show for current reservations */}
                   {type === 'current' && onChatWithDispatcher && (

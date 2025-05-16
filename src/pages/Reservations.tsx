@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
@@ -9,6 +8,7 @@ import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { ChatDialog } from "@/components/ChatDialog";
 import NotificationBell from "@/components/NotificationBell";
 import { useLanguage } from "@/hooks/use-language";
+import OrderFormDialog from "@/components/OrderFormDialog";
 
 // Type de réservation
 type VehicleType = 'standard' | 'berline' | 'van' | 'mini-bus' | 'first-class';
@@ -147,6 +147,8 @@ const Reservations = () => {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [showChat, setShowChat] = useState(false);
   const [currentDispatcher, setCurrentDispatcher] = useState("");
+  const [showOrderForm, setShowOrderForm] = useState(false);
+  const [selectedReservation, setSelectedReservation] = useState<ReservationType | null>(null);
 
   // Accepter une réservation
   const handleAcceptReservation = (id: string) => {
@@ -226,6 +228,12 @@ const Reservations = () => {
   const openChatWithDispatcher = (dispatcher: string) => {
     setCurrentDispatcher(dispatcher);
     setShowChat(true);
+  };
+
+  // Handle opening the order form dialog
+  const handleShowOrderForm = (reservation: ReservationType) => {
+    setSelectedReservation(reservation);
+    setShowOrderForm(true);
   };
 
   // Load reservations from localStorage on initial load
@@ -329,6 +337,7 @@ const Reservations = () => {
                 onClientBoarded={handleClientBoarded}
                 onComplete={handleCompleteRide}
                 onChatWithDispatcher={openChatWithDispatcher}
+                onShowOrderForm={handleShowOrderForm}  // Add new prop for order form
               />
             ))
           ) : (
@@ -361,9 +370,17 @@ const Reservations = () => {
         onOpenChange={setShowChat} 
         dispatcher={currentDispatcher}
       />
+
+      {/* Order Form Dialog */}
+      {selectedReservation && (
+        <OrderFormDialog
+          open={showOrderForm}
+          onOpenChange={setShowOrderForm}
+          reservation={selectedReservation}
+        />
+      )}
     </div>
   );
 };
 
 export default Reservations;
-

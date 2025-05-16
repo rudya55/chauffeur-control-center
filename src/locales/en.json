@@ -21,6 +21,7 @@
   "general_conditions": "Conditions Générales",
   "contact": "Contact",
   "calendar": "Calendar",
+  "order_form": "Bon de commande",
   "notification": {
     "new_reservation": "New reservation",
     "new_reservation_message": "You have a new reservation available.",
