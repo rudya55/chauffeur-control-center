@@ -5,9 +5,11 @@ import { useNavigate } from "react-router-dom";
 import {
   DropdownMenu,
   DropdownMenuContent,
+  DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { useLanguage } from "@/hooks/use-language";
+import { toast } from "sonner";
 
 interface PageHeaderProps {
   title: string;
@@ -21,6 +23,10 @@ const PageHeader = ({ title, showBackButton = true, className }: PageHeaderProps
   
   const handleGoBack = () => {
     navigate(-1);
+  };
+  
+  const handleMenuAction = (action: string) => {
+    toast.success(`Action "${action}" clicked`);
   };
   
   return (
@@ -45,7 +51,15 @@ const PageHeader = ({ title, showBackButton = true, className }: PageHeaderProps
           </Button>
         </DropdownMenuTrigger>
         <DropdownMenuContent>
-          {/* Empty menu content as requested */}
+          <DropdownMenuItem onClick={() => handleMenuAction("Option 1")}>
+            Option 1
+          </DropdownMenuItem>
+          <DropdownMenuItem onClick={() => handleMenuAction("Option 2")}>
+            Option 2
+          </DropdownMenuItem>
+          <DropdownMenuItem onClick={() => handleMenuAction("Option 3")}>
+            Option 3
+          </DropdownMenuItem>
         </DropdownMenuContent>
       </DropdownMenu>
     </div>

@@ -1,4 +1,3 @@
-
 import { useEffect, useRef, useState } from 'react';
 import { cn } from '@/lib/utils';
 import { useTheme as useNextTheme } from 'next-themes';
@@ -296,7 +295,7 @@ const Map = ({
     >
       <div ref={mapRef} className="h-full w-full" />
       
-      {/* Menu toggle button - more visible with higher z-index and styling */}
+      {/* Menu toggle button - only on the left side, not the right (removed) */}
       <button 
         className="absolute top-4 left-4 z-50 bg-white dark:bg-background p-2 rounded-md shadow-md"
         onClick={handleMenuToggle}

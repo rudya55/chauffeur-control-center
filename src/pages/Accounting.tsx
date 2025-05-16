@@ -1,10 +1,10 @@
 
-import AccountingHeader from "@/components/accounting/AccountingHeader";
+import PageHeader from "@/components/PageHeader";
 
 const Accounting = () => {
   return (
     <div className="p-4 sm:p-6">
-      <AccountingHeader />
+      <PageHeader title="accounting" />
       
       <div className="bg-white rounded-lg shadow p-4 md:p-6">
         <h2 className="text-xl font-semibold mb-4">Comptabilité</h2>

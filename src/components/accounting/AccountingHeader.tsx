@@ -1,47 +1,8 @@
 
-import { Button } from "@/components/ui/button";
-import { ArrowLeft, MoreVertical } from "lucide-react";
-import { useNavigate } from "react-router-dom";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
-import { useLanguage } from "@/hooks/use-language";
+import PageHeader from "@/components/PageHeader";
 
 const AccountingHeader = () => {
-  const { t } = useLanguage();
-  const navigate = useNavigate();
-  
-  const handleGoBack = () => {
-    navigate(-1);
-  };
-  
-  return (
-    <div className="flex justify-between items-center mb-6">
-      <div className="flex items-center gap-2">
-        <Button 
-          variant="ghost" 
-          size="icon" 
-          onClick={handleGoBack} 
-          className="mr-2"
-        >
-          <ArrowLeft className="h-5 w-5" />
-        </Button>
-        <h1 className="text-2xl font-bold tracking-tight">{t("accounting")}</h1>
-      </div>
-      <DropdownMenu>
-        <DropdownMenuTrigger asChild>
-          <Button variant="outline" size="icon">
-            <MoreVertical className="h-5 w-5" />
-          </Button>
-        </DropdownMenuTrigger>
-        <DropdownMenuContent>
-          {/* Menu content removed as requested */}
-        </DropdownMenuContent>
-      </DropdownMenu>
-    </div>
-  );
+  return <PageHeader title="accounting" />;
 };
 
 export default AccountingHeader;
