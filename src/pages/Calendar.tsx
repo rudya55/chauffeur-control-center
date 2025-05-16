@@ -1,5 +1,5 @@
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import PageHeader from "@/components/PageHeader";
 import { Calendar as CalendarIcon, ChevronLeft, ChevronRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -7,10 +7,30 @@ import { format } from "date-fns";
 import { fr } from "date-fns/locale";
 import { cn } from "@/lib/utils";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { useReservations } from "@/hooks/use-reservations";
+import { ReservationType } from "@/types/reservation";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import ReservationDetails from "@/components/reservation/ReservationDetails";
 
 const Calendar = () => {
+  const { myReservations } = useReservations();
   const [currentMonth, setCurrentMonth] = useState(new Date());
   const [currentView, setCurrentView] = useState<"day" | "week" | "month">("month");
+  const [selectedReservation, setSelectedReservation] = useState<ReservationType | null>(null);
+  const [showReservationDetails, setShowReservationDetails] = useState(false);
+  
+  // Organiser les réservations par date
+  const reservationsByDate = myReservations.reduce((acc, reservation) => {
+    const date = new Date(reservation.date);
+    const dateString = `${date.getFullYear()}-${date.getMonth()}-${date.getDate()}`;
+    
+    if (!acc[dateString]) {
+      acc[dateString] = [];
+    }
+    
+    acc[dateString].push(reservation);
+    return acc;
+  }, {} as Record<string, ReservationType[]>);
   
   const prevMonth = () => {
     setCurrentMonth(new Date(currentMonth.getFullYear(), currentMonth.getMonth() - 1, 1));
@@ -36,9 +56,27 @@ const Calendar = () => {
   // Noms des jours de la semaine
   const weekDays = ['Lun', 'Mar', 'Mer', 'Jeu', 'Ven', 'Sam', 'Dim'];
   
+  // Obtenir la couleur pour une réservation en fonction du statut
+  const getReservationColor = (status?: string) => {
+    switch (status) {
+      case 'pending': return 'bg-amber-100 border-amber-300';
+      case 'accepted': return 'bg-blue-100 border-blue-300';
+      case 'started': return 'bg-green-100 border-green-300';
+      case 'completed': return 'bg-purple-100 border-purple-300';
+      default: return 'bg-gray-100 border-gray-300';
+    }
+  };
+  
+  const handleReservationClick = (reservation: ReservationType) => {
+    setSelectedReservation(reservation);
+    setShowReservationDetails(true);
+  };
+  
   // Fonction pour obtenir la vue du jour courant
   const renderDayView = () => {
     const today = new Date();
+    const dateString = `${today.getFullYear()}-${today.getMonth()}-${today.getDate()}`;
+    const todayReservations = reservationsByDate[dateString] || [];
     
     return (
       <div className="bg-white rounded-lg p-4">
@@ -46,10 +84,25 @@ const Calendar = () => {
         <div className="grid grid-cols-1 gap-2">
           {Array.from({ length: 12 }).map((_, index) => {
             const hour = 8 + index;
+            const hourReservations = todayReservations.filter(r => {
+              const resDate = new Date(r.date);
+              return resDate.getHours() === hour;
+            });
+            
             return (
               <div key={`hour-${hour}`} className="border rounded-md p-2 flex">
                 <div className="w-16 text-muted-foreground">{`${hour}:00`}</div>
-                <div className="flex-1 min-h-[40px] hover:bg-muted/50 transition-colors"></div>
+                <div className="flex-1 min-h-[40px] hover:bg-muted/50 transition-colors">
+                  {hourReservations.map((reservation, i) => (
+                    <div 
+                      key={`res-${reservation.id}-${i}`}
+                      className={`text-xs p-1 mb-1 rounded border ${getReservationColor(reservation.status)} cursor-pointer`}
+                      onClick={() => handleReservationClick(reservation)}
+                    >
+                      {reservation.clientName} - {reservation.pickupAddress.split(',')[0]}
+                    </div>
+                  ))}
+                </div>
               </div>
             );
           })}
@@ -76,37 +129,55 @@ const Calendar = () => {
     return (
       <div className="bg-white rounded-lg p-4">
         <div className="grid grid-cols-7 gap-1">
-          {weekDates.map((date, index) => (
-            <div key={`weekday-${index}`} className="text-center">
-              <div className="text-sm font-medium text-muted-foreground">
-                {format(date, 'EEE', { locale: fr })}
-              </div>
-              <div className={cn(
-                "text-sm py-1 my-1 rounded-full w-8 h-8 flex items-center justify-center mx-auto",
-                new Date().toDateString() === date.toDateString() ? "bg-primary text-primary-foreground" : ""
-              )}>
-                {format(date, 'd')}
-              </div>
-            </div>
-          ))}
-          
-          {/* Heures de la journée */}
-          {Array.from({ length: 6 }).map((_, hourIndex) => (
-            <React.Fragment key={`hour-row-${hourIndex}`}>
-              {weekDates.map((date, dayIndex) => (
-                <div 
-                  key={`cell-${dayIndex}-${hourIndex}`} 
-                  className="border min-h-[60px] hover:bg-muted/50 transition-colors"
-                >
-                  {hourIndex === 0 && dayIndex === 0 && (
-                    <div className="p-2 text-xs bg-blue-100 rounded m-1">
-                      Réunion 9h-10h
-                    </div>
-                  )}
+          {weekDates.map((date, index) => {
+            const dateString = `${date.getFullYear()}-${date.getMonth()}-${date.getDate()}`;
+            const dateReservations = reservationsByDate[dateString] || [];
+            
+            return (
+              <React.Fragment key={`weekday-${index}`}>
+                <div className="text-center">
+                  <div className="text-sm font-medium text-muted-foreground">
+                    {format(date, 'EEE', { locale: fr })}
+                  </div>
+                  <div className={cn(
+                    "text-sm py-1 my-1 rounded-full w-8 h-8 flex items-center justify-center mx-auto",
+                    new Date().toDateString() === date.toDateString() ? "bg-primary text-primary-foreground" : ""
+                  )}>
+                    {format(date, 'd')}
+                  </div>
                 </div>
-              ))}
-            </React.Fragment>
-          ))}
+                
+                {/* For the next row, continue with hours */}
+                {index === 0 && Array.from({ length: 6 }).map((_, hourIndex) => {
+                  return weekDates.map((date, dayIndex) => {
+                    const hour = 9 + hourIndex;
+                    const dateStr = `${date.getFullYear()}-${date.getMonth()}-${date.getDate()}`;
+                    const hourReservations = (reservationsByDate[dateStr] || []).filter(r => {
+                      const resDate = new Date(r.date);
+                      return resDate.getHours() === hour;
+                    });
+                    
+                    return (
+                      <div 
+                        key={`cell-${dayIndex}-${hourIndex}`} 
+                        className="border min-h-[60px] hover:bg-muted/50 transition-colors"
+                      >
+                        {hourReservations.map((reservation, i) => (
+                          <div 
+                            key={`res-${reservation.id}-${i}`}
+                            className={`text-xs p-1 m-1 rounded border ${getReservationColor(reservation.status)} cursor-pointer`}
+                            onClick={() => handleReservationClick(reservation)}
+                          >
+                            {reservation.clientName}
+                          </div>
+                        ))}
+                      </div>
+                    );
+                  });
+                })}
+              </React.Fragment>
+            );
+          })}
         </div>
       </div>
     );
@@ -125,25 +196,37 @@ const Calendar = () => {
         
         {/* Espaces vides pour l'alignement du premier jour */}
         {Array.from({ length: startDay }).map((_, index) => (
-          <div key={`empty-${index}`} className="p-2 h-12 border border-transparent"></div>
+          <div key={`empty-${index}`} className="p-2 h-20 border border-transparent"></div>
         ))}
         
         {/* Jours du mois */}
         {days.map((day) => {
           const date = new Date(currentMonth.getFullYear(), currentMonth.getMonth(), day);
           const isToday = new Date().toDateString() === date.toDateString();
+          const dateString = `${date.getFullYear()}-${date.getMonth()}-${date.getDate()}`;
+          const dateReservations = reservationsByDate[dateString] || [];
           
           return (
             <div 
               key={day} 
               className={cn(
-                "p-1 border border-border h-12 hover:bg-muted/50 transition-colors",
+                "p-1 border border-border h-20 hover:bg-muted/50 transition-colors",
                 isToday && "bg-primary/10 font-bold"
               )}
             >
               <div className="flex flex-col h-full">
                 <span className="text-sm">{day}</span>
-                {/* Espace pour les événements potentiels */}
+                <div className="flex flex-col flex-grow overflow-auto space-y-1 mt-1">
+                  {dateReservations.map((reservation, index) => (
+                    <div 
+                      key={`reservation-${day}-${index}`}
+                      className={`text-xs p-1 rounded border truncate ${getReservationColor(reservation.status)} cursor-pointer`}
+                      onClick={() => handleReservationClick(reservation)}
+                    >
+                      {reservation.clientName}
+                    </div>
+                  ))}
+                </div>
               </div>
             </div>
           );
@@ -218,9 +301,40 @@ const Calendar = () => {
           <h3 className="text-lg font-medium">Réservations du jour</h3>
         </div>
         <p className="text-muted-foreground">
-          Aucune réservation pour aujourd'hui. Cliquez sur une date pour voir ou ajouter des réservations.
+          Cliquez sur une date pour voir ou ajouter des réservations.
         </p>
       </div>
+
+      {/* Dialogue pour afficher les détails de la réservation */}
+      <Dialog open={showReservationDetails} onOpenChange={setShowReservationDetails}>
+        <DialogContent className="max-w-md">
+          <DialogHeader>
+            <DialogTitle>Détails de la réservation</DialogTitle>
+          </DialogHeader>
+          {selectedReservation && (
+            <ReservationDetails
+              pickupAddress={selectedReservation.pickupAddress}
+              destination={selectedReservation.destination}
+              flightNumber={selectedReservation.flightNumber}
+              clientName={selectedReservation.clientName}
+              amount={selectedReservation.amount}
+              driverAmount={selectedReservation.driverAmount}
+              commission={selectedReservation.commission}
+              paymentType={selectedReservation.paymentType}
+              flightStatus={selectedReservation.flightStatus}
+              placardText={selectedReservation.clientName}
+              pickupGPS={selectedReservation.pickupGPS}
+              destinationGPS={selectedReservation.destinationGPS}
+              dispatcherLogo={selectedReservation.dispatcherLogo}
+              passengers={selectedReservation.passengers}
+              luggage={selectedReservation.luggage}
+              status={selectedReservation.status}
+              vehicleType={selectedReservation.vehicleType}
+              showAddressLabels={true}
+            />
+          )}
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };

@@ -1,15 +1,8 @@
 
 import { Button } from "@/components/ui/button";
-import { ArrowLeft, Menu, MoreVertical } from "lucide-react";
+import { ArrowLeft, Menu } from "lucide-react";
 import { useNavigate } from "react-router-dom";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
 import { useLanguage } from "@/hooks/use-language";
-import { toast } from "sonner";
 
 interface PageHeaderProps {
   title: string;
@@ -24,10 +17,6 @@ const PageHeader = ({ title, showBackButton = true, className, onMenuToggle }: P
   
   const handleGoBack = () => {
     navigate(-1);
-  };
-  
-  const handleMenuAction = (action: string) => {
-    toast.success(`Action "${action}" clicked`);
   };
 
   const handleMenuToggle = () => {
@@ -67,24 +56,6 @@ const PageHeader = ({ title, showBackButton = true, className, onMenuToggle }: P
         )}
         <h1 className="text-2xl font-bold tracking-tight">{t(title.toLowerCase()) || title}</h1>
       </div>
-      <DropdownMenu>
-        <DropdownMenuTrigger asChild>
-          <Button variant="outline" size="icon">
-            <MoreVertical className="h-5 w-5" />
-          </Button>
-        </DropdownMenuTrigger>
-        <DropdownMenuContent>
-          <DropdownMenuItem onClick={() => handleMenuAction("Option 1")}>
-            Option 1
-          </DropdownMenuItem>
-          <DropdownMenuItem onClick={() => handleMenuAction("Option 2")}>
-            Option 2
-          </DropdownMenuItem>
-          <DropdownMenuItem onClick={() => handleMenuAction("Option 3")}>
-            Option 3
-          </DropdownMenuItem>
-        </DropdownMenuContent>
-      </DropdownMenu>
     </div>
   );
 };
