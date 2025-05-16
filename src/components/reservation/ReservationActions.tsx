@@ -3,7 +3,7 @@ import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
 import { ReservationType } from "@/types/reservation";
-import { Check, X } from "lucide-react";
+import { Check, X, MessageCircle } from "lucide-react";
 import { toast } from "sonner";
 import CircularTimer from "@/components/CircularTimer";
 
@@ -18,6 +18,7 @@ interface ReservationActionsProps {
   onComplete?: (id: string, rating: number, comment: string) => void;
   testTimerDate?: Date;
   canStartRide?: () => boolean;
+  onChatWithDispatcher?: (dispatcher: string) => void;
 }
 
 const ReservationActions = ({ 
@@ -30,7 +31,8 @@ const ReservationActions = ({
   onClientBoarded, 
   onComplete,
   testTimerDate,
-  canStartRide
+  canStartRide,
+  onChatWithDispatcher
 }: ReservationActionsProps) => {
   const [rating, setRating] = useState(5);
   const [comment, setComment] = useState("");
@@ -42,13 +44,8 @@ const ReservationActions = ({
     }
   };
 
-  // Handle start ride with time check
+  // Handle start ride after timer ends
   const handleStartRide = () => {
-    if (canStartRide && !canStartRide()) {
-      toast.error("Vous ne pouvez pas démarrer cette course plus de 2h avant l'heure prévue");
-      return;
-    }
-    
     if (onStartRide) {
       onStartRide(reservation.id);
     }
@@ -80,33 +77,56 @@ const ReservationActions = ({
   }
 
   if (type === 'current' && reservation.status === 'accepted') {
-    const canStart = canStartRide ? canStartRide() : true;
-    
     return (
-      <div className="flex justify-end items-center gap-3 mt-4">
-        {testTimerDate && (
-          <CircularTimer 
-            targetTime={testTimerDate} 
-            durationInSeconds={10}
-          />
-        )}
-        <Button 
-          variant="default" 
-          size="sm" 
-          onClick={handleStartRide}
-          disabled={!canStart}
-          className={canStart ? "" : "opacity-50 cursor-not-allowed"}
-        >
-          Démarrer
-        </Button>
+      <div className="flex justify-between items-center gap-3 mt-4">
+        <div>
+          <Button 
+            variant="ghost" 
+            size="sm" 
+            onClick={() => onChatWithDispatcher && onChatWithDispatcher(reservation.dispatcher)}
+            className="p-2"
+          >
+            <MessageCircle className="h-4 w-4" />
+          </Button>
+        </div>
+        
+        <div className="flex items-center gap-2">
+          {testTimerDate && (
+            <CircularTimer 
+              targetTime={testTimerDate} 
+              durationInSeconds={10}
+              onTimeReached={handleStartRide}
+            />
+          )}
+          <Button 
+            variant="default" 
+            size="sm" 
+            onClick={handleStartRide}
+          >
+            Démarrer la course
+          </Button>
+        </div>
       </div>
     );
   }
 
   if (type === 'current' && reservation.status === 'started') {
     return (
-      <div className="flex justify-end gap-2 mt-4">
-        <Button variant="default" size="sm" onClick={() => onArrived && onArrived(reservation.id)}>
+      <div className="flex justify-between items-center mt-4">
+        <Button 
+          variant="ghost" 
+          size="sm" 
+          onClick={() => onChatWithDispatcher && onChatWithDispatcher(reservation.dispatcher)}
+          className="p-2"
+        >
+          <MessageCircle className="h-4 w-4" />
+        </Button>
+        
+        <Button 
+          variant="default" 
+          size="sm" 
+          onClick={() => onArrived && onArrived(reservation.id)}
+        >
           Je suis arrivé
         </Button>
       </div>
@@ -115,8 +135,21 @@ const ReservationActions = ({
 
   if (type === 'current' && reservation.status === 'arrived') {
     return (
-      <div className="flex justify-end gap-2 mt-4">
-        <Button variant="default" size="sm" onClick={() => onClientBoarded && onClientBoarded(reservation.id)}>
+      <div className="flex justify-between items-center mt-4">
+        <Button 
+          variant="ghost" 
+          size="sm" 
+          onClick={() => onChatWithDispatcher && onChatWithDispatcher(reservation.dispatcher)}
+          className="p-2"
+        >
+          <MessageCircle className="h-4 w-4" />
+        </Button>
+        
+        <Button 
+          variant="default" 
+          size="sm" 
+          onClick={() => onClientBoarded && onClientBoarded(reservation.id)}
+        >
           Client à bord
         </Button>
       </div>
@@ -125,7 +158,16 @@ const ReservationActions = ({
 
   if (type === 'current' && reservation.status === 'onBoard') {
     return (
-      <div className="flex justify-end gap-2 mt-4">
+      <div className="flex justify-between items-center mt-4">
+        <Button 
+          variant="ghost" 
+          size="sm" 
+          onClick={() => onChatWithDispatcher && onChatWithDispatcher(reservation.dispatcher)}
+          className="p-2"
+        >
+          <MessageCircle className="h-4 w-4" />
+        </Button>
+        
         <AlertDialog>
           <AlertDialogTrigger asChild>
             <Button variant="default" size="sm">

@@ -45,41 +45,31 @@ const ReservationCard: React.FC<ReservationCardProps> = ({
   // Create a date 10 seconds in the future for the test timer
   const testTimerDate = new Date();
   testTimerDate.setSeconds(testTimerDate.getSeconds() + 10);
-  
-  // Check if ride can be started (2 hours before scheduled time)
-  const canStartRide = () => {
-    const now = new Date();
-    const rideTime = new Date(reservation.date);
-    const twoHoursBefore = new Date(rideTime);
-    twoHoursBefore.setHours(twoHoursBefore.getHours() - 2);
-    
-    return now >= twoHoursBefore;
-  };
 
   return (
     <Card className="mb-4">
       <CardContent className="p-4">
-        {/* Show dispatcher at the top right for current reservations */}
-        {type === 'current' && (
-          <ReservationDispatcher 
-            reservation={reservation}
-            showAsHeader={true}
-          />
-        )}
-        
-        {/* Date and status header */}
+        {/* Header with dispatcher info and date/status */}
         <div className="flex items-start justify-between mb-4">
           <div>
             <p className="text-sm text-gray-500">{formattedDate}</p>
           </div>
-          <ReservationStatus status={reservation.status} />
+          <div className="flex items-center gap-2">
+            {type === 'current' && (
+              <ReservationDispatcher 
+                reservation={reservation}
+                showAsHeader={true}
+                onShowOrderForm={onShowOrderForm}
+              />
+            )}
+            <ReservationStatus status={reservation.status} />
+          </div>
         </div>
 
         {/* Détails de la réservation */}
         <ReservationDetails 
           pickupAddress={reservation.pickupAddress}
           destination={reservation.destination}
-          phone={type === 'upcoming' ? undefined : (type === 'current' || type === 'completed') ? undefined : reservation.phone}
           flightNumber={reservation.flightNumber}
           clientName={type === 'upcoming' ? undefined : reservation.clientName}
           amount={reservation.amount}
@@ -109,7 +99,7 @@ const ReservationCard: React.FC<ReservationCardProps> = ({
             onClientBoarded={onClientBoarded}
             onComplete={onComplete}
             testTimerDate={testTimerDate}
-            canStartRide={canStartRide}
+            onChatWithDispatcher={onChatWithDispatcher}
           />
           
           {type === 'completed' && (
@@ -119,15 +109,6 @@ const ReservationCard: React.FC<ReservationCardProps> = ({
             />
           )}
         </div>
-
-        {/* Infos du dispatcher et Bon de commande */}
-        {type === 'current' && (
-          <ReservationDispatcher 
-            reservation={reservation}
-            onChatWithDispatcher={onChatWithDispatcher}
-            onShowOrderForm={onShowOrderForm}
-          />
-        )}
       </CardContent>
     </Card>
   );

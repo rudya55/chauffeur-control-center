@@ -1,6 +1,5 @@
 
 import { Button } from "@/components/ui/button";
-import { MessageCircle } from "lucide-react";
 import { ReservationType } from "@/types/reservation";
 
 interface ReservationDispatcherProps {
@@ -18,43 +17,27 @@ const ReservationDispatcher = ({
 }: ReservationDispatcherProps) => {
   if (showAsHeader) {
     return (
-      <div className="flex items-center justify-end mb-2">
+      <div className="flex items-center gap-2">
         <div className="flex items-center bg-slate-50 rounded-md px-3 py-1">
           <span className="text-xl mr-2">{reservation.dispatcherLogo}</span>
           <span className="font-medium text-sm">{reservation.dispatcher}</span>
         </div>
+        {onShowOrderForm && (
+          <Button 
+            variant="subtle" 
+            size="sm" 
+            onClick={() => onShowOrderForm(reservation)}
+            className="text-xs"
+          >
+            Bon de commande
+          </Button>
+        )}
       </div>
     );
   }
 
-  return (
-    <>
-      <div className="flex items-center justify-between mt-4 p-3 bg-slate-50 rounded-md">
-        <div className="flex items-center">
-          <span className="text-2xl mr-2">{reservation.dispatcherLogo}</span>
-          <span className="font-medium">{reservation.dispatcher}</span>
-        </div>
-        <Button 
-          variant="subtle" 
-          size="sm" 
-          onClick={() => onShowOrderForm && onShowOrderForm(reservation)}
-          className="text-xs"
-        >
-          Bon de commande
-        </Button>
-      </div>
-      
-      <Button 
-        variant="ghost" 
-        size="sm" 
-        onClick={() => onChatWithDispatcher && onChatWithDispatcher(reservation.dispatcher)}
-        className="mt-2 w-full"
-      >
-        <MessageCircle className="mr-2 h-4 w-4" />
-        Contacter {reservation.dispatcher}
-      </Button>
-    </>
-  );
+  // The bottom section is no longer needed as we moved everything to the header
+  return null;
 };
 
 export default ReservationDispatcher;
