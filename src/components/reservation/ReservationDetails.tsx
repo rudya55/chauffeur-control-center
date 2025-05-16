@@ -315,9 +315,9 @@ const ReservationDetails = ({
           <DialogHeader>
             <DialogTitle>Pancarte</DialogTitle>
           </DialogHeader>
-          <div className="bg-primary text-primary-foreground p-8 rounded-lg text-center">
-            {dispatcherLogo && <div className="text-3xl mb-3">{dispatcherLogo}</div>}
-            <h2 className="text-2xl font-bold dark:text-primary">{clientName}</h2>
+          <div className="bg-blue-600 dark:bg-blue-600 p-8 rounded-lg text-center">
+            {dispatcherLogo && <div className="text-3xl mb-3 text-white dark:text-primary">{dispatcherLogo}</div>}
+            <h2 className="text-2xl font-bold text-white dark:text-[#e6b800]">{clientName}</h2>
           </div>
         </DialogContent>
       </Dialog>
