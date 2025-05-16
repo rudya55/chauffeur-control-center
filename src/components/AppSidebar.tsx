@@ -34,6 +34,7 @@ import {
   DialogTrigger 
 } from "@/components/ui/dialog";
 import { useLanguage } from "@/hooks/use-language";
+import { useAuth } from "@/hooks/use-auth";
 
 interface AppSidebarProps {
   isOpen?: boolean;
@@ -47,6 +48,7 @@ const AppSidebar = ({ isOpen = false, onClose }: AppSidebarProps) => {
   const isMobile = useIsMobile();
   const [avatarUrl, setAvatarUrl] = useState("/profile-photo.jpg");
   const { t } = useLanguage();
+  const { logout } = useAuth();
   
   // Driver information
   const driverName = "Jean Dupont";
@@ -84,6 +86,10 @@ const AppSidebar = ({ isOpen = false, onClose }: AppSidebarProps) => {
         ? "bg-primary/10 text-primary font-medium" 
         : "hover:bg-muted/50 text-foreground/80"
     );
+
+  const handleLogout = () => {
+    logout();
+  };
 
   return (
     <Sidebar
@@ -174,7 +180,7 @@ const AppSidebar = ({ isOpen = false, onClose }: AppSidebarProps) => {
                 <SidebarMenuButton asChild>
                   <button 
                     className="flex items-center gap-3 p-2 text-destructive hover:bg-muted/50 rounded-md w-full"
-                    onClick={() => alert("Déconnexion")}
+                    onClick={handleLogout}
                   >
                     <LogOut className="h-5 w-5" />
                     {(!collapsed || isMobile) && <span>{t("logout")}</span>}

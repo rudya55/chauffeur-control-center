@@ -10,6 +10,7 @@ import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { toast } from "sonner";
 import { Lock, User } from "lucide-react";
+import { useAuth } from "@/hooks/use-auth";
 
 const loginSchema = z.object({
   email: z.string().email("Entrez une adresse email valide"),
@@ -21,6 +22,7 @@ type LoginFormValues = z.infer<typeof loginSchema>;
 const Login = () => {
   const navigate = useNavigate();
   const [isLoading, setIsLoading] = useState(false);
+  const { login } = useAuth();
 
   const form = useForm<LoginFormValues>({
     resolver: zodResolver(loginSchema),
@@ -34,13 +36,11 @@ const Login = () => {
     setIsLoading(true);
     
     try {
-      // Simulating login - in a real app, you would connect to an authentication service
-      if (data.email === "admin@example.com" && data.password === "password123") {
+      const success = await login(data.email, data.password);
+      
+      if (success) {
         toast.success("Connexion réussie");
-        localStorage.setItem("isAuthenticated", "true");
-        setTimeout(() => {
-          navigate("/");
-        }, 1000);
+        navigate("/");
       } else {
         toast.error("Email ou mot de passe incorrect");
       }
