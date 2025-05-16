@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { ReservationType } from "@/types/reservation";
 import { toast } from "sonner";
@@ -126,35 +125,46 @@ export const useReservations = () => {
 
   // Accepter une réservation
   const handleAcceptReservation = (id: string) => {
+    console.log("Accepting reservation with ID:", id);
+    
     // Trouver la réservation dans la liste des réservations à venir
     const reservation = upcomingReservations.find(res => res.id === id);
     
     if (reservation) {
       // Mettre à jour le statut et déplacer vers mes réservations
       const updatedReservation: ReservationType = { ...reservation, status: 'accepted' };
+      
+      // Ajouter aux réservations acceptées
       setMyReservations(prev => [...prev, updatedReservation]);
       
       // Retirer de la liste des réservations à venir
       setUpcomingReservations(prev => prev.filter(res => res.id !== id));
       
       // Ajouter la réservation au localStorage pour le calendrier
-      // S'assurer que nous utilisons la date exacte de la réservation originale
       const calendarReservations = JSON.parse(localStorage.getItem('calendarReservations') || '[]');
       calendarReservations.push(updatedReservation);
       localStorage.setItem('calendarReservations', JSON.stringify(calendarReservations));
       
       toast.success(`Réservation pour ${reservation.clientName} acceptée`);
+    } else {
+      console.error("Reservation not found with ID:", id);
+      toast.error("Erreur: Réservation introuvable");
     }
   };
 
   // Refuser une réservation
   const handleRejectReservation = (id: string) => {
+    console.log("Rejecting reservation with ID:", id);
+    
     // Simplement retirer de la liste des réservations à venir
     const reservation = upcomingReservations.find(res => res.id === id);
-    setUpcomingReservations(prev => prev.filter(res => res.id !== id));
     
     if (reservation) {
+      setUpcomingReservations(prev => prev.filter(res => res.id !== id));
       toast.info(`Réservation pour ${reservation.clientName} refusée`);
+    } else {
+      console.error("Reservation not found with ID:", id);
+      toast.error("Erreur: Réservation introuvable");
     }
   };
 

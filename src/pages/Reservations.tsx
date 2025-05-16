@@ -11,7 +11,14 @@ const Reservations = () => {
   const { 
     upcomingReservations, 
     myReservations, 
-    completedReservations, 
+    completedReservations,
+    handleAcceptReservation,
+    handleRejectReservation,
+    handleStartRide,
+    handleArrived,
+    handleClientBoarded,
+    handleCompleteRide,
+    openChatWithDispatcher, 
     handleShowOrderForm,
     showOrderForm,
     setShowOrderForm,
@@ -34,6 +41,8 @@ const Reservations = () => {
             reservations={upcomingReservations} 
             type="upcoming" 
             emptyMessage="Aucune nouvelle réservation"
+            onAccept={handleAcceptReservation}
+            onReject={handleRejectReservation}
           />
         </TabsContent>
         
@@ -43,6 +52,11 @@ const Reservations = () => {
             type="current" 
             emptyMessage="Aucune réservation active"
             onShowOrderForm={handleShowOrderForm}
+            onStartRide={handleStartRide}
+            onArrived={handleArrived}
+            onClientBoarded={handleClientBoarded}
+            onComplete={handleCompleteRide}
+            onChatWithDispatcher={openChatWithDispatcher}
           />
         </TabsContent>
         
