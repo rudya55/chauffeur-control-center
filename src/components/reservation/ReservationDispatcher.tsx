@@ -16,9 +16,10 @@ const ReservationDispatcher = ({
 }: ReservationDispatcherProps) => {
   return (
     <>
-      <div className="flex items-center justify-between mt-4">
-        <div className="text-sm">
-          <span className="font-medium">De: {reservation.dispatcherLogo} {reservation.dispatcher}</span>
+      <div className="flex items-center justify-between mt-4 p-3 bg-slate-50 rounded-md">
+        <div className="flex items-center">
+          <span className="text-2xl mr-2">{reservation.dispatcherLogo}</span>
+          <span className="font-medium">{reservation.dispatcher}</span>
         </div>
         <Button 
           variant="subtle" 
@@ -34,7 +35,7 @@ const ReservationDispatcher = ({
         variant="ghost" 
         size="sm" 
         onClick={() => onChatWithDispatcher && onChatWithDispatcher(reservation.dispatcher)}
-        className="mt-2"
+        className="mt-2 w-full"
       >
         <MessageCircle className="mr-2 h-4 w-4" />
         Contacter {reservation.dispatcher}

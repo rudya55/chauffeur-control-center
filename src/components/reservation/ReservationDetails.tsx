@@ -1,6 +1,6 @@
 
 import { useState } from "react";
-import { Navigation, PhoneCall, FileText, MapPin, User, Plane } from "lucide-react";
+import { Navigation, PhoneCall, FileText, MapPin, User, Plane, Users, Package } from "lucide-react";
 import { 
   Dialog, 
   DialogContent, 
@@ -18,10 +18,17 @@ type ReservationDetailsProps = {
   flightNumber?: string;
   clientName: string;
   amount?: string;
+  driverAmount?: string;
+  commission?: string;
+  paymentType?: 'cash' | 'card' | 'transfer' | 'paypal';
   flightStatus?: 'on-time' | 'delayed' | 'landed' | 'boarding' | 'cancelled';
   placardText?: string;
   pickupGPS?: {lat: number, lng: number};
   destinationGPS?: {lat: number, lng: number};
+  dispatcherLogo?: string;
+  passengers?: number;
+  luggage?: number;
+  status?: string;
 };
 
 const ReservationDetails = ({ 
@@ -30,11 +37,18 @@ const ReservationDetails = ({
   phone, 
   flightNumber, 
   clientName, 
-  amount, 
+  amount,
+  driverAmount,
+  commission,
+  paymentType,
   flightStatus = 'on-time',
   placardText,
   pickupGPS,
-  destinationGPS
+  destinationGPS,
+  dispatcherLogo,
+  passengers,
+  luggage,
+  status
 }: ReservationDetailsProps) => {
   const [showPickupMap, setShowPickupMap] = useState(false);
   const [showDestinationMap, setShowDestinationMap] = useState(false);
@@ -44,38 +58,74 @@ const ReservationDetails = ({
   // Handler for navigating to address
   const handleNavigateTo = (address: string, isPickup: boolean) => {
     // Check if we can use the native map app
-    if (navigator.geolocation && 'share' in navigator) {
+    if (navigator.geolocation) {
       try {
         // Try to use the Web Share API with geo coordinates if available
         const geoData = isPickup ? pickupGPS : destinationGPS;
         if (geoData) {
-          navigator.share({
-            title: isPickup ? 'Navigation vers le point de départ' : 'Navigation vers la destination',
-            text: address,
-            url: `https://www.google.com/maps/search/?api=1&query=${geoData.lat},${geoData.lng}`
-          });
+          const mapUrl = `https://www.google.com/maps/search/?api=1&query=${geoData.lat},${geoData.lng}`;
+          window.open(mapUrl, '_blank');
         } else {
           // Fallback to using the address
-          navigator.share({
-            title: isPickup ? 'Navigation vers le point de départ' : 'Navigation vers la destination',
-            text: address,
-            url: `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(address)}`
-          });
+          const mapUrl = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(address)}`;
+          window.open(mapUrl, '_blank');
         }
       } catch (error) {
-        // Fallback if share API is not available or fails
+        console.error("Navigation error:", error);
+        // Fallback
         window.open(
           `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(address)}`,
           '_blank'
         );
       }
-    } else {
-      // Fallback for browsers that don't support the Share API
-      window.open(
-        `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(address)}`,
-        '_blank'
+    }
+  };
+
+  // Show different price information based on status and payment type
+  const renderPriceInfo = () => {
+    if (!amount) return null;
+    
+    if (status === 'pending') {
+      return null; // No price info for pending reservations
+    }
+
+    if (paymentType === 'cash' || paymentType === 'card') {
+      return (
+        <div className="mt-3 p-3 bg-slate-50 rounded-md">
+          <div className="flex justify-between">
+            <span className="text-sm text-gray-500">Montant client:</span>
+            <span className="font-semibold">{amount} €</span>
+          </div>
+          
+          {commission && (
+            <div className="flex justify-between">
+              <span className="text-sm text-gray-500">Commission:</span>
+              <span className="text-red-500">{commission} €</span>
+            </div>
+          )}
+          
+          {driverAmount && (
+            <div className="flex justify-between border-t pt-2 mt-2">
+              <span className="text-sm font-medium">Net chauffeur:</span>
+              <span className="font-bold text-primary">{driverAmount} €</span>
+            </div>
+          )}
+        </div>
       );
     }
+    
+    if (paymentType === 'transfer' || paymentType === 'paypal') {
+      return (
+        <div className="mt-3 p-3 bg-slate-50 rounded-md">
+          <div className="flex justify-between border-t pt-2 mt-2">
+            <span className="text-sm font-medium">Net chauffeur:</span>
+            <span className="font-bold text-primary">{driverAmount} €</span>
+          </div>
+        </div>
+      );
+    }
+    
+    return null;
   };
 
   return (
@@ -132,6 +182,23 @@ const ReservationDetails = ({
         </span>
       </div>
       
+      {/* Passengers and luggage info */}
+      <div className="flex items-center space-x-4">
+        {passengers !== undefined && (
+          <div className="flex items-center">
+            <Users className="mr-1 h-4 w-4 text-primary" />
+            <span className="text-sm">{passengers}</span>
+          </div>
+        )}
+        
+        {luggage !== undefined && (
+          <div className="flex items-center">
+            <Package className="mr-1 h-4 w-4 text-primary" />
+            <span className="text-sm">{luggage}</span>
+          </div>
+        )}
+      </div>
+      
       {/* Phone number */}
       <div className="flex items-center">
         <PhoneCall className="mr-2 h-4 w-4 text-primary" />
@@ -170,14 +237,8 @@ const ReservationDetails = ({
         </div>
       )}
       
-      {/* Amount */}
-      {amount && (
-        <div className="flex items-center mt-3">
-          <span className="font-semibold text-primary text-lg">
-            {amount} €
-          </span>
-        </div>
-      )}
+      {/* Price information */}
+      {renderPriceInfo()}
 
       {/* Pickup map dialog */}
       <Dialog open={showPickupMap} onOpenChange={setShowPickupMap}>
@@ -234,6 +295,7 @@ const ReservationDetails = ({
             <DialogTitle>Pancarte pour {clientName}</DialogTitle>
           </DialogHeader>
           <div className="bg-primary text-white p-8 rounded-lg text-center">
+            {dispatcherLogo && <div className="text-3xl mb-3">{dispatcherLogo}</div>}
             <h2 className="text-2xl font-bold mb-4">{placardText || clientName}</h2>
             <p className="text-lg">Votre chauffeur vous attend</p>
           </div>

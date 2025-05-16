@@ -6,6 +6,7 @@ import ReservationDetails from "@/components/reservation/ReservationDetails";
 import ReservationActions from "@/components/reservation/ReservationActions";
 import ReservationDispatcher from "@/components/reservation/ReservationDispatcher";
 import ReservationRating from "@/components/reservation/ReservationRating";
+import CircularTimer from "@/components/CircularTimer";
 
 interface ReservationCardProps {
   reservation: ReservationType;
@@ -41,14 +42,28 @@ const ReservationCard: React.FC<ReservationCardProps> = ({
     minute: '2-digit',
   });
 
+  // Create a date 10 seconds in the future for the test timer
+  const testTimerDate = new Date();
+  testTimerDate.setSeconds(testTimerDate.getSeconds() + 10);
+
   return (
     <Card className="mb-4">
       <CardContent className="p-4">
         {/* En-tête avec le nom du client et le statut */}
         <div className="flex items-start justify-between mb-4">
           <div>
-            <h2 className="text-lg font-semibold">{reservation.clientName}</h2>
+            {type !== 'upcoming' && <h2 className="text-lg font-semibold">{reservation.clientName}</h2>}
             <p className="text-sm text-gray-500">{formattedDate}</p>
+            
+            {/* Test timer - for testing purposes */}
+            {type === 'upcoming' && (
+              <div className="mt-2">
+                <CircularTimer 
+                  targetTime={testTimerDate} 
+                  durationInSeconds={10}
+                />
+              </div>
+            )}
           </div>
           <ReservationStatus status={reservation.status} />
         </div>
@@ -61,10 +76,17 @@ const ReservationCard: React.FC<ReservationCardProps> = ({
           flightNumber={reservation.flightNumber}
           clientName={reservation.clientName}
           amount={reservation.amount}
-          flightStatus={reservation.flightStatus as any}
+          driverAmount={reservation.driverAmount}
+          commission={reservation.commission}
+          paymentType={reservation.paymentType}
+          flightStatus={reservation.flightStatus}
           placardText={reservation.placardText}
           pickupGPS={reservation.pickupGPS}
           destinationGPS={reservation.destinationGPS}
+          dispatcherLogo={reservation.dispatcherLogo}
+          passengers={reservation.passengers}
+          luggage={reservation.luggage}
+          status={reservation.status}
         />
 
         {/* Actions spécifiques selon le type de réservation */}
