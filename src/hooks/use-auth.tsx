@@ -12,12 +12,14 @@ const AuthContext = createContext<AuthContextType | null>(null);
 
 export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const [isAuthenticated, setIsAuthenticated] = useState<boolean>(false);
+  const [isInitialized, setIsInitialized] = useState<boolean>(false);
   const navigate = useNavigate();
 
   // Load authentication state when the component mounts
   useEffect(() => {
     const authStatus = localStorage.getItem('isAuthenticated');
     setIsAuthenticated(authStatus === 'true');
+    setIsInitialized(true);
     console.log("Auth status loaded:", authStatus === 'true');
   }, []);
 
@@ -40,6 +42,11 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   };
 
   console.log("AuthProvider render, isAuthenticated:", isAuthenticated);
+
+  // Only render children once we've checked localStorage
+  if (!isInitialized) {
+    return null; // Or a loading spinner
+  }
 
   return (
     <AuthContext.Provider value={{ isAuthenticated, login, logout }}>
