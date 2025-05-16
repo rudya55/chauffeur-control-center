@@ -54,7 +54,8 @@ const AppSidebar = ({ isOpen = false, onClose }: AppSidebarProps) => {
   
   const menuItems = [
     { title: t("home"), url: "/", icon: Home },
-    { title: t("reservations"), url: "/reservations", icon: Calendar },
+    { title: t("calendar"), url: "/calendar", icon: Calendar },
+    { title: t("reservations"), url: "/reservations", icon: FileText },
     { title: t("accounting"), url: "/accounting", icon: FileText },
     { title: t("analytics"), url: "/analytics", icon: BarChart4 },
     { title: t("settings"), url: "/settings", icon: Settings },
