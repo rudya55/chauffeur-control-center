@@ -3,7 +3,7 @@ import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
 import { ReservationType } from "@/types/reservation";
-import { Check, X, MessageCircle, Car, Van, Bus, Star } from "lucide-react";
+import { Check, X, MessageCircle, Car, Truck, Bus, Star } from "lucide-react";
 import { toast } from "sonner";
 import CircularTimer from "@/components/CircularTimer";
 
@@ -237,7 +237,7 @@ const renderVehicleIcon = (vehicleType?: string) => {
     case 'berline':
       return <Car className="h-4 w-4 text-primary" />;
     case 'van':
-      return <Van className="h-4 w-4 text-primary" />;
+      return <Truck className="h-4 w-4 text-primary" />; // Changed from Van to Truck
     case 'mini-bus':
       return <Bus className="h-4 w-4 text-primary" />;
     case 'first-class':
