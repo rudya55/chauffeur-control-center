@@ -1,6 +1,6 @@
 
 import { useState, useEffect } from "react";
-import { format, parseISO, isValid } from "date-fns";
+import { format, parseISO, isValid, startOfWeek, endOfWeek, eachDayOfInterval, startOfDay, endOfDay } from "date-fns";
 import { fr } from "date-fns/locale";
 import PageHeader from "@/components/PageHeader";
 import { Calendar as CalendarIcon, CircleDot } from "lucide-react";
@@ -11,6 +11,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/u
 import ReservationDetails from "@/components/reservation/ReservationDetails";
 import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
+import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
 
 const Calendar = () => {
   const [date, setDate] = useState<Date>(new Date());
@@ -18,6 +19,7 @@ const Calendar = () => {
   const [selectedDate, setSelectedDate] = useState<Date | null>(null);
   const [selectedReservation, setSelectedReservation] = useState<ReservationType | null>(null);
   const [showReservationDetails, setShowReservationDetails] = useState(false);
+  const [viewMode, setViewMode] = useState<"day" | "week" | "month">("month");
   
   // Charger les réservations du localStorage
   useEffect(() => {
@@ -26,6 +28,31 @@ const Calendar = () => {
       setReservations(JSON.parse(storedReservations));
     }
   }, []);
+
+  // Fonction pour obtenir les réservations selon le mode d'affichage
+  const getReservationsForView = () => {
+    if (!selectedDate) return [];
+    
+    let startDate, endDate;
+    
+    if (viewMode === "day") {
+      startDate = startOfDay(selectedDate);
+      endDate = endOfDay(selectedDate);
+    } else if (viewMode === "week") {
+      startDate = startOfWeek(selectedDate, { locale: fr });
+      endDate = endOfWeek(selectedDate, { locale: fr });
+    } else {
+      // Month view uses the selected date to filter
+      return getDailyReservations();
+    }
+    
+    return reservations.filter(reservation => {
+      const reservationDate = parseISO(reservation.date);
+      return isValid(reservationDate) && 
+        reservationDate >= startDate && 
+        reservationDate <= endDate;
+    });
+  };
 
   // Réservations du jour sélectionné
   const getDailyReservations = () => {
@@ -38,7 +65,7 @@ const Calendar = () => {
     });
   };
 
-  const dailyReservations = getDailyReservations();
+  const viewReservations = getReservationsForView();
 
   // Fonction pour obtenir toutes les dates avec des réservations
   const getDaysWithReservations = () => {
@@ -153,9 +180,39 @@ const Calendar = () => {
     setShowReservationDetails(true);
   };
 
+  // Générer le titre selon le mode d'affichage
+  const getViewTitle = () => {
+    if (!selectedDate) return "Sélectionnez une date";
+    
+    if (viewMode === "day") {
+      return `Réservations du ${format(selectedDate, 'dd MMMM yyyy', { locale: fr })}`;
+    } else if (viewMode === "week") {
+      const weekStart = startOfWeek(selectedDate, { locale: fr });
+      const weekEnd = endOfWeek(selectedDate, { locale: fr });
+      return `Semaine du ${format(weekStart, 'dd')} au ${format(weekEnd, 'dd MMMM yyyy', { locale: fr })}`;
+    } else {
+      return `Réservations du ${format(selectedDate, 'dd MMMM yyyy', { locale: fr })}`;
+    }
+  };
+
   return (
     <div className="p-4 sm:p-6">
       <PageHeader title="planning" />
+      
+      <div className="flex justify-between items-center mb-4">
+        <h2 className="text-xl font-semibold">Calendrier</h2>
+        <ToggleGroup type="single" value={viewMode} onValueChange={(value) => value && setViewMode(value as "day" | "week" | "month")}>
+          <ToggleGroupItem value="day" aria-label="Vue jour">
+            Jour
+          </ToggleGroupItem>
+          <ToggleGroupItem value="week" aria-label="Vue semaine">
+            Semaine
+          </ToggleGroupItem>
+          <ToggleGroupItem value="month" aria-label="Vue mois">
+            Mois
+          </ToggleGroupItem>
+        </ToggleGroup>
+      </div>
       
       <div className="grid grid-cols-1 md:grid-cols-12 gap-6">
         {/* Calendrier */}
@@ -197,10 +254,7 @@ const Calendar = () => {
         <Card className="md:col-span-5">
           <CardHeader className="pb-2">
             <CardTitle>
-              {selectedDate 
-                ? `Réservations du ${format(selectedDate, 'dd MMMM yyyy', { locale: fr })}`
-                : "Sélectionnez une date"
-              }
+              {getViewTitle()}
             </CardTitle>
           </CardHeader>
           <CardContent className="pt-2">
@@ -208,13 +262,13 @@ const Calendar = () => {
               <div className="text-center py-8 text-muted-foreground">
                 Veuillez sélectionner une date pour voir les réservations
               </div>
-            ) : dailyReservations.length === 0 ? (
+            ) : viewReservations.length === 0 ? (
               <div className="text-center py-8 text-muted-foreground">
-                Aucune réservation pour cette date
+                Aucune réservation {viewMode === "day" ? "pour cette date" : viewMode === "week" ? "pour cette semaine" : "pour cette date"}
               </div>
             ) : (
               <div className="space-y-4">
-                {dailyReservations.map((reservation) => (
+                {viewReservations.map((reservation) => (
                   <div 
                     key={reservation.id}
                     className={cn(
@@ -227,7 +281,7 @@ const Calendar = () => {
                       <div>
                         <p className="font-medium">{reservation.clientName}</p>
                         <p className="text-sm">
-                          {format(parseISO(reservation.date), 'HH:mm')}
+                          {format(parseISO(reservation.date), 'dd/MM/yyyy HH:mm')}
                         </p>
                       </div>
                       <Badge variant="outline" className={cn(
