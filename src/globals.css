@@ -75,18 +75,8 @@
     @apply bg-background text-foreground;
   }
   
-  /* Make text bold in dark mode */
-  .dark .font-bold,
-  .dark h1,
-  .dark h2,
-  .dark h3,
-  .dark h4,
-  .dark h5,
-  .dark h6,
-  .dark p,
-  .dark span,
-  .dark div,
-  .dark button {
+  /* Make ALL text gold and bold in dark mode */
+  .dark * {
     @apply text-primary;
     font-weight: bold;
   }
