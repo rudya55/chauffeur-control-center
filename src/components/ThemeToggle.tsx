@@ -11,7 +11,7 @@ interface ThemeToggleProps {
 const ThemeToggle = ({ className }: ThemeToggleProps) => {
   const { theme, setTheme } = useTheme();
 
-  // Set dark theme by default
+  // Set dark theme by default on first load
   useEffect(() => {
     if (!theme || theme === 'system') {
       setTheme('dark');
