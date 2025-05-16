@@ -37,16 +37,10 @@ const ReservationActions = ({
   const [rating, setRating] = useState(5);
   const [comment, setComment] = useState("");
 
-  // Gestion de la soumission de l'évaluation
-  const handleSubmitRating = () => {
-    if (onComplete) {
-      onComplete(reservation.id, rating, comment);
-    }
-  };
-
   // Handle start ride after timer ends
   const handleStartRide = () => {
     if (onStartRide) {
+      toast.success("Course démarrée");
       onStartRide(reservation.id);
     }
   };
@@ -78,33 +72,33 @@ const ReservationActions = ({
 
   if (type === 'current' && reservation.status === 'accepted') {
     return (
-      <div className="flex justify-between items-center gap-3 mt-4">
-        <div>
-          <Button 
-            variant="ghost" 
-            size="sm" 
-            onClick={() => onChatWithDispatcher && onChatWithDispatcher(reservation.dispatcher)}
-            className="p-2"
-          >
-            <MessageCircle className="h-4 w-4" />
-          </Button>
-        </div>
+      <div className="flex justify-between items-center gap-2 mt-4">
+        <Button 
+          variant="ghost" 
+          size="sm" 
+          onClick={() => onChatWithDispatcher && onChatWithDispatcher(reservation.dispatcher)}
+          className="p-2"
+        >
+          <MessageCircle className="h-4 w-4" />
+        </Button>
         
         <div className="flex items-center gap-2">
-          {testTimerDate && (
-            <CircularTimer 
-              targetTime={testTimerDate} 
-              durationInSeconds={10}
-              onTimeReached={handleStartRide}
-            />
-          )}
           <Button 
             variant="default" 
             size="sm" 
             onClick={handleStartRide}
           >
-            Démarrer la course
+            Démarrer
           </Button>
+          
+          {testTimerDate && (
+            <CircularTimer 
+              targetTime={testTimerDate} 
+              durationInSeconds={10}
+              onTimeReached={handleStartRide}
+              autoStart={true}
+            />
+          )}
         </div>
       </div>
     );
@@ -181,33 +175,37 @@ const ReservationActions = ({
                 Comment s'est déroulée la course avec {reservation.clientName} ?
               </AlertDialogDescription>
             </AlertDialogHeader>
-            <div className="flex items-center space-x-2">
-              <label htmlFor="rating">Note :</label>
-              <select
-                id="rating"
-                value={rating}
-                onChange={(e) => setRating(parseInt(e.target.value))}
-                className="border rounded px-2 py-1"
-              >
-                <option value="5">5 Étoiles</option>
-                <option value="4">4 Étoiles</option>
-                <option value="3">3 Étoiles</option>
-                <option value="2">2 Étoiles</option>
-                <option value="1">1 Étoile</option>
-              </select>
-            </div>
-            <div className="mt-2">
-              <label htmlFor="comment">Commentaire :</label>
-              <textarea
-                id="comment"
-                value={comment}
-                onChange={(e) => setComment(e.target.value)}
-                className="border rounded w-full px-2 py-1"
-              />
+            <div className="flex flex-col space-y-4 py-2">
+              <div className="flex justify-center">
+                <div className="flex items-center space-x-1">
+                  {[1, 2, 3, 4, 5].map((star) => (
+                    <button
+                      key={star}
+                      type="button"
+                      onClick={() => setRating(star)}
+                      className="text-2xl focus:outline-none"
+                    >
+                      <span className={`${rating >= star ? 'text-yellow-500' : 'text-gray-300'}`}>
+                        ★
+                      </span>
+                    </button>
+                  ))}
+                </div>
+              </div>
+              <div>
+                <label htmlFor="comment" className="block text-sm font-medium mb-1">Commentaire :</label>
+                <textarea
+                  id="comment"
+                  value={comment}
+                  onChange={(e) => setComment(e.target.value)}
+                  className="border rounded w-full px-3 py-2 min-h-[80px]"
+                  placeholder="Votre commentaire (optionnel)"
+                />
+              </div>
             </div>
             <AlertDialogFooter>
               <AlertDialogCancel>Annuler</AlertDialogCancel>
-              <AlertDialogAction onClick={handleSubmitRating}>
+              <AlertDialogAction onClick={() => onComplete && onComplete(reservation.id, rating, comment)}>
                 Soumettre
               </AlertDialogAction>
             </AlertDialogFooter>

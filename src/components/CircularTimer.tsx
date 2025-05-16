@@ -6,11 +6,18 @@ interface CircularTimerProps {
   targetTime: Date;
   onTimeReached?: () => void;
   durationInSeconds?: number;
+  autoStart?: boolean;
 }
 
-const CircularTimer = ({ targetTime, onTimeReached, durationInSeconds = 10 }: CircularTimerProps) => {
+const CircularTimer = ({ 
+  targetTime, 
+  onTimeReached, 
+  durationInSeconds = 10,
+  autoStart = false
+}: CircularTimerProps) => {
   const [timeLeft, setTimeLeft] = useState<string>("00:00:00");
   const [progress, setProgress] = useState(100);
+  const [timerCompleted, setTimerCompleted] = useState(false);
 
   useEffect(() => {
     const targetTimeMs = targetTime.getTime();
@@ -28,7 +35,10 @@ const CircularTimer = ({ targetTime, onTimeReached, durationInSeconds = 10 }: Ci
       
       if (timeLeftMs <= 0) {
         setTimeLeft("00:00:00");
-        if (onTimeReached) onTimeReached();
+        setTimerCompleted(true);
+        if (onTimeReached && autoStart) {
+          onTimeReached();
+        }
         return;
       }
       
@@ -50,11 +60,11 @@ const CircularTimer = ({ targetTime, onTimeReached, durationInSeconds = 10 }: Ci
     const interval = setInterval(updateTimer, 1000);
     
     return () => clearInterval(interval);
-  }, [targetTime, onTimeReached, durationInSeconds]);
+  }, [targetTime, onTimeReached, durationInSeconds, autoStart]);
 
   return (
     <div className="flex flex-col items-center justify-center">
-      <div className="relative w-16 h-16 mb-2">
+      <div className="relative w-16 h-16">
         {/* Circular progress background */}
         <div className="absolute inset-0 rounded-full bg-gray-100 border border-gray-200"></div>
         
