@@ -79,7 +79,7 @@ const ReservationCard: React.FC<ReservationCardProps> = ({
         <ReservationDetails 
           pickupAddress={reservation.pickupAddress}
           destination={reservation.destination}
-          phone={type === 'upcoming' ? undefined : reservation.phone}
+          phone={type === 'upcoming' ? undefined : (type === 'current' || type === 'completed') ? undefined : reservation.phone}
           flightNumber={reservation.flightNumber}
           clientName={type === 'upcoming' ? undefined : reservation.clientName}
           amount={reservation.amount}
@@ -94,6 +94,7 @@ const ReservationCard: React.FC<ReservationCardProps> = ({
           passengers={reservation.passengers}
           luggage={reservation.luggage}
           status={reservation.status}
+          showAddressLabels={true}
         />
 
         {/* Actions spécifiques selon le type de réservation */}
@@ -107,6 +108,8 @@ const ReservationCard: React.FC<ReservationCardProps> = ({
             onArrived={onArrived}
             onClientBoarded={onClientBoarded}
             onComplete={onComplete}
+            testTimerDate={testTimerDate}
+            canStartRide={canStartRide}
           />
           
           {type === 'completed' && (
@@ -119,33 +122,11 @@ const ReservationCard: React.FC<ReservationCardProps> = ({
 
         {/* Infos du dispatcher et Bon de commande */}
         {type === 'current' && (
-          <>
-            <ReservationDispatcher 
-              reservation={reservation}
-              onChatWithDispatcher={onChatWithDispatcher}
-              onShowOrderForm={onShowOrderForm}
-            />
-            
-            {/* Test timer for current rides - displayed at the bottom */}
-            {reservation.status === 'accepted' && (
-              <div className="mt-4 flex justify-center">
-                <CircularTimer 
-                  targetTime={testTimerDate} 
-                  durationInSeconds={10}
-                />
-              </div>
-            )}
-            
-            {/* Real timer (commented for now) */}
-            {/* {reservation.status === 'accepted' && !canStartRide() && (
-              <div className="mt-4 flex justify-center">
-                <CircularTimer 
-                  targetTime={new Date(reservation.date)} 
-                  durationInSeconds={7200} // 2 hours in seconds
-                />
-              </div>
-            )} */}
-          </>
+          <ReservationDispatcher 
+            reservation={reservation}
+            onChatWithDispatcher={onChatWithDispatcher}
+            onShowOrderForm={onShowOrderForm}
+          />
         )}
       </CardContent>
     </Card>

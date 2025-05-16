@@ -5,6 +5,7 @@ import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, 
 import { ReservationType } from "@/types/reservation";
 import { Check, X } from "lucide-react";
 import { toast } from "sonner";
+import CircularTimer from "@/components/CircularTimer";
 
 interface ReservationActionsProps {
   reservation: ReservationType;
@@ -15,6 +16,8 @@ interface ReservationActionsProps {
   onArrived?: (id: string) => void;
   onClientBoarded?: (id: string) => void;
   onComplete?: (id: string, rating: number, comment: string) => void;
+  testTimerDate?: Date;
+  canStartRide?: () => boolean;
 }
 
 const ReservationActions = ({ 
@@ -25,20 +28,12 @@ const ReservationActions = ({
   onStartRide, 
   onArrived, 
   onClientBoarded, 
-  onComplete 
+  onComplete,
+  testTimerDate,
+  canStartRide
 }: ReservationActionsProps) => {
   const [rating, setRating] = useState(5);
   const [comment, setComment] = useState("");
-
-  // Check if ride can be started (2 hours before scheduled time)
-  const canStartRide = () => {
-    const now = new Date();
-    const rideTime = new Date(reservation.date);
-    const twoHoursBefore = new Date(rideTime);
-    twoHoursBefore.setHours(twoHoursBefore.getHours() - 2);
-    
-    return now >= twoHoursBefore;
-  };
 
   // Gestion de la soumission de l'évaluation
   const handleSubmitRating = () => {
@@ -49,7 +44,7 @@ const ReservationActions = ({
 
   // Handle start ride with time check
   const handleStartRide = () => {
-    if (!canStartRide()) {
+    if (canStartRide && !canStartRide()) {
       toast.error("Vous ne pouvez pas démarrer cette course plus de 2h avant l'heure prévue");
       return;
     }
@@ -85,22 +80,25 @@ const ReservationActions = ({
   }
 
   if (type === 'current' && reservation.status === 'accepted') {
+    const canStart = canStartRide ? canStartRide() : true;
+    
     return (
-      <div className="flex justify-end gap-2 mt-4">
+      <div className="flex justify-end items-center gap-3 mt-4">
+        {testTimerDate && (
+          <CircularTimer 
+            targetTime={testTimerDate} 
+            durationInSeconds={10}
+          />
+        )}
         <Button 
           variant="default" 
           size="sm" 
           onClick={handleStartRide}
-          disabled={!canStartRide()}
-          className={canStartRide() ? "" : "opacity-50 cursor-not-allowed"}
+          disabled={!canStart}
+          className={canStart ? "" : "opacity-50 cursor-not-allowed"}
         >
-          Démarrer la course
+          Démarrer
         </Button>
-        {!canStartRide() && (
-          <div className="text-xs text-amber-600 italic mt-1">
-            La course ne peut être démarrée que 2h avant l'heure prévue
-          </div>
-        )}
       </div>
     );
   }

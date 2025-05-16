@@ -14,9 +14,9 @@ import Map from "@/components/Map";
 type ReservationDetailsProps = {
   pickupAddress: string;
   destination: string;
-  phone: string;
+  phone?: string;
   flightNumber?: string;
-  clientName: string;
+  clientName?: string;
   amount?: string;
   driverAmount?: string;
   commission?: string;
@@ -29,6 +29,7 @@ type ReservationDetailsProps = {
   passengers?: number;
   luggage?: number;
   status?: string;
+  showAddressLabels?: boolean;
 };
 
 const ReservationDetails = ({ 
@@ -48,7 +49,8 @@ const ReservationDetails = ({
   dispatcherLogo,
   passengers,
   luggage,
-  status
+  status,
+  showAddressLabels = false
 }: ReservationDetailsProps) => {
   const [showPickupMap, setShowPickupMap] = useState(false);
   const [showDestinationMap, setShowDestinationMap] = useState(false);
@@ -133,6 +135,7 @@ const ReservationDetails = ({
       {/* Pickup address with map option */}
       <div className="flex items-center">
         <MapPin className="mr-2 h-4 w-4 text-primary" />
+        {showAddressLabels && <span className="text-sm font-medium mr-1">Départ:</span>}
         <button 
           className="text-sm underline hover:text-primary"
           onClick={() => setShowPickupMap(true)}
@@ -152,6 +155,7 @@ const ReservationDetails = ({
       {/* Destination with map option */}
       <div className="flex items-center">
         <MapPin className="mr-2 h-4 w-4 text-primary" />
+        {showAddressLabels && <span className="text-sm font-medium mr-1">Destination:</span>}
         <button 
           className="text-sm underline hover:text-primary"
           onClick={() => setShowDestinationMap(true)}
