@@ -1,0 +1,56 @@
+
+{
+  "welcome": "مرحبا",
+  "hello": "أهلا",
+  "goodbye": "وداعا",
+  "home": "الرئيسية",
+  "reservations": "الحجوزات",
+  "accounting": "المحاسبة",
+  "analytics": "التحليلات",
+  "settings": "الإعدادات",
+  "menu": "القائمة",
+  "logout": "تسجيل الخروج",
+  "dark_mode": "الوضع الداكن",
+  "light_mode": "الوضع الفاتح",
+  "upcoming": "القادمة",
+  "completed": "المكتملة",
+  "notifications": "الإشعارات",
+  "mark_all_read": "تعليم الكل كمقروء",
+  "no_notifications": "لا توجد إشعارات",
+  "planning": "التخطيط",
+  "general_conditions": "الشروط العامة",
+  "contact": "اتصل بنا",
+  "calendar": "التقويم",
+  "order_form": "نموذج الطلب",
+  "notification": {
+    "new_reservation": "حجز جديد",
+    "new_reservation_message": "لديك حجز جديد متاح.",
+    "payment_received": "تم استلام الدفعة",
+    "payment_received_message": "تم إضافة مبلغ 45 يورو إلى حسابك."
+  },
+  "language": {
+    "title": "اللغة",
+    "fr": "الفرنسية",
+    "en": "الإنجليزية",
+    "es": "الإسبانية",
+    "de": "الألمانية",
+    "it": "الإيطالية",
+    "ar": "العربية",
+    "zh": "الصينية",
+    "ru": "الروسية",
+    "pt": "البرتغالية",
+    "ja": "اليابانية",
+    "select": "اختر اللغة",
+    "save": "حفظ اللغة",
+    "description": "اختر لغة التطبيق"
+  },
+  "settings": {
+    "title": "الإعدادات",
+    "tabs": {
+      "profile": "الملف الشخصي",
+      "notifications": "الإشعارات",
+      "payment": "الدفع",
+      "security": "الأمان"
+    }
+  }
+}

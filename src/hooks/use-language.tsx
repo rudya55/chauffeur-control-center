@@ -1,7 +1,7 @@
 
 import { createContext, useContext, useState, useEffect, ReactNode } from "react";
 
-type SupportedLanguages = "fr" | "en" | "es" | "de" | "it";
+type SupportedLanguages = "fr" | "en" | "es" | "de" | "it" | "ar" | "zh" | "ru" | "pt" | "ja";
 
 type LanguageContextType = {
   language: SupportedLanguages;

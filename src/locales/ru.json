@@ -1,0 +1,56 @@
+
+{
+  "welcome": "Добро пожаловать",
+  "hello": "Привет",
+  "goodbye": "До свидания",
+  "home": "Главная",
+  "reservations": "Бронирования",
+  "accounting": "Бухгалтерия",
+  "analytics": "Аналитика",
+  "settings": "Настройки",
+  "menu": "Меню",
+  "logout": "Выйти",
+  "dark_mode": "Темная тема",
+  "light_mode": "Светлая тема",
+  "upcoming": "Предстоящие",
+  "completed": "Завершенные",
+  "notifications": "Уведомления",
+  "mark_all_read": "Отметить все как прочитанное",
+  "no_notifications": "Нет уведомлений",
+  "planning": "Планирование",
+  "general_conditions": "Общие условия",
+  "contact": "Контакты",
+  "calendar": "Календарь",
+  "order_form": "Форма заказа",
+  "notification": {
+    "new_reservation": "Новое бронирование",
+    "new_reservation_message": "У вас есть новое бронирование.",
+    "payment_received": "Получен платеж",
+    "payment_received_message": "На ваш счет зачислено 45 евро."
+  },
+  "language": {
+    "title": "Язык",
+    "fr": "Французский",
+    "en": "Английский",
+    "es": "Испанский",
+    "de": "Немецкий",
+    "it": "Итальянский",
+    "ar": "Арабский",
+    "zh": "Китайский",
+    "ru": "Русский",
+    "pt": "Португальский",
+    "ja": "Японский",
+    "select": "Выберите язык",
+    "save": "Сохранить язык",
+    "description": "Выберите язык приложения"
+  },
+  "settings": {
+    "title": "Настройки",
+    "tabs": {
+      "profile": "Профиль",
+      "notifications": "Уведомления",
+      "payment": "Оплата",
+      "security": "Безопасность"
+    }
+  }
+}

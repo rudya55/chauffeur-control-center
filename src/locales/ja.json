@@ -1,0 +1,56 @@
+
+{
+  "welcome": "ようこそ",
+  "hello": "こんにちは",
+  "goodbye": "さようなら",
+  "home": "ホーム",
+  "reservations": "予約",
+  "accounting": "会計",
+  "analytics": "分析",
+  "settings": "設定",
+  "menu": "メニュー",
+  "logout": "ログアウト",
+  "dark_mode": "ダークモード",
+  "light_mode": "ライトモード",
+  "upcoming": "近日中",
+  "completed": "完了",
+  "notifications": "通知",
+  "mark_all_read": "すべて既読にする",
+  "no_notifications": "通知なし",
+  "planning": "計画",
+  "general_conditions": "一般条件",
+  "contact": "お問い合わせ",
+  "calendar": "カレンダー",
+  "order_form": "注文書",
+  "notification": {
+    "new_reservation": "新規予約",
+    "new_reservation_message": "新しい予約が利用可能です。",
+    "payment_received": "支払い受領",
+    "payment_received_message": "45ユーロがあなたのアカウントに入金されました。"
+  },
+  "language": {
+    "title": "言語",
+    "fr": "フランス語",
+    "en": "英語",
+    "es": "スペイン語",
+    "de": "ドイツ語",
+    "it": "イタリア語",
+    "ar": "アラビア語",
+    "zh": "中国語",
+    "ru": "ロシア語",
+    "pt": "ポルトガル語",
+    "ja": "日本語",
+    "select": "言語を選択",
+    "save": "言語を保存",
+    "description": "アプリケーションの言語を選択"
+  },
+  "settings": {
+    "title": "設定",
+    "tabs": {
+      "profile": "プロフィール",
+      "notifications": "通知",
+      "payment": "支払い",
+      "security": "セキュリティ"
+    }
+  }
+}

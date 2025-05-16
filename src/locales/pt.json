@@ -1,0 +1,56 @@
+
+{
+  "welcome": "Bem-vindo",
+  "hello": "Olá",
+  "goodbye": "Adeus",
+  "home": "Início",
+  "reservations": "Reservas",
+  "accounting": "Contabilidade",
+  "analytics": "Análises",
+  "settings": "Configurações",
+  "menu": "Menu",
+  "logout": "Sair",
+  "dark_mode": "Modo escuro",
+  "light_mode": "Modo claro",
+  "upcoming": "Próximas",
+  "completed": "Concluídas",
+  "notifications": "Notificações",
+  "mark_all_read": "Marcar todas como lidas",
+  "no_notifications": "Sem notificações",
+  "planning": "Planejamento",
+  "general_conditions": "Condições gerais",
+  "contact": "Contato",
+  "calendar": "Calendário",
+  "order_form": "Formulário de pedido",
+  "notification": {
+    "new_reservation": "Nova reserva",
+    "new_reservation_message": "Você tem uma nova reserva disponível.",
+    "payment_received": "Pagamento recebido",
+    "payment_received_message": "Um pagamento de €45 foi creditado em sua conta."
+  },
+  "language": {
+    "title": "Idioma",
+    "fr": "Francês",
+    "en": "Inglês",
+    "es": "Espanhol",
+    "de": "Alemão",
+    "it": "Italiano",
+    "ar": "Árabe",
+    "zh": "Chinês",
+    "ru": "Russo",
+    "pt": "Português",
+    "ja": "Japonês",
+    "select": "Selecionar idioma",
+    "save": "Salvar idioma",
+    "description": "Escolha o idioma do aplicativo"
+  },
+  "settings": {
+    "title": "Configurações",
+    "tabs": {
+      "profile": "Perfil",
+      "notifications": "Notificações",
+      "payment": "Pagamento",
+      "security": "Segurança"
+    }
+  }
+}

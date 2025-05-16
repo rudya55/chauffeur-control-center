@@ -1,0 +1,56 @@
+
+{
+  "welcome": "欢迎",
+  "hello": "你好",
+  "goodbye": "再见",
+  "home": "首页",
+  "reservations": "预订",
+  "accounting": "会计",
+  "analytics": "分析",
+  "settings": "设置",
+  "menu": "菜单",
+  "logout": "退出",
+  "dark_mode": "深色模式",
+  "light_mode": "浅色模式",
+  "upcoming": "即将到来",
+  "completed": "已完成",
+  "notifications": "通知",
+  "mark_all_read": "全部标为已读",
+  "no_notifications": "没有通知",
+  "planning": "规划",
+  "general_conditions": "通用条款",
+  "contact": "联系",
+  "calendar": "日历",
+  "order_form": "订单表格",
+  "notification": {
+    "new_reservation": "新预订",
+    "new_reservation_message": "您有新的预订可用。",
+    "payment_received": "已收到付款",
+    "payment_received_message": "您的账户已收到45欧元。"
+  },
+  "language": {
+    "title": "语言",
+    "fr": "法语",
+    "en": "英语",
+    "es": "西班牙语",
+    "de": "德语",
+    "it": "意大利语",
+    "ar": "阿拉伯语",
+    "zh": "中文",
+    "ru": "俄语",
+    "pt": "葡萄牙语",
+    "ja": "日语",
+    "select": "选择语言",
+    "save": "保存语言",
+    "description": "选择应用程序语言"
+  },
+  "settings": {
+    "title": "设置",
+    "tabs": {
+      "profile": "个人资料",
+      "notifications": "通知",
+      "payment": "支付",
+      "security": "安全"
+    }
+  }
+}

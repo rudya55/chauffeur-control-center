@@ -3,11 +3,11 @@ import { useLanguage } from "@/hooks/use-language";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Languages } from "lucide-react";
-import { toast } from "@/hooks/use-toast";
+import { Globe } from "lucide-react";
+import { toast } from "sonner";
 import { useState } from "react";
 
-type SupportedLanguages = "fr" | "en" | "es" | "de" | "it";
+type SupportedLanguages = "fr" | "en" | "es" | "de" | "it" | "ar" | "zh" | "ru" | "pt" | "ja";
 
 const languageOptions = [
   { value: "fr", label: "Français" },
@@ -15,6 +15,11 @@ const languageOptions = [
   { value: "es", label: "Español" },
   { value: "de", label: "Deutsch" },
   { value: "it", label: "Italiano" },
+  { value: "ar", label: "العربية" },
+  { value: "zh", label: "中文" },
+  { value: "ru", label: "Русский" },
+  { value: "pt", label: "Português" },
+  { value: "ja", label: "日本語" },
 ];
 
 export const LanguageCard = () => {
@@ -23,17 +28,14 @@ export const LanguageCard = () => {
 
   const handleSaveLanguage = () => {
     setLanguage(selectedLanguage);
-    toast({
-      title: t("language.save"),
-      description: t(`language.${selectedLanguage}`),
-    });
+    toast.success(`Langue changée en ${languageOptions.find(lang => lang.value === selectedLanguage)?.label}`);
   };
 
   return (
     <Card>
       <CardHeader>
         <div className="flex items-center gap-2">
-          <Languages className="text-primary" size={20} />
+          <Globe className="text-primary" size={20} />
           <div>
             <CardTitle>{t("language.title")}</CardTitle>
             <CardDescription>{t("language.description")}</CardDescription>

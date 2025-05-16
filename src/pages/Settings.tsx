@@ -6,15 +6,51 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Bell, CreditCard, User, Lock, Globe, MoonStar } from "lucide-react";
+import { 
+  Bell, 
+  CreditCard, 
+  User, 
+  Lock, 
+  Globe, 
+  MoonStar, 
+  Building, 
+  Mail, 
+  Phone, 
+  AlertCircle 
+} from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { toast } from "sonner";
+import { useLanguage } from "@/hooks/use-language";
+import { LanguageCard } from "@/components/LanguageCard";
+import { 
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger 
+} from "@/components/ui/accordion";
+import { 
+  Dialog, 
+  DialogContent, 
+  DialogHeader, 
+  DialogTitle, 
+  DialogTrigger 
+} from "@/components/ui/dialog";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 
 const Settings = () => {
+  const { t } = useLanguage();
   const [avatar, setAvatar] = useState("/profile-photo.jpg");
   const [darkMode, setDarkMode] = useState(false);
   const [emailNotifications, setEmailNotifications] = useState(true);
   const [pushNotifications, setPushNotifications] = useState(true);
+  const [showPaymentDialog, setShowPaymentDialog] = useState(false);
+  const [paymentMethod, setPaymentMethod] = useState("card");
   
   const handleSaveProfile = (e: React.FormEvent) => {
     e.preventDefault();
@@ -34,17 +70,24 @@ const Settings = () => {
       toast.success("Photo de profil mise à jour");
     }
   };
+
+  const handleAddPaymentMethod = (e: React.FormEvent) => {
+    e.preventDefault();
+    toast.success(`Nouvelle méthode de paiement ajoutée`);
+    setShowPaymentDialog(false);
+  };
   
   return (
     <div className="p-4 sm:p-6">
       <PageHeader title="settings" />
       
       <Tabs defaultValue="profile" className="w-full">
-        <TabsList className="grid w-full grid-cols-4 mb-6">
+        <TabsList className="grid w-full grid-cols-5 mb-6">
           <TabsTrigger value="profile">Profil</TabsTrigger>
           <TabsTrigger value="notifications">Notifications</TabsTrigger>
           <TabsTrigger value="payment">Paiement</TabsTrigger>
           <TabsTrigger value="security">Sécurité</TabsTrigger>
+          <TabsTrigger value="language">Langues</TabsTrigger>
         </TabsList>
         
         <TabsContent value="profile" className="bg-white rounded-lg shadow p-4 md:p-6">
@@ -97,28 +140,13 @@ const Settings = () => {
                 <Input id="address" defaultValue="123 Rue de Paris" />
               </div>
               
-              <div className="flex items-center justify-between">
-                <div className="flex items-center space-x-2">
-                  <Globe className="h-5 w-5" />
-                  <span>Langue</span>
-                </div>
-                <div>
-                  <select className="border rounded-md p-2">
-                    <option value="fr">Français</option>
-                    <option value="en">English</option>
-                    <option value="es">Español</option>
-                  </select>
-                </div>
-              </div>
-              
-              <div className="flex items-center justify-between">
-                <div className="flex items-center space-x-2">
-                  <MoonStar className="h-5 w-5" />
-                  <span>Mode sombre</span>
-                </div>
+              <div className="flex items-center space-x-2">
+                <MoonStar className="h-5 w-5" />
+                <span>Mode sombre</span>
                 <Switch 
                   checked={darkMode} 
                   onCheckedChange={setDarkMode} 
+                  className="ml-auto"
                 />
               </div>
               
@@ -129,52 +157,138 @@ const Settings = () => {
         
         <TabsContent value="notifications" className="bg-white rounded-lg shadow p-4 md:p-6">
           <form onSubmit={handleSaveNotifications}>
-            <div className="space-y-4">
+            <div className="space-y-6">
               <div>
                 <h3 className="text-lg font-medium mb-4 flex items-center">
                   <Bell className="mr-2 h-5 w-5" />
                   Préférences de notification
                 </h3>
                 
-                <div className="space-y-4">
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <p className="font-medium">Notifications par email</p>
-                      <p className="text-sm text-muted-foreground">Recevez des notifications par email</p>
-                    </div>
-                    <Switch 
-                      checked={emailNotifications} 
-                      onCheckedChange={setEmailNotifications} 
-                    />
-                  </div>
+                <Accordion type="single" collapsible className="w-full space-y-4">
+                  <AccordionItem value="email-notifications" className="border rounded-lg px-4">
+                    <AccordionTrigger className="py-4">Notifications par email</AccordionTrigger>
+                    <AccordionContent className="space-y-4 pb-4">
+                      <div className="flex items-center justify-between">
+                        <div>
+                          <p className="font-medium">Nouvelles réservations</p>
+                          <p className="text-sm text-muted-foreground">Recevoir un email pour chaque nouvelle réservation</p>
+                        </div>
+                        <Switch defaultChecked />
+                      </div>
+                      
+                      <div className="flex items-center justify-between">
+                        <div>
+                          <p className="font-medium">Rappels</p>
+                          <p className="text-sm text-muted-foreground">Recevoir un rappel 2 heures avant une course</p>
+                        </div>
+                        <Switch defaultChecked />
+                      </div>
+                      
+                      <div className="flex items-center justify-between">
+                        <div>
+                          <p className="font-medium">Paiements</p>
+                          <p className="text-sm text-muted-foreground">Recevoir une confirmation pour chaque paiement</p>
+                        </div>
+                        <Switch defaultChecked />
+                      </div>
+                      
+                      <div className="flex items-center justify-between">
+                        <div>
+                          <p className="font-medium">Marketing</p>
+                          <p className="text-sm text-muted-foreground">Offres et promotions</p>
+                        </div>
+                        <Switch />
+                      </div>
+                    </AccordionContent>
+                  </AccordionItem>
                   
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <p className="font-medium">Notifications push</p>
-                      <p className="text-sm text-muted-foreground">Recevez des notifications sur votre appareil</p>
-                    </div>
-                    <Switch 
-                      checked={pushNotifications} 
-                      onCheckedChange={setPushNotifications} 
-                    />
-                  </div>
+                  <AccordionItem value="push-notifications" className="border rounded-lg px-4">
+                    <AccordionTrigger className="py-4">Notifications push</AccordionTrigger>
+                    <AccordionContent className="space-y-4 pb-4">
+                      <div className="flex items-center justify-between">
+                        <div>
+                          <p className="font-medium">Nouvelles réservations</p>
+                          <p className="text-sm text-muted-foreground">Recevoir une notification pour chaque nouvelle réservation</p>
+                        </div>
+                        <Switch defaultChecked />
+                      </div>
+                      
+                      <div className="flex items-center justify-between">
+                        <div>
+                          <p className="font-medium">Rappels de courses</p>
+                          <p className="text-sm text-muted-foreground">Recevoir un rappel 30 minutes avant une course</p>
+                        </div>
+                        <Switch defaultChecked />
+                      </div>
+                      
+                      <div className="flex items-center justify-between">
+                        <div>
+                          <p className="font-medium">Changements de statut</p>
+                          <p className="text-sm text-muted-foreground">Recevoir une notification pour les changements de statut</p>
+                        </div>
+                        <Switch defaultChecked />
+                      </div>
+                      
+                      <div className="flex items-center justify-between">
+                        <div>
+                          <p className="font-medium">Alertes importantes</p>
+                          <p className="text-sm text-muted-foreground">Notifications urgentes et critiques</p>
+                        </div>
+                        <Switch defaultChecked />
+                      </div>
+                    </AccordionContent>
+                  </AccordionItem>
                   
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <p className="font-medium">Nouvelles réservations</p>
-                      <p className="text-sm text-muted-foreground">Soyez notifié des nouvelles réservations</p>
-                    </div>
-                    <Switch defaultChecked />
-                  </div>
+                  <AccordionItem value="sms-notifications" className="border rounded-lg px-4">
+                    <AccordionTrigger className="py-4">Notifications SMS</AccordionTrigger>
+                    <AccordionContent className="space-y-4 pb-4">
+                      <div className="flex items-center justify-between">
+                        <div>
+                          <p className="font-medium">Réservations urgentes</p>
+                          <p className="text-sm text-muted-foreground">Recevoir un SMS pour les réservations de dernière minute</p>
+                        </div>
+                        <Switch defaultChecked />
+                      </div>
+                      
+                      <div className="flex items-center justify-between">
+                        <div>
+                          <p className="font-medium">Annulations</p>
+                          <p className="text-sm text-muted-foreground">Recevoir un SMS en cas d'annulation</p>
+                        </div>
+                        <Switch defaultChecked />
+                      </div>
+                    </AccordionContent>
+                  </AccordionItem>
                   
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <p className="font-medium">Rappels de réservations</p>
-                      <p className="text-sm text-muted-foreground">Recevez un rappel avant vos réservations</p>
-                    </div>
-                    <Switch defaultChecked />
-                  </div>
-                </div>
+                  <AccordionItem value="in-app-notifications" className="border rounded-lg px-4">
+                    <AccordionTrigger className="py-4">Notifications dans l'application</AccordionTrigger>
+                    <AccordionContent className="space-y-4 pb-4">
+                      <div className="flex items-center justify-between">
+                        <div>
+                          <p className="font-medium">Activité du compte</p>
+                          <p className="text-sm text-muted-foreground">Nouvelles réservations, paiements, etc.</p>
+                        </div>
+                        <Switch defaultChecked />
+                      </div>
+                      
+                      <div className="flex items-center justify-between">
+                        <div>
+                          <p className="font-medium">Communications</p>
+                          <p className="text-sm text-muted-foreground">Messages des clients et répartiteurs</p>
+                        </div>
+                        <Switch defaultChecked />
+                      </div>
+                      
+                      <div className="flex items-center justify-between">
+                        <div>
+                          <p className="font-medium">Mises à jour</p>
+                          <p className="text-sm text-muted-foreground">Nouvelles fonctionnalités et améliorations</p>
+                        </div>
+                        <Switch />
+                      </div>
+                    </AccordionContent>
+                  </AccordionItem>
+                </Accordion>
               </div>
               
               <Button type="submit" className="w-full">Enregistrer les préférences</Button>
@@ -205,7 +319,86 @@ const Settings = () => {
                 </div>
               </div>
               
-              <Button className="w-full">Ajouter une nouvelle méthode</Button>
+              <Dialog open={showPaymentDialog} onOpenChange={setShowPaymentDialog}>
+                <DialogTrigger asChild>
+                  <Button className="w-full">Ajouter une nouvelle méthode</Button>
+                </DialogTrigger>
+                <DialogContent className="sm:max-w-[425px]">
+                  <DialogHeader>
+                    <DialogTitle>Ajouter une méthode de paiement</DialogTitle>
+                  </DialogHeader>
+                  <form onSubmit={handleAddPaymentMethod}>
+                    <div className="space-y-4 py-4">
+                      <div className="space-y-2">
+                        <Label htmlFor="payment-type">Type de méthode de paiement</Label>
+                        <Select value={paymentMethod} onValueChange={setPaymentMethod}>
+                          <SelectTrigger>
+                            <SelectValue placeholder="Sélectionner un type" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="card">Carte bancaire</SelectItem>
+                            <SelectItem value="bank">Coordonnées bancaires (RIB)</SelectItem>
+                          </SelectContent>
+                        </Select>
+                      </div>
+                      
+                      {paymentMethod === "card" && (
+                        <div className="space-y-4">
+                          <div className="space-y-2">
+                            <Label htmlFor="card-number">Numéro de carte</Label>
+                            <Input id="card-number" placeholder="1234 5678 9012 3456" />
+                          </div>
+                          
+                          <div className="grid grid-cols-2 gap-4">
+                            <div className="space-y-2">
+                              <Label htmlFor="expiry">Date d'expiration</Label>
+                              <Input id="expiry" placeholder="MM/YY" />
+                            </div>
+                            <div className="space-y-2">
+                              <Label htmlFor="cvc">CVC</Label>
+                              <Input id="cvc" placeholder="123" />
+                            </div>
+                          </div>
+                          
+                          <div className="space-y-2">
+                            <Label htmlFor="card-name">Nom sur la carte</Label>
+                            <Input id="card-name" placeholder="Jean Dupont" />
+                          </div>
+                        </div>
+                      )}
+                      
+                      {paymentMethod === "bank" && (
+                        <div className="space-y-4">
+                          <div className="space-y-2">
+                            <Label htmlFor="account-name">Titulaire du compte</Label>
+                            <Input id="account-name" placeholder="Jean Dupont" />
+                          </div>
+                          
+                          <div className="space-y-2">
+                            <Label htmlFor="iban">IBAN</Label>
+                            <Input id="iban" placeholder="FR76 1234 5678 9012 3456 7890 123" />
+                          </div>
+                          
+                          <div className="space-y-2">
+                            <Label htmlFor="bic">BIC / SWIFT</Label>
+                            <Input id="bic" placeholder="ABCDEFGHXXX" />
+                          </div>
+                          
+                          <div className="space-y-2">
+                            <Label htmlFor="bank-name">Nom de la banque</Label>
+                            <Input id="bank-name" placeholder="Banque Populaire" />
+                          </div>
+                        </div>
+                      )}
+                    </div>
+                    
+                    <div className="flex justify-end gap-3">
+                      <Button variant="outline" type="button" onClick={() => setShowPaymentDialog(false)}>Annuler</Button>
+                      <Button type="submit">Enregistrer</Button>
+                    </div>
+                  </form>
+                </DialogContent>
+              </Dialog>
             </div>
             
             <h3 className="text-lg font-medium mt-8 mb-4">Historique de facturation</h3>
@@ -287,6 +480,47 @@ const Settings = () => {
                 </div>
                 <Button variant="destructive">Supprimer</Button>
               </div>
+            </div>
+          </div>
+        </TabsContent>
+        
+        <TabsContent value="language" className="bg-white rounded-lg shadow p-4 md:p-6">
+          <div className="space-y-6">
+            <h3 className="text-lg font-medium mb-4 flex items-center">
+              <Globe className="mr-2 h-5 w-5" />
+              Préférences linguistiques
+            </h3>
+            
+            <LanguageCard />
+            
+            <div className="space-y-4 mt-6">
+              <h4 className="text-md font-medium">Langues disponibles</h4>
+              <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-3">
+                {["fr", "en", "es", "de", "it", "ar", "zh", "ru", "pt", "ja"].map((lang) => (
+                  <div key={lang} className="p-3 border rounded-md flex items-center justify-center text-center">
+                    {lang === "fr" && "Français"}
+                    {lang === "en" && "English"}
+                    {lang === "es" && "Español"}
+                    {lang === "de" && "Deutsch"}
+                    {lang === "it" && "Italiano"}
+                    {lang === "ar" && "العربية"}
+                    {lang === "zh" && "中文"}
+                    {lang === "ru" && "Русский"}
+                    {lang === "pt" && "Português"}
+                    {lang === "ja" && "日本語"}
+                  </div>
+                ))}
+              </div>
+            </div>
+            
+            <div className="border-t pt-6 mt-6">
+              <div className="flex items-center gap-2 text-amber-600">
+                <AlertCircle className="h-5 w-5" />
+                <p className="text-sm font-medium">La traduction automatique peut ne pas être parfaite.</p>
+              </div>
+              <p className="text-sm text-muted-foreground mt-2">
+                Nous nous efforçons d'améliorer constamment nos traductions. Si vous remarquez des erreurs, n'hésitez pas à nous les signaler.
+              </p>
             </div>
           </div>
         </TabsContent>
