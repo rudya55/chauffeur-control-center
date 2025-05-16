@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { format, parseISO, isValid, startOfWeek, endOfWeek, eachDayOfInterval, startOfDay, endOfDay } from "date-fns";
 import { fr } from "date-fns/locale";
@@ -201,27 +200,29 @@ const Calendar = () => {
       
       <div className="flex justify-between items-center mb-4">
         <h2 className="text-xl font-semibold">Calendrier</h2>
-        <ToggleGroup type="single" value={viewMode} onValueChange={(value) => value && setViewMode(value as "day" | "week" | "month")}>
-          <ToggleGroupItem value="day" aria-label="Vue jour">
-            Jour
-          </ToggleGroupItem>
-          <ToggleGroupItem value="week" aria-label="Vue semaine">
-            Semaine
-          </ToggleGroupItem>
-          <ToggleGroupItem value="month" aria-label="Vue mois">
-            Mois
-          </ToggleGroupItem>
-        </ToggleGroup>
       </div>
       
       <div className="grid grid-cols-1 md:grid-cols-12 gap-6">
         {/* Calendrier */}
         <Card className="md:col-span-7">
           <CardHeader className="pb-2">
-            <CardTitle className="flex items-center">
-              <CalendarIcon className="mr-2 h-5 w-5" />
-              Calendrier
-            </CardTitle>
+            <div className="flex justify-between items-center">
+              <CardTitle className="flex items-center">
+                <CalendarIcon className="mr-2 h-5 w-5" />
+                Calendrier
+              </CardTitle>
+              <ToggleGroup type="single" value={viewMode} onValueChange={(value) => value && setViewMode(value as "day" | "week" | "month")}>
+                <ToggleGroupItem value="day" aria-label="Vue jour">
+                  Jour
+                </ToggleGroupItem>
+                <ToggleGroupItem value="week" aria-label="Vue semaine">
+                  Semaine
+                </ToggleGroupItem>
+                <ToggleGroupItem value="month" aria-label="Vue mois">
+                  Mois
+                </ToggleGroupItem>
+              </ToggleGroup>
+            </div>
           </CardHeader>
           <CardContent className="pt-2">
             <CalendarComponent
