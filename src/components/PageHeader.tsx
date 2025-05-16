@@ -22,7 +22,7 @@ const PageHeader = ({ title, showBackButton = true, className, onMenuToggle }: P
   return (
     <div className={`flex justify-between items-center mb-6 ${className}`}>
       <div className="flex items-center gap-2">
-        {/* Add back the menu hamburger button */}
+        {/* Menu hamburger button */}
         {onMenuToggle && (
           <Button 
             variant="ghost" 

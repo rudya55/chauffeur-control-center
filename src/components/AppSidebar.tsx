@@ -6,7 +6,8 @@ import {
   Settings,
   Mail,
   FileText as FileTextIcon,
-  ArrowLeft
+  ArrowLeft,
+  Home
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useIsMobile } from "@/hooks/use-mobile";
@@ -19,7 +20,6 @@ import {
   SidebarMenu,
   SidebarMenuButton,
   SidebarMenuItem,
-  SidebarTrigger,
   useSidebar,
 } from "@/components/ui/sidebar";
 import { Button } from "@/components/ui/button";
@@ -54,6 +54,7 @@ const AppSidebar = ({ isOpen = false, onClose }: AppSidebarProps) => {
   const driverRating = 4.8;
   
   const menuItems = [
+    { title: t("home"), url: "/", icon: Home },
     { title: t("planning"), url: "/calendar", icon: Calendar },
     { title: t("reservations"), url: "/reservations", icon: FileText },
     { title: t("analytics"), url: "/analytics", icon: BarChart4 },
