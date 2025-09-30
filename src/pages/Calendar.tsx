@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { format, parseISO, isValid, startOfWeek, endOfWeek, eachDayOfInterval, startOfDay, endOfDay } from "date-fns";
 import { fr } from "date-fns/locale";
 import PageHeader from "@/components/PageHeader";
-import { Calendar as CalendarIcon, CircleDot } from "lucide-react";
+import { Calendar as CalendarIcon } from "lucide-react";
 import { Calendar as CalendarComponent } from "@/components/ui/calendar";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { ReservationType } from "@/types/reservation";
@@ -41,7 +41,6 @@ const Calendar = () => {
       startDate = startOfWeek(selectedDate, { locale: fr });
       endDate = endOfWeek(selectedDate, { locale: fr });
     } else {
-      // Month view uses the selected date to filter
       return getDailyReservations();
     }
     
@@ -53,7 +52,6 @@ const Calendar = () => {
     });
   };
 
-  // Réservations du jour sélectionné
   const getDailyReservations = () => {
     if (!selectedDate) return [];
     
@@ -66,7 +64,6 @@ const Calendar = () => {
 
   const viewReservations = getReservationsForView();
 
-  // Fonction pour obtenir toutes les dates avec des réservations
   const getDaysWithReservations = () => {
     const daysWithReservations: Record<string, string> = {};
     
@@ -74,8 +71,6 @@ const Calendar = () => {
       const reservationDate = parseISO(reservation.date);
       if (isValid(reservationDate)) {
         const dateString = format(reservationDate, 'yyyy-MM-dd');
-        // Stocker le statut de la réservation la plus prioritaire pour cette date
-        // Priorité: started > arrived > onBoard > accepted > completed
         const currentStatus = daysWithReservations[dateString];
         const newStatus = reservation.status || 'pending';
         
@@ -100,20 +95,17 @@ const Calendar = () => {
 
   const daysWithReservations = getDaysWithReservations();
 
-  // Rendu personnalisé pour les jours avec des réservations
   const renderDayContent = (day: Date) => {
     const dateString = format(day, 'yyyy-MM-dd');
     const status = daysWithReservations[dateString];
 
     if (!status) return null;
 
-    // Nombre de réservations pour cette date
     const count = reservations.filter(res => {
       const resDate = parseISO(res.date);
       return isValid(resDate) && format(resDate, 'yyyy-MM-dd') === dateString;
     }).length;
 
-    // Couleurs en fonction du statut
     let dotColor = "bg-gray-400";
     if (status === 'started') dotColor = "bg-amber-500";
     else if (status === 'arrived') dotColor = "bg-purple-500";
@@ -131,55 +123,50 @@ const Calendar = () => {
     );
   };
 
-  // Couleur en fonction du statut
   const getStatusColor = (status?: string) => {
     switch (status) {
       case 'accepted':
-        return 'bg-blue-100 text-blue-800 border-blue-300';
+        return 'bg-blue-100 text-blue-800 border-blue-300 dark:bg-blue-900/30 dark:text-blue-300';
       case 'started':
-        return 'bg-amber-100 text-amber-800 border-amber-300';
+        return 'bg-amber-100 text-amber-800 border-amber-300 dark:bg-amber-900/30 dark:text-amber-300';
       case 'arrived':
-        return 'bg-purple-100 text-purple-800 border-purple-300';
+        return 'bg-purple-100 text-purple-800 border-purple-300 dark:bg-purple-900/30 dark:text-purple-300';
       case 'onBoard':
-        return 'bg-teal-100 text-teal-800 border-teal-300';
+        return 'bg-teal-100 text-teal-800 border-teal-300 dark:bg-teal-900/30 dark:text-teal-300';
       case 'completed':
-        return 'bg-green-100 text-green-800 border-green-300';
+        return 'bg-green-100 text-green-800 border-green-300 dark:bg-green-900/30 dark:text-green-300';
       default:
-        return 'bg-gray-100 text-gray-800 border-gray-300';
+        return 'bg-gray-100 text-gray-800 border-gray-300 dark:bg-gray-900/30 dark:text-gray-300';
     }
   };
 
-  // Fonction pour styliser les jours dans le calendrier
   const getDayStyle = (date: Date): React.CSSProperties => {
     const dateString = format(date, 'yyyy-MM-dd');
     const status = daysWithReservations[dateString];
     
     if (!status) return {};
 
-    // Styles pour les différents statuts
     switch (status) {
       case 'accepted':
-        return { backgroundColor: 'rgba(59, 130, 246, 0.15)' };
+        return { backgroundColor: 'rgba(59, 130, 246, 0.2)' };
       case 'started':
-        return { backgroundColor: 'rgba(245, 158, 11, 0.15)' };
+        return { backgroundColor: 'rgba(245, 158, 11, 0.2)' };
       case 'arrived':
-        return { backgroundColor: 'rgba(168, 85, 247, 0.15)' };
+        return { backgroundColor: 'rgba(168, 85, 247, 0.2)' };
       case 'onBoard':
-        return { backgroundColor: 'rgba(20, 184, 166, 0.15)' };
+        return { backgroundColor: 'rgba(20, 184, 166, 0.2)' };
       case 'completed':
-        return { backgroundColor: 'rgba(34, 197, 94, 0.15)' };
+        return { backgroundColor: 'rgba(34, 197, 94, 0.2)' };
       default:
         return {};
     }
   };
 
-  // Ouvrir le dialogue des détails de réservation
   const handleOpenReservationDetails = (reservation: ReservationType) => {
     setSelectedReservation(reservation);
     setShowReservationDetails(true);
   };
 
-  // Générer le titre selon le mode d'affichage
   const getViewTitle = () => {
     if (!selectedDate) return "Sélectionnez une date";
     
@@ -194,21 +181,51 @@ const Calendar = () => {
     }
   };
 
+  const getViewModeColor = (mode: string) => {
+    switch (mode) {
+      case 'day':
+        return 'data-[state=on]:bg-blue-500 data-[state=on]:text-white';
+      case 'week':
+        return 'data-[state=on]:bg-purple-500 data-[state=on]:text-white';
+      case 'month':
+        return 'data-[state=on]:bg-green-500 data-[state=on]:text-white';
+      default:
+        return '';
+    }
+  };
+
   return (
-    <div className="p-4 sm:p-6">
+    <div className="p-4 sm:p-6 animate-fade-in">
       <PageHeader title="planning" />
       
       <div className="flex justify-between items-center mb-4">
         <h2 className="text-xl font-semibold flex items-center gap-4">
           Calendrier
-          <ToggleGroup type="single" value={viewMode} onValueChange={(value) => value && setViewMode(value as "day" | "week" | "month")}>
-            <ToggleGroupItem value="day" aria-label="Vue jour">
+          <ToggleGroup 
+            type="single" 
+            value={viewMode} 
+            onValueChange={(value) => value && setViewMode(value as "day" | "week" | "month")}
+            className="border rounded-lg"
+          >
+            <ToggleGroupItem 
+              value="day" 
+              aria-label="Vue jour"
+              className="data-[state=on]:bg-blue-500 data-[state=on]:text-white transition-all"
+            >
               Jour
             </ToggleGroupItem>
-            <ToggleGroupItem value="week" aria-label="Vue semaine">
+            <ToggleGroupItem 
+              value="week" 
+              aria-label="Vue semaine"
+              className="data-[state=on]:bg-purple-500 data-[state=on]:text-white transition-all"
+            >
               Semaine
             </ToggleGroupItem>
-            <ToggleGroupItem value="month" aria-label="Vue mois">
+            <ToggleGroupItem 
+              value="month" 
+              aria-label="Vue mois"
+              className="data-[state=on]:bg-green-500 data-[state=on]:text-white transition-all"
+            >
               Mois
             </ToggleGroupItem>
           </ToggleGroup>
@@ -216,12 +233,11 @@ const Calendar = () => {
       </div>
       
       <div className="flex flex-col gap-6">
-        {/* Calendrier */}
-        <Card>
-          <CardHeader className="pb-2">
+        <Card className="hover-scale border-t-4 border-t-indigo-500">
+          <CardHeader className="pb-2 bg-gradient-to-r from-indigo-50 to-white dark:from-indigo-950/20 dark:to-background">
             <div className="flex justify-between items-center">
-              <CardTitle className="flex items-center">
-                <CalendarIcon className="mr-2 h-5 w-5" />
+              <CardTitle className="flex items-center text-xl">
+                <CalendarIcon className="mr-2 h-5 w-5 text-indigo-600" />
                 Calendrier
               </CardTitle>
             </div>
@@ -243,7 +259,7 @@ const Calendar = () => {
               }}
               components={{
                 DayContent: ({ date }) => (
-                  <div className="relative w-full h-full flex items-center justify-center" style={getDayStyle(date)}>
+                  <div className="relative w-full h-full flex items-center justify-center transition-all" style={getDayStyle(date)}>
                     <div>{format(date, 'd')}</div>
                     {renderDayContent(date)}
                   </div>
@@ -253,10 +269,9 @@ const Calendar = () => {
           </CardContent>
         </Card>
         
-        {/* Liste des réservations du jour */}
-        <Card>
-          <CardHeader className="pb-2">
-            <CardTitle>
+        <Card className="hover-scale border-t-4 border-t-pink-500">
+          <CardHeader className="pb-2 bg-gradient-to-r from-pink-50 to-white dark:from-pink-950/20 dark:to-background">
+            <CardTitle className="text-xl">
               {getViewTitle()}
             </CardTitle>
           </CardHeader>
@@ -275,20 +290,20 @@ const Calendar = () => {
                   <div 
                     key={reservation.id}
                     className={cn(
-                      "p-4 border rounded-lg cursor-pointer transition-all hover:shadow-md",
+                      "p-4 border-2 rounded-lg cursor-pointer transition-all hover:shadow-lg hover-scale",
                       getStatusColor(reservation.status)
                     )}
                     onClick={() => handleOpenReservationDetails(reservation)}
                   >
                     <div className="flex justify-between items-start mb-2">
                       <div>
-                        <p className="font-medium">{reservation.clientName}</p>
+                        <p className="font-medium text-lg">{reservation.clientName}</p>
                         <p className="text-sm">
                           {format(parseISO(reservation.date), 'dd/MM/yyyy HH:mm')}
                         </p>
                       </div>
                       <Badge variant="outline" className={cn(
-                        "border", 
+                        "border-2 font-semibold", 
                         reservation.status === 'accepted' && "bg-blue-500 text-white border-blue-600",
                         reservation.status === 'started' && "bg-amber-500 text-white border-amber-600",
                         reservation.status === 'arrived' && "bg-purple-500 text-white border-purple-600",
@@ -323,7 +338,6 @@ const Calendar = () => {
         </Card>
       </div>
 
-      {/* Dialogue des détails de réservation */}
       <Dialog 
         open={showReservationDetails} 
         onOpenChange={setShowReservationDetails}
