@@ -11,7 +11,8 @@ import {
   Home,
   Moon,
   Sun,
-  Bell
+  Bell,
+  Wallet
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useIsMobile } from "@/hooks/use-mobile";
@@ -64,6 +65,7 @@ const AppSidebar = ({ isOpen = false, onClose }: AppSidebarProps) => {
     { title: t("home"), url: "/", icon: Home },
     { title: t("planning"), url: "/calendar", icon: Calendar },
     { title: t("reservations"), url: "/reservations", icon: FileText },
+    { title: t("accounting"), url: "/accounting", icon: Wallet },
     { title: t("analytics"), url: "/analytics", icon: BarChart4 },
     { title: t("settings"), url: "/settings", icon: Settings },
     { title: t("contact"), url: "/contact", icon: Mail },

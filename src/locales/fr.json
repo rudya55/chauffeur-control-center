@@ -17,6 +17,10 @@
   "notifications": "Notifications",
   "mark_all_read": "Tout marquer comme lu",
   "no_notifications": "Aucune notification",
+  "planning": "Planning",
+  "general_conditions": "Conditions Générales",
+  "contact": "Contact",
+  "back_to_home": "Retour à l'accueil",
   "notification": {
     "new_reservation": "Nouvelle réservation",
     "new_reservation_message": "Vous avez une nouvelle réservation disponible.",

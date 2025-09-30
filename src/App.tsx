@@ -12,6 +12,7 @@ import Reservations from "@/pages/Reservations";
 import Contact from "@/pages/Contact";
 import Settings from "@/pages/Settings";
 import Terms from "@/pages/Terms";
+import Accounting from "@/pages/Accounting";
 import NotFound from "@/pages/NotFound";
 
 function App() {
@@ -29,6 +30,7 @@ function App() {
               <Route path="analytics" element={<Analytics />} />
               <Route path="calendar" element={<Calendar />} />
               <Route path="reservations" element={<Reservations />} />
+              <Route path="accounting" element={<Accounting />} />
               <Route path="contact" element={<Contact />} />
               <Route path="settings" element={<Settings />} />
               <Route path="terms" element={<Terms />} />
