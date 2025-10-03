@@ -284,13 +284,24 @@ const Calendar = () => {
               onSelect={(day) => setSelectedDate(day)}
               className="rounded-md border"
               locale={fr}
+              showOutsideDays={viewMode === "month"}
               modifiers={{
-                booked: (date) => Boolean(daysWithReservations[format(date, 'yyyy-MM-dd')])
+                booked: (date) => Boolean(daysWithReservations[format(date, 'yyyy-MM-dd')]),
+                hidden: (date) => {
+                  if (!selectedDate) return false;
+                  if (viewMode === 'day') {
+                    return format(date, 'yyyy-MM-dd') !== format(selectedDate, 'yyyy-MM-dd');
+                  }
+                  if (viewMode === 'week') {
+                    const start = startOfWeek(selectedDate, { locale: fr });
+                    const end = endOfWeek(selectedDate, { locale: fr });
+                    return date < start || date > end;
+                  }
+                  return false; // month: show all
+                },
               }}
               modifiersStyles={{
-                booked: { 
-                  textDecoration: 'none'
-                }
+                booked: { textDecoration: 'none' },
               }}
               components={{
                 DayContent: ({ date }) => (
