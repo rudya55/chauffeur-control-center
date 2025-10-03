@@ -309,6 +309,27 @@ export const useReservations = () => {
     localStorage.setItem('completedReservations', JSON.stringify(completedReservations));
   }, [myReservations, completedReservations]);
 
+  // Déplacer automatiquement toute réservation marquée 'completed' vers l'onglet Terminé
+  useEffect(() => {
+    const completedInCurrent = myReservations.filter(r => r.status === 'completed');
+    if (completedInCurrent.length === 0) return;
+
+    // Retirer des réservations en cours
+    setMyReservations(prev => prev.filter(r => r.status !== 'completed'));
+
+    // Ajouter aux terminées en évitant les doublons
+    setCompletedReservations(prev => {
+      const existing = new Set(prev.map(r => r.id));
+      const toAdd = completedInCurrent
+        .filter(r => !existing.has(r.id))
+        .map(r => ({
+          ...r,
+          dropoffTime: r.dropoffTime || new Date().toISOString()
+        }));
+      return [...prev, ...toAdd];
+    });
+  }, [myReservations, setMyReservations, setCompletedReservations]);
+
   return {
     upcomingReservations,
     myReservations,
