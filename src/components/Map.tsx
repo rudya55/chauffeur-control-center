@@ -128,7 +128,7 @@ const Map = ({
         // @ts-ignore
         mapInstanceRef.current = new window.google.maps.Map(mapRef.current, mapOptions);
 
-        // Créer un élément DOM pour l'icône de voiture
+        // Créer un élément DOM pour l'icône de voiture (pour Advanced Marker)
         const carIconDiv = document.createElement('div');
         const root = ReactDOM.createRoot(carIconDiv);
         root.render(
@@ -147,14 +147,34 @@ const Map = ({
           </div>
         );
 
-        // Add a marker for the driver's position with car icon
-        // @ts-ignore
-        markerRef.current = new window.google.maps.marker.AdvancedMarkerElement({
-          position: center,
-          map: mapInstanceRef.current,
-          content: carIconDiv,
-          title: "Position"
-        });
+        // Créer le marqueur voiture avec fallback si AdvancedMarkerElement indisponible
+        const hasAdvanced = Boolean((window as any)?.google?.maps?.marker?.AdvancedMarkerElement);
+        if (hasAdvanced) {
+          // @ts-ignore
+          markerRef.current = new window.google.maps.marker.AdvancedMarkerElement({
+            position: center,
+            map: mapInstanceRef.current,
+            content: carIconDiv,
+            title: "Position"
+          });
+        } else {
+          // @ts-ignore
+          markerRef.current = new window.google.maps.Marker({
+            position: center,
+            map: mapInstanceRef.current,
+            icon: {
+              // @ts-ignore
+              path: window.google.maps.SymbolPath.CIRCLE,
+              scale: 12,
+              fillColor: theme === 'dark' ? '#d4af37' : '#1a73e8',
+              fillOpacity: 1,
+              strokeColor: '#ffffff',
+              strokeWeight: 3,
+            },
+            label: { text: '🚗', fontSize: '14px' },
+            title: 'Position'
+          });
+        }
 
         // Si nous avons un itinéraire, on affiche une polyline
         if (route && route.length > 1) {
@@ -188,7 +208,14 @@ const Map = ({
                 
                 if (mapInstanceRef.current && markerRef.current) {
                   mapInstanceRef.current.setCenter(userLocation);
-                  markerRef.current.setPosition(userLocation);
+                  if (markerRef.current?.setPosition) {
+                    markerRef.current.setPosition(userLocation);
+                  } else {
+                    // Advanced Marker
+                    try {
+                      markerRef.current.position = userLocation;
+                    } catch {}
+                  }
                 }
               },
               () => {
@@ -271,25 +298,42 @@ const Map = ({
       mapInstanceRef.current.setOptions({ styles });
       
       if (markerRef.current) {
-        // Recréer l'icône de voiture avec la nouvelle couleur
-        const carIconDiv = document.createElement('div');
-        const root = ReactDOM.createRoot(carIconDiv);
-        root.render(
-          <div style={{ 
-            width: '40px', 
-            height: '40px', 
-            display: 'flex', 
-            alignItems: 'center', 
-            justifyContent: 'center',
-            background: theme === 'dark' ? '#d4af37' : '#1a73e8',
-            borderRadius: '50%',
-            border: '3px solid white',
-            boxShadow: '0 2px 6px rgba(0,0,0,0.3)'
-          }}>
-            <Car color="white" size={20} />
-          </div>
-        );
-        markerRef.current.content = carIconDiv;
+        const isAdvanced = 'content' in markerRef.current;
+        if (isAdvanced) {
+          // Recréer l'icône de voiture avec la nouvelle couleur
+          const carIconDiv = document.createElement('div');
+          const root = ReactDOM.createRoot(carIconDiv);
+          root.render(
+            <div style={{ 
+              width: '40px', 
+              height: '40px', 
+              display: 'flex', 
+              alignItems: 'center', 
+              justifyContent: 'center',
+              background: theme === 'dark' ? '#d4af37' : '#1a73e8',
+              borderRadius: '50%',
+              border: '3px solid white',
+              boxShadow: '0 2px 6px rgba(0,0,0,0.3)'
+            }}>
+              <Car color="white" size={20} />
+            </div>
+          );
+          // @ts-ignore
+          markerRef.current.content = carIconDiv;
+        } else if (markerRef.current.setIcon) {
+          // @ts-ignore
+          markerRef.current.setIcon({
+            // @ts-ignore
+            path: window.google.maps.SymbolPath.CIRCLE,
+            scale: 12,
+            fillColor: theme === 'dark' ? '#d4af37' : '#1a73e8',
+            fillOpacity: 1,
+            strokeColor: '#ffffff',
+            strokeWeight: 3,
+          });
+          // @ts-ignore
+          markerRef.current.setLabel({ text: '🚗', fontSize: '14px' });
+        }
       }
 
       if (polylineRef.current) {
