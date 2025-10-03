@@ -25,10 +25,8 @@ const Map = ({
   const polylineRef = useRef<any>(null);
   const { theme } = useNextTheme();
   
-  // Google Maps API key management
-  const [apiKey, setApiKey] = useState<string>(() => localStorage.getItem('googleMapsApiKey') || "");
-  const [tempKey, setTempKey] = useState<string>("");
-  const [showKeyPrompt, setShowKeyPrompt] = useState<boolean>(() => !Boolean(localStorage.getItem('googleMapsApiKey')));
+  // Google Maps API key
+  const apiKey = "AIzaSyBInRJxBA3-aLlx6o7Np8Mic0yXHLnaFQE";
 
 
   useEffect(() => {
@@ -364,14 +362,6 @@ const Map = ({
     }
   };
 
-  const handleSaveKey = () => {
-    const trimmed = tempKey.trim();
-    if (trimmed) {
-      localStorage.setItem('googleMapsApiKey', trimmed);
-      setApiKey(trimmed);
-      setShowKeyPrompt(false);
-    }
-  };
 
   return (
 
@@ -380,28 +370,7 @@ const Map = ({
     >
       <div ref={mapRef} className="h-full w-full" />
       
-      {/* API key prompt */}
-      {!apiKey && (
-        <div className="absolute top-4 right-4 z-50 w-80 max-w-[90vw] bg-background/95 backdrop-blur border rounded-lg shadow-md p-3">
-          <div className="text-sm font-medium mb-2">Entrez votre clé Google Maps</div>
-          <input
-            type="text"
-            placeholder="Ex: AIza..."
-            value={tempKey}
-            onChange={(e) => setTempKey(e.target.value)}
-            className="w-full px-3 py-2 rounded-md border bg-background text-foreground placeholder:text-muted-foreground"
-          />
-          <button
-            onClick={handleSaveKey}
-            className="mt-2 w-full px-3 py-2 rounded-md bg-primary text-primary-foreground"
-          >
-            Enregistrer la clé
-          </button>
-          <p className="text-xs text-muted-foreground mt-1">La clé est stockée localement sur cet appareil.</p>
-        </div>
-      )}
-      
-      {/* Menu toggle button - only on the left side, not the right (removed) */}
+      {/* Menu toggle button */}
 
       <button 
         className="absolute top-4 left-4 z-50 bg-card text-foreground border p-2 rounded-md shadow-md"
