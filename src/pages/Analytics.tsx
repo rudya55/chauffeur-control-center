@@ -19,12 +19,12 @@ const Analytics = () => {
   
   // Mock data for charts
   const revenueData = [
-    { month: "Jan", revenue: 950 },
-    { month: "Feb", revenue: 1100 },
-    { month: "Mar", revenue: 980 },
-    { month: "Apr", revenue: 1250 },
-    { month: "May", revenue: 1400 },
-    { month: "Jun", revenue: 1200 },
+    { month: "Janvier", revenue: 950 },
+    { month: "Février", revenue: 1100 },
+    { month: "Mars", revenue: 980 },
+    { month: "Avril", revenue: 1250 },
+    { month: "Mai", revenue: 1400 },
+    { month: "Juin", revenue: 1200 },
   ];
   
   const weeklyRides = [
@@ -38,12 +38,12 @@ const Analytics = () => {
   ];
   
   const monthlyStats = [
-    { month: "Jan", completed: 68, canceled: 12 },
-    { month: "Feb", completed: 72, canceled: 8 },
-    { month: "Mar", completed: 80, canceled: 10 },
-    { month: "Apr", completed: 92, canceled: 5 },
-    { month: "May", completed: 95, canceled: 7 },
-    { month: "Jun", completed: 85, canceled: 9 },
+    { month: "Janvier", completed: 68, canceled: 12 },
+    { month: "Février", completed: 72, canceled: 8 },
+    { month: "Mars", completed: 80, canceled: 10 },
+    { month: "Avril", completed: 92, canceled: 5 },
+    { month: "Mai", completed: 95, canceled: 7 },
+    { month: "Juin", completed: 85, canceled: 9 },
   ];
   
   const dispatcherData = [
