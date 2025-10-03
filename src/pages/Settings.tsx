@@ -121,8 +121,9 @@ const Settings = () => {
       <PageHeader title="settings" />
       
       <Tabs defaultValue="profile" className="w-full">
-        <TabsList className="grid w-full grid-cols-6 mb-6">
+        <TabsList className="grid w-full grid-cols-7 mb-6">
           <TabsTrigger value="profile">Profil</TabsTrigger>
+          <TabsTrigger value="map">Carte</TabsTrigger>
           <TabsTrigger value="notifications">Notifications</TabsTrigger>
           <TabsTrigger value="payment">Paiement</TabsTrigger>
           <TabsTrigger value="security">Sécurité</TabsTrigger>
@@ -193,6 +194,44 @@ const Settings = () => {
               <Button type="submit" className="w-full">Enregistrer les modifications</Button>
             </div>
           </form>
+        </TabsContent>
+
+        <TabsContent value="map" className="bg-white rounded-lg shadow p-4 md:p-6">
+          <div className="space-y-6">
+            <div>
+              <h3 className="text-lg font-medium mb-4 flex items-center">
+                <Globe className="mr-2 h-5 w-5" />
+                Paramètres de la carte
+              </h3>
+              
+              <div className="space-y-4">
+                <div className="space-y-2">
+                  <Label htmlFor="car-type">Type de voiture sur la carte</Label>
+                  <Select 
+                    defaultValue={localStorage.getItem('mapCarType') || 'sedan'} 
+                    onValueChange={(value) => {
+                      localStorage.setItem('mapCarType', value);
+                      window.dispatchEvent(new Event('carTypeChanged'));
+                      toast.success("Type de voiture mis à jour");
+                    }}
+                  >
+                    <SelectTrigger>
+                      <SelectValue placeholder="Choisir un type de voiture" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="sedan">🚗 Berline</SelectItem>
+                      <SelectItem value="suv">🚙 SUV</SelectItem>
+                      <SelectItem value="sports">🏎️ Sportive</SelectItem>
+                      <SelectItem value="taxi">🚕 Taxi</SelectItem>
+                    </SelectContent>
+                  </Select>
+                  <p className="text-sm text-muted-foreground">
+                    Choisissez l'icône de voiture qui s'affichera sur la carte
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
         </TabsContent>
         
         <TabsContent value="notifications" className="bg-white rounded-lg shadow p-4 md:p-6">
