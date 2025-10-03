@@ -23,13 +23,19 @@ const Map = ({
   const markerRef = useRef<any>(null);
   const polylineRef = useRef<any>(null);
   const { theme } = useNextTheme();
+  
+  // Google Maps API key management
+  const [apiKey, setApiKey] = useState<string>(() => localStorage.getItem('googleMapsApiKey') || "");
+  const [tempKey, setTempKey] = useState<string>("");
+  const [showKeyPrompt, setShowKeyPrompt] = useState<boolean>(() => !Boolean(localStorage.getItem('googleMapsApiKey')));
+
 
   useEffect(() => {
     // Load Google Maps API script
     const loadMap = () => {
       if (!window.google) {
         const script = document.createElement('script');
-        script.src = `https://maps.googleapis.com/maps/api/js?key=AIzaSyBInRJxBA3-aLlx6o7Np8Mic0yXHLnaFQE&libraries=places`;
+        script.src = `https://maps.googleapis.com/maps/api/js?key=${apiKey}&libraries=places`;
         script.async = true;
         script.defer = true;
         script.onload = initMap;
@@ -181,7 +187,9 @@ const Map = ({
       }
     };
 
+    if (!apiKey) return;
     loadMap();
+
 
     // Update map when theme changes
     if (mapInstanceRef.current) {
@@ -277,7 +285,7 @@ const Map = ({
       markerRef.current = null;
       polylineRef.current = null;
     };
-  }, [center, zoom, route, theme]);
+  }, [center, zoom, route, theme, apiKey]);
 
   // Handle menu toggle click
   const handleMenuToggle = () => {
@@ -289,19 +297,51 @@ const Map = ({
     }
   };
 
+  const handleSaveKey = () => {
+    const trimmed = tempKey.trim();
+    if (trimmed) {
+      localStorage.setItem('googleMapsApiKey', trimmed);
+      setApiKey(trimmed);
+      setShowKeyPrompt(false);
+    }
+  };
+
   return (
+
     <div 
       className={cn("h-full w-full rounded-lg overflow-hidden relative", className)} 
     >
       <div ref={mapRef} className="h-full w-full" />
       
+      {/* API key prompt */}
+      {!apiKey && (
+        <div className="absolute top-4 right-4 z-50 w-80 max-w-[90vw] bg-background/95 backdrop-blur border rounded-lg shadow-md p-3">
+          <div className="text-sm font-medium mb-2">Entrez votre clé Google Maps</div>
+          <input
+            type="text"
+            placeholder="Ex: AIza..."
+            value={tempKey}
+            onChange={(e) => setTempKey(e.target.value)}
+            className="w-full px-3 py-2 rounded-md border bg-background text-foreground placeholder:text-muted-foreground"
+          />
+          <button
+            onClick={handleSaveKey}
+            className="mt-2 w-full px-3 py-2 rounded-md bg-primary text-primary-foreground"
+          >
+            Enregistrer la clé
+          </button>
+          <p className="text-xs text-muted-foreground mt-1">La clé est stockée localement sur cet appareil.</p>
+        </div>
+      )}
+      
       {/* Menu toggle button - only on the left side, not the right (removed) */}
+
       <button 
-        className="absolute top-4 left-4 z-50 bg-white dark:bg-background p-2 rounded-md shadow-md"
+        className="absolute top-4 left-4 z-50 bg-card text-foreground border p-2 rounded-md shadow-md"
         onClick={handleMenuToggle}
         aria-label="Toggle menu"
       >
-        <Menu className="h-5 w-5 text-gray-700 dark:text-primary" />
+        <Menu className="h-5 w-5 text-foreground" />
       </button>
     </div>
   );

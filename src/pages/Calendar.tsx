@@ -39,13 +39,18 @@ const Calendar = () => {
       }
     };
 
+    // Événement custom pour MAJ immédiate dans le même onglet
+    const handleCustomUpdate = () => loadReservations();
+
     window.addEventListener('storage', handleStorageChange);
+    window.addEventListener('calendarReservationsUpdated', handleCustomUpdate as EventListener);
     
-    // Vérifier les changements toutes les secondes
+    // Vérifier les changements toutes les secondes (fallback)
     const interval = setInterval(loadReservations, 1000);
 
     return () => {
       window.removeEventListener('storage', handleStorageChange);
+      window.removeEventListener('calendarReservationsUpdated', handleCustomUpdate as EventListener);
       clearInterval(interval);
     };
   }, []);

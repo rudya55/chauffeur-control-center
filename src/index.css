@@ -94,9 +94,4 @@
     @apply bg-background text-foreground;
   }
 
-  /* Make ALL text gold and bold in dark mode */
-  .dark * {
-    @apply text-primary;
-    font-weight: bold;
-  }
 }
