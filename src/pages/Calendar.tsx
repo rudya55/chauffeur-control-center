@@ -22,10 +22,32 @@ const Calendar = () => {
   
   // Charger les réservations du localStorage
   useEffect(() => {
-    const storedReservations = localStorage.getItem('calendarReservations');
-    if (storedReservations) {
-      setReservations(JSON.parse(storedReservations));
-    }
+    const loadReservations = () => {
+      const storedReservations = localStorage.getItem('calendarReservations');
+      if (storedReservations) {
+        setReservations(JSON.parse(storedReservations));
+      }
+    };
+
+    // Charger au montage
+    loadReservations();
+
+    // Écouter les changements du localStorage
+    const handleStorageChange = (e: StorageEvent) => {
+      if (e.key === 'calendarReservations') {
+        loadReservations();
+      }
+    };
+
+    window.addEventListener('storage', handleStorageChange);
+    
+    // Vérifier les changements toutes les secondes
+    const interval = setInterval(loadReservations, 1000);
+
+    return () => {
+      window.removeEventListener('storage', handleStorageChange);
+      clearInterval(interval);
+    };
   }, []);
 
   // Fonction pour obtenir les réservations selon le mode d'affichage
