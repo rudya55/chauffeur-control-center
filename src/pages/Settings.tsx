@@ -121,22 +121,22 @@ const Settings = () => {
       <PageHeader title="settings" />
       
       <Tabs defaultValue="profile" className="w-full">
-        <TabsList className="grid w-full grid-cols-7 mb-6">
-          <TabsTrigger value="profile">Profil</TabsTrigger>
-          <TabsTrigger value="map">Carte</TabsTrigger>
-          <TabsTrigger value="notifications">Notifications</TabsTrigger>
-          <TabsTrigger value="payment">Paiement</TabsTrigger>
-          <TabsTrigger value="security">Sécurité</TabsTrigger>
-          <TabsTrigger value="language">Langues</TabsTrigger>
-          <TabsTrigger value="documents">Documents</TabsTrigger>
+        <TabsList className="grid w-full grid-cols-2 sm:grid-cols-4 lg:grid-cols-7 mb-6 h-auto gap-2 bg-card p-2">
+          <TabsTrigger value="profile" className="text-xs sm:text-sm">Profil</TabsTrigger>
+          <TabsTrigger value="map" className="text-xs sm:text-sm">Carte</TabsTrigger>
+          <TabsTrigger value="notifications" className="text-xs sm:text-sm">Notifications</TabsTrigger>
+          <TabsTrigger value="payment" className="text-xs sm:text-sm">Paiement</TabsTrigger>
+          <TabsTrigger value="security" className="text-xs sm:text-sm">Sécurité</TabsTrigger>
+          <TabsTrigger value="language" className="text-xs sm:text-sm">Langues</TabsTrigger>
+          <TabsTrigger value="documents" className="text-xs sm:text-sm">Documents</TabsTrigger>
         </TabsList>
         
-        <TabsContent value="profile" className="bg-white rounded-lg shadow p-4 md:p-6">
+        <TabsContent value="profile" className="bg-card text-card-foreground rounded-lg shadow p-4 md:p-6">
           <form onSubmit={handleSaveProfile}>
             <div className="flex flex-col items-center mb-6">
               <Avatar className="h-24 w-24 mb-4">
                 <AvatarImage src={avatar} alt="Avatar" />
-                <AvatarFallback>JD</AvatarFallback>
+                <AvatarFallback className="bg-primary text-primary-foreground">JD</AvatarFallback>
               </Avatar>
               
               <Label 
@@ -155,35 +155,35 @@ const Settings = () => {
             </div>
             
             <div className="space-y-4">
-              <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+              <div className="flex flex-col gap-4">
                 <div className="space-y-2">
-                  <Label htmlFor="firstName">Prénom</Label>
-                  <Input id="firstName" defaultValue="Jean" />
+                  <Label htmlFor="firstName" className="text-foreground">Prénom</Label>
+                  <Input id="firstName" defaultValue="Jean" className="bg-background text-foreground" />
                 </div>
                 <div className="space-y-2">
-                  <Label htmlFor="lastName">Nom</Label>
-                  <Input id="lastName" defaultValue="Dupont" />
+                  <Label htmlFor="lastName" className="text-foreground">Nom</Label>
+                  <Input id="lastName" defaultValue="Dupont" className="bg-background text-foreground" />
                 </div>
               </div>
               
               <div className="space-y-2">
-                <Label htmlFor="email">Email</Label>
-                <Input id="email" type="email" defaultValue="jean.dupont@example.com" />
+                <Label htmlFor="email" className="text-foreground">Email</Label>
+                <Input id="email" type="email" defaultValue="jean.dupont@example.com" className="bg-background text-foreground" />
               </div>
               
               <div className="space-y-2">
-                <Label htmlFor="phone">Téléphone</Label>
-                <Input id="phone" defaultValue="+33 6 12 34 56 78" />
+                <Label htmlFor="phone" className="text-foreground">Téléphone</Label>
+                <Input id="phone" defaultValue="+33 6 12 34 56 78" className="bg-background text-foreground" />
               </div>
               
               <div className="space-y-2">
-                <Label htmlFor="address">Adresse</Label>
-                <Input id="address" defaultValue="123 Rue de Paris" />
+                <Label htmlFor="address" className="text-foreground">Adresse</Label>
+                <Input id="address" defaultValue="123 Rue de Paris" className="bg-background text-foreground" />
               </div>
               
               <div className="flex items-center space-x-2">
-                <MoonStar className="h-5 w-5" />
-                <span>Mode sombre</span>
+                <MoonStar className="h-5 w-5 text-foreground" />
+                <span className="text-foreground">Mode sombre</span>
                 <Switch 
                   checked={darkMode} 
                   onCheckedChange={setDarkMode} 
@@ -196,7 +196,7 @@ const Settings = () => {
           </form>
         </TabsContent>
 
-        <TabsContent value="map" className="bg-white rounded-lg shadow p-4 md:p-6">
+        <TabsContent value="map" className="bg-card text-card-foreground rounded-lg shadow p-4 md:p-6">
           <div className="space-y-6">
             <div>
               <h3 className="text-lg font-medium mb-4 flex items-center">
@@ -234,7 +234,7 @@ const Settings = () => {
           </div>
         </TabsContent>
         
-        <TabsContent value="notifications" className="bg-white rounded-lg shadow p-4 md:p-6">
+        <TabsContent value="notifications" className="bg-card text-card-foreground rounded-lg shadow p-4 md:p-6">
           <form onSubmit={handleSaveNotifications}>
             <div className="space-y-6">
               <div>
@@ -375,7 +375,7 @@ const Settings = () => {
           </form>
         </TabsContent>
         
-        <TabsContent value="payment" className="bg-white rounded-lg shadow p-4 md:p-6">
+        <TabsContent value="payment" className="bg-card text-card-foreground rounded-lg shadow p-4 md:p-6">
           <div>
             <h3 className="text-lg font-medium mb-4 flex items-center">
               <CreditCard className="mr-2 h-5 w-5" />
@@ -507,7 +507,7 @@ const Settings = () => {
           </div>
         </TabsContent>
         
-        <TabsContent value="security" className="bg-white rounded-lg shadow p-4 md:p-6">
+        <TabsContent value="security" className="bg-card text-card-foreground rounded-lg shadow p-4 md:p-6">
           <div>
             <h3 className="text-lg font-medium mb-4 flex items-center">
               <Lock className="mr-2 h-5 w-5" />
@@ -563,7 +563,7 @@ const Settings = () => {
           </div>
         </TabsContent>
         
-        <TabsContent value="language" className="bg-white rounded-lg shadow p-4 md:p-6">
+        <TabsContent value="language" className="bg-card text-card-foreground rounded-lg shadow p-4 md:p-6">
           <div className="space-y-6">
             <h3 className="text-lg font-medium mb-4 flex items-center">
               <Globe className="mr-2 h-5 w-5" />
@@ -604,7 +604,7 @@ const Settings = () => {
           </div>
         </TabsContent>
 
-        <TabsContent value="documents" className="bg-white rounded-lg shadow p-4 md:p-6">
+        <TabsContent value="documents" className="bg-card text-card-foreground rounded-lg shadow p-4 md:p-6">
           <div className="space-y-6">
             <h3 className="text-lg font-medium mb-4 flex items-center">
               <FileText className="mr-2 h-5 w-5" />
