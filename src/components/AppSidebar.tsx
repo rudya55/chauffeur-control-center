@@ -103,7 +103,7 @@ const AppSidebar = ({ isOpen = false, onClose }: AppSidebarProps) => {
       <div className="flex flex-col p-4 border-b">
         <Dialog>
           <DialogTrigger asChild>
-            <div className="flex flex-col items-center mb-2 cursor-pointer">
+            <div className="flex flex-col items-center mb-4 cursor-pointer">
               <Avatar className="h-16 w-16 mb-2">
                 <AvatarImage src={avatarUrl} alt="Driver" />
                 <AvatarFallback>JD</AvatarFallback>
@@ -143,21 +143,10 @@ const AppSidebar = ({ isOpen = false, onClose }: AppSidebarProps) => {
           </DialogContent>
         </Dialog>
         
-        {/* Keep the back button */}
-        <Button 
-          variant="ghost" 
-          size="sm" 
-          onClick={handleGoBack}
-          className="flex items-center gap-2 mb-2 w-full justify-start"
-        >
-          <ArrowLeft className="h-4 w-4" />
-          <span>{t("back_to_home")}</span>
-        </Button>
-
-        {/* Add theme toggle and notification buttons - removed white background */}
-        <div className="flex justify-between items-center mt-2 mb-4">
-          <ThemeToggle className="mr-2 hover:bg-transparent" />
+        {/* Notifications et mode nuit repositionnés */}
+        <div className="flex justify-center items-center gap-3">
           <NotificationBell />
+          <ThemeToggle />
         </div>
       </div>
 
