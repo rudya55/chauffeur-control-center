@@ -328,58 +328,78 @@ const Calendar = () => {
               <div className="text-center py-8 text-muted-foreground">
                 Veuillez sélectionner une date pour voir les réservations
               </div>
-            ) : viewReservations.length === 0 ? (
-              <div className="text-center py-8 text-muted-foreground">
-                Aucune réservation {viewMode === "day" ? "pour cette date" : viewMode === "week" ? "pour cette semaine" : "pour cette date"}
-              </div>
             ) : (
-              <div className="space-y-4">
-                {viewReservations.map((reservation) => (
-                  <div 
-                    key={reservation.id}
-                    className={cn(
-                      "p-4 border-2 rounded-lg cursor-pointer transition-all hover:shadow-lg hover-scale",
-                      getStatusColor(reservation.status)
-                    )}
-                    onClick={() => handleOpenReservationDetails(reservation)}
-                  >
-                    <div className="flex justify-between items-start mb-2">
-                      <div>
-                        <p className="font-medium text-lg">{reservation.clientName}</p>
-                        <p className="text-sm">
-                          {format(parseISO(reservation.date), 'dd/MM/yyyy HH:mm')}
-                        </p>
-                      </div>
-                      <Badge variant="outline" className={cn(
-                        "border-2 font-semibold", 
-                        reservation.status === 'accepted' && "bg-blue-500 text-white border-blue-600",
-                        reservation.status === 'started' && "bg-amber-500 text-white border-amber-600",
-                        reservation.status === 'arrived' && "bg-purple-500 text-white border-purple-600",
-                        reservation.status === 'onBoard' && "bg-teal-500 text-white border-teal-600",
-                        reservation.status === 'completed' && "bg-green-500 text-white border-green-600",
-                      )}>
-                        {reservation.status === 'accepted' && "Acceptée"}
-                        {reservation.status === 'started' && "En route"}
-                        {reservation.status === 'arrived' && "Arrivé"}
-                        {reservation.status === 'onBoard' && "Client à bord"}
-                        {reservation.status === 'completed' && "Terminée"}
-                      </Badge>
-                    </div>
-                    <div className="space-y-1 text-sm">
-                      <p className="flex items-center">
-                        <span className="font-medium mr-1">De:</span> {reservation.pickupAddress}
-                      </p>
-                      <p className="flex items-center">
-                        <span className="font-medium mr-1">À:</span> {reservation.destination}
-                      </p>
-                      {reservation.dispatcher && (
-                        <p className="text-xs text-muted-foreground mt-2">
-                          Via {reservation.dispatcher} {reservation.dispatcherLogo}
-                        </p>
-                      )}
-                    </div>
+              <div className="space-y-6">
+                {viewMode === "day" && (
+                  <AgendaDay
+                    date={selectedDate}
+                    reservations={reservations}
+                    onSelect={handleOpenReservationDetails}
+                  />
+                )}
+
+                {viewMode === "week" && (
+                  <AgendaWeek
+                    selectedDate={selectedDate}
+                    reservations={reservations}
+                    onSelect={handleOpenReservationDetails}
+                  />
+                )}
+
+                {viewMode === "month" && viewReservations.length === 0 ? (
+                  <div className="text-center py-8 text-muted-foreground">
+                    Aucune réservation pour cette date
                   </div>
-                ))}
+                ) : viewMode === "month" ? (
+                  <div className="space-y-4">
+                    {viewReservations.map((reservation) => (
+                      <div 
+                        key={reservation.id}
+                        className={cn(
+                          "p-4 border-2 rounded-lg cursor-pointer transition-all hover:shadow-lg hover-scale",
+                          getStatusColor(reservation.status)
+                        )}
+                        onClick={() => handleOpenReservationDetails(reservation)}
+                      >
+                        <div className="flex justify-between items-start mb-2">
+                          <div>
+                            <p className="font-medium text-lg">{reservation.clientName}</p>
+                            <p className="text-sm">
+                              {format(parseISO(reservation.date), 'dd/MM/yyyy HH:mm')}
+                            </p>
+                          </div>
+                          <Badge variant="outline" className={cn(
+                            "border-2 font-semibold", 
+                            reservation.status === 'accepted' && "bg-blue-500 text-white border-blue-600",
+                            reservation.status === 'started' && "bg-amber-500 text-white border-amber-600",
+                            reservation.status === 'arrived' && "bg-purple-500 text-white border-purple-600",
+                            reservation.status === 'onBoard' && "bg-teal-500 text-white border-teal-600",
+                            reservation.status === 'completed' && "bg-green-500 text-white border-green-600",
+                          )}>
+                            {reservation.status === 'accepted' && "Acceptée"}
+                            {reservation.status === 'started' && "En route"}
+                            {reservation.status === 'arrived' && "Arrivé"}
+                            {reservation.status === 'onBoard' && "Client à bord"}
+                            {reservation.status === 'completed' && "Terminée"}
+                          </Badge>
+                        </div>
+                        <div className="space-y-1 text-sm">
+                          <p className="flex items-center">
+                            <span className="font-medium mr-1">De:</span> {reservation.pickupAddress}
+                          </p>
+                          <p className="flex items-center">
+                            <span className="font-medium mr-1">À:</span> {reservation.destination}
+                          </p>
+                          {reservation.dispatcher && (
+                            <p className="text-xs text-muted-foreground mt-2">
+                              Via {reservation.dispatcher} {reservation.dispatcherLogo}
+                            </p>
+                          )}
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                ) : null}
               </div>
             )}
           </CardContent>

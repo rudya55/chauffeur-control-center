@@ -1,7 +1,8 @@
 import { useEffect, useRef, useState } from 'react';
 import { cn } from '@/lib/utils';
 import { useTheme as useNextTheme } from 'next-themes';
-import { Menu } from 'lucide-react';
+import { Menu, Car } from 'lucide-react';
+import ReactDOM from 'react-dom/client';
 
 interface MapProps {
   className?: string;
@@ -35,7 +36,8 @@ const Map = ({
     const loadMap = () => {
       if (!window.google) {
         const script = document.createElement('script');
-        script.src = `https://maps.googleapis.com/maps/api/js?key=${apiKey}&libraries=places`;
+        script.src = `https://maps.googleapis.com/maps/api/js?key=${apiKey}&libraries=places,marker`;
+
         script.async = true;
         script.defer = true;
         script.onload = initMap;
@@ -126,20 +128,31 @@ const Map = ({
         // @ts-ignore
         mapInstanceRef.current = new window.google.maps.Map(mapRef.current, mapOptions);
 
-        // Add a marker for the driver's position
+        // Créer un élément DOM pour l'icône de voiture
+        const carIconDiv = document.createElement('div');
+        const root = ReactDOM.createRoot(carIconDiv);
+        root.render(
+          <div style={{ 
+            width: '40px', 
+            height: '40px', 
+            display: 'flex', 
+            alignItems: 'center', 
+            justifyContent: 'center',
+            background: theme === 'dark' ? '#d4af37' : '#1a73e8',
+            borderRadius: '50%',
+            border: '3px solid white',
+            boxShadow: '0 2px 6px rgba(0,0,0,0.3)'
+          }}>
+            <Car color="white" size={20} />
+          </div>
+        );
+
+        // Add a marker for the driver's position with car icon
         // @ts-ignore
-        markerRef.current = new window.google.maps.Marker({
+        markerRef.current = new window.google.maps.marker.AdvancedMarkerElement({
           position: center,
           map: mapInstanceRef.current,
-          icon: {
-            // @ts-ignore
-            path: window.google.maps.SymbolPath.CIRCLE,
-            scale: 10,
-            fillColor: theme === 'dark' ? '#d4af37' : '#1a73e8', // Gold in dark mode, blue in light mode
-            fillOpacity: 1,
-            strokeColor: '#ffffff',
-            strokeWeight: 2,
-          },
+          content: carIconDiv,
           title: "Position"
         });
 
@@ -258,17 +271,27 @@ const Map = ({
       mapInstanceRef.current.setOptions({ styles });
       
       if (markerRef.current) {
-        markerRef.current.setIcon({
-          // @ts-ignore
-          path: window.google.maps.SymbolPath.CIRCLE,
-          scale: 10,
-          fillColor: theme === 'dark' ? '#d4af37' : '#1a73e8', // Gold in dark mode, blue in light mode
-          fillOpacity: 1,
-          strokeColor: '#ffffff',
-          strokeWeight: 2,
-        });
+        // Recréer l'icône de voiture avec la nouvelle couleur
+        const carIconDiv = document.createElement('div');
+        const root = ReactDOM.createRoot(carIconDiv);
+        root.render(
+          <div style={{ 
+            width: '40px', 
+            height: '40px', 
+            display: 'flex', 
+            alignItems: 'center', 
+            justifyContent: 'center',
+            background: theme === 'dark' ? '#d4af37' : '#1a73e8',
+            borderRadius: '50%',
+            border: '3px solid white',
+            boxShadow: '0 2px 6px rgba(0,0,0,0.3)'
+          }}>
+            <Car color="white" size={20} />
+          </div>
+        );
+        markerRef.current.content = carIconDiv;
       }
-      
+
       if (polylineRef.current) {
         polylineRef.current.setOptions({
           strokeColor: theme === 'dark' ? '#d4af37' : '#FF0000' // Gold in dark mode, red in light mode
