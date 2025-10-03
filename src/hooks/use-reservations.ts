@@ -296,12 +296,22 @@ export const useReservations = () => {
     if (storedMyReservations) {
       setMyReservations(JSON.parse(storedMyReservations));
     }
+
+    const storedCompletedReservations = localStorage.getItem('completedReservations');
+    if (storedCompletedReservations) {
+      setCompletedReservations(JSON.parse(storedCompletedReservations));
+    }
   }, []);
 
   // Sauvegarder les réservations dans localStorage à chaque changement
   useEffect(() => {
     localStorage.setItem('myReservations', JSON.stringify(myReservations));
   }, [myReservations]);
+
+  // Sauvegarder les réservations terminées dans localStorage à chaque changement
+  useEffect(() => {
+    localStorage.setItem('completedReservations', JSON.stringify(completedReservations));
+  }, [completedReservations]);
 
   return {
     upcomingReservations,
