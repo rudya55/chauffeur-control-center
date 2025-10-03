@@ -103,7 +103,7 @@ const ScrollableDayGrid: React.FC<{
   const nowTop = useMemo(() => getTop(new Date()), [getTop]);
 
   return (
-    <div ref={scrollRef} className="relative flex-1 overflow-auto max-h-[70vh]">
+    <div ref={scrollRef} className="relative flex-1 h-[70vh] overflow-auto">
       <div className="relative" style={{ height: `${contentHeight}px` }}>
         {Array.from({ length: 24 }).map((_, i) => (
           <div key={i} className="absolute left-0 right-0 border-t" style={{ top: `${i * HOUR_HEIGHT}px` }} />

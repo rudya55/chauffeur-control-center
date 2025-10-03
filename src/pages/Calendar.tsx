@@ -1,10 +1,11 @@
 import { useState, useEffect } from "react";
-import { format, parseISO, isValid, startOfWeek, endOfWeek, eachDayOfInterval, startOfDay, endOfDay } from "date-fns";
+import { format, parseISO, isValid, startOfWeek, endOfWeek, eachDayOfInterval, startOfDay, endOfDay, addDays, addWeeks } from "date-fns";
 import { fr } from "date-fns/locale";
 import PageHeader from "@/components/PageHeader";
-import { Calendar as CalendarIcon } from "lucide-react";
+import { Calendar as CalendarIcon, ChevronLeft, ChevronRight } from "lucide-react";
 import { Calendar as CalendarComponent } from "@/components/ui/calendar";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
 import { ReservationType } from "@/types/reservation";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import ReservationDetails from "@/components/reservation/ReservationDetails";
@@ -231,6 +232,20 @@ const Calendar = () => {
     }
   };
 
+  const handleToday = () => setSelectedDate(new Date());
+  const handlePrev = () => {
+    if (!selectedDate) return;
+    if (viewMode === 'day') setSelectedDate(addDays(selectedDate, -1));
+    else if (viewMode === 'week') setSelectedDate(addWeeks(selectedDate, -1));
+    else setSelectedDate(addDays(selectedDate, -30));
+  };
+  const handleNext = () => {
+    if (!selectedDate) return;
+    if (viewMode === 'day') setSelectedDate(addDays(selectedDate, 1));
+    else if (viewMode === 'week') setSelectedDate(addWeeks(selectedDate, 1));
+    else setSelectedDate(addDays(selectedDate, 30));
+  };
+
   return (
     <div className="p-4 sm:p-6 animate-fade-in">
       <PageHeader title="planning" />
@@ -311,9 +326,20 @@ const Calendar = () => {
         
         <Card className="hover-scale border-t-4 border-t-pink-500">
           <CardHeader className="pb-2 bg-gradient-to-r from-pink-50 to-white dark:from-pink-950/20 dark:to-background">
-            <CardTitle className="text-xl">
-              {getViewTitle()}
-            </CardTitle>
+            <div className="flex items-center justify-between gap-2 flex-wrap">
+              <div className="flex items-center gap-2">
+                <Button variant="outline" size="sm" onClick={handlePrev} aria-label="Précédent">
+                  <ChevronLeft className="h-4 w-4" />
+                </Button>
+                <Button variant="outline" size="sm" onClick={handleToday}>Aujourd'hui</Button>
+                <Button variant="outline" size="sm" onClick={handleNext} aria-label="Suivant">
+                  <ChevronRight className="h-4 w-4" />
+                </Button>
+              </div>
+              <CardTitle className="text-xl">
+                {getViewTitle()}
+              </CardTitle>
+            </div>
           </CardHeader>
           <CardContent className="pt-2">
             {!selectedDate ? (
