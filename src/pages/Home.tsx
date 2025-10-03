@@ -18,11 +18,11 @@ const Home = () => {
       </div>
 
       {/* Page header with menu button only, no title */}
-      <div className="absolute top-4 left-4 z-10 bg-white/80 backdrop-blur-sm rounded-md">
+      <div className="absolute top-4 left-4 z-10">
         <PageHeader 
           title="" 
           showBackButton={false} 
-          className="mb-0 px-2 py-1"
+          className="mb-0 p-0"
         />
       </div>
     </div>
