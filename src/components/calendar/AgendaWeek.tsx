@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useMemo, useRef } from "react";
 import { eachDayOfInterval, endOfWeek, format, isValid, parseISO, startOfWeek } from "date-fns";
 import { fr } from "date-fns/locale";
 import { ReservationType } from "@/types/reservation";
@@ -40,7 +40,7 @@ const AgendaWeek: React.FC<AgendaWeekProps> = ({ selectedDate, reservations, onS
   };
 
   return (
-    <div className="border rounded-lg overflow-hidden">
+    <div className="border rounded-lg overflow-hidden bg-card">
       <div className="flex">
         {/* Time gutter */}
         <div className="w-14 border-r bg-card/70">
@@ -51,50 +51,97 @@ const AgendaWeek: React.FC<AgendaWeekProps> = ({ selectedDate, reservations, onS
           ))}
         </div>
 
-        {/* Columns for each day */}
-        <div className="flex-1 grid grid-cols-7">
-          {days.map((day) => {
-            const dayKey = format(day, "yyyy-MM-dd");
-            const dayReservations = reservations.filter((r) => {
-              const d = parseISO(r.date);
-              return isValid(d) && format(d, "yyyy-MM-dd") === dayKey;
-            });
+        {/* Scrollable columns */}
+        <ScrollableWeekGrid days={days} reservations={reservations} onSelect={onSelect} getTop={getTop} />
+      </div>
+    </div>
+  );
+};
 
-            return (
-              <div key={dayKey} className="relative border-l" style={{ height: `${24 * HOUR_HEIGHT}px` }}>
-                {/* Header */}
-                <div className="sticky top-0 z-10 bg-card/80 backdrop-blur px-2 py-1 border-b">
-                  <div className="text-xs font-medium">{format(day, "EEE d", { locale: fr })}</div>
-                </div>
+const ScrollableWeekGrid: React.FC<{
+  days: Date[];
+  reservations: ReservationType[];
+  onSelect: (reservation: ReservationType) => void;
+  getTop: (d: Date) => number;
+}> = ({ days, reservations, onSelect, getTop }) => {
+  const scrollRef = useRef<HTMLDivElement>(null);
+  const contentHeight = 24 * HOUR_HEIGHT;
 
-                {/* Hour lines */}
-                {Array.from({ length: 24 }).map((_, i) => (
-                  <div key={i} className="absolute left-0 right-0 border-t" style={{ top: `${i * HOUR_HEIGHT}px` }} />
-                ))}
+  useEffect(() => {
+    if (!scrollRef.current) return;
+    const now = new Date();
+    const top = getTop(now) - 120;
+    scrollRef.current.scrollTo({ top: Math.max(0, top), behavior: 'smooth' });
+  }, [getTop]);
 
-                {/* Events */}
-                {dayReservations.map((res) => {
-                  const d = parseISO(res.date);
-                  const top = getTop(d);
-                  return (
-                    <button
-                      key={res.id}
-                      onClick={() => onSelect(res)}
-                      className={`absolute left-1 right-1 border rounded-md p-1.5 text-left shadow-sm hover:shadow-md transition ${getEventClasses(
-                        res.status
-                      )}`}
-                      style={{ top, height: 44 }}
-                      aria-label={`${res.clientName} ${format(d, "HH:mm")}`}
-                    >
-                      <div className="text-[11px] font-medium truncate">{format(d, "HH:mm")} • {res.clientName}</div>
-                      <div className="text-[10px] text-muted-foreground truncate">{res.pickupAddress} → {res.destination}</div>
-                    </button>
-                  );
-                })}
+  const todayKey = format(new Date(), "yyyy-MM-dd");
+
+  const getEventClasses = (status?: string) => {
+    switch (status) {
+      case "started":
+        return "bg-accent/40 border-accent";
+      case "arrived":
+        return "bg-secondary/30 border-secondary";
+      case "onBoard":
+        return "bg-primary/20 border-primary";
+      case "accepted":
+        return "bg-ring/10 border-ring";
+      case "completed":
+        return "bg-foreground/10 border-foreground/30";
+      default:
+        return "bg-muted/50 border-muted";
+    }
+  };
+
+  return (
+    <div ref={scrollRef} className="relative flex-1 overflow-auto max-h-[70vh]">
+      <div className="grid grid-cols-7">
+        {days.map((day) => {
+          const dayKey = format(day, "yyyy-MM-dd");
+          const dayReservations = reservations.filter((r) => {
+            const d = parseISO(r.date);
+            return isValid(d) && format(d, "yyyy-MM-dd") === dayKey;
+          });
+
+          return (
+            <div key={dayKey} className="relative border-l" style={{ height: `${contentHeight}px` }}>
+              {/* Header */}
+              <div className="sticky top-0 z-10 bg-card/80 backdrop-blur px-2 py-1 border-b">
+                <div className="text-xs font-medium">{format(day, "EEE d", { locale: fr })}</div>
               </div>
-            );
-          })}
-        </div>
+
+              {/* Hour lines */}
+              {Array.from({ length: 24 }).map((_, i) => (
+                <div key={i} className="absolute left-0 right-0 border-t" style={{ top: `${i * HOUR_HEIGHT}px` }} />
+              ))}
+
+              {/* Now indicator */}
+              {dayKey === todayKey && (
+                <div className="absolute left-0 right-0 h-[2px] bg-destructive" style={{ top: `${getTop(new Date())}px` }} />
+              )}
+
+              {/* Events */}
+              {dayReservations.map((res) => {
+                const d = parseISO(res.date);
+                const top = getTop(d);
+                return (
+                  <button
+                    key={res.id}
+                    onClick={() => onSelect(res)}
+                    className={`absolute left-1 right-1 border rounded-md p-1.5 text-left shadow-sm hover:shadow-md transition ${getEventClasses(
+                      res.status
+                    )}`}
+                    style={{ top, height: 44 }}
+                    aria-label={`${res.clientName} ${format(d, "HH:mm")}`}
+                  >
+                    <div className="text-[11px] font-medium truncate">{format(d, "HH:mm")} • {res.clientName}</div>
+                    <div className="text-[10px] text-muted-foreground truncate">{res.pickupAddress} → {res.destination}</div>
+                  </button>
+                );
+              })}
+            </div>
+          );
+        })}
       </div>
     </div>
   );
