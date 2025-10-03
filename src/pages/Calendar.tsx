@@ -97,27 +97,35 @@ const Calendar = () => {
 
   const renderDayContent = (day: Date) => {
     const dateString = format(day, 'yyyy-MM-dd');
-    const status = daysWithReservations[dateString];
-
-    if (!status) return null;
-
-    const count = reservations.filter(res => {
+    
+    const dayReservations = reservations.filter(res => {
       const resDate = parseISO(res.date);
       return isValid(resDate) && format(resDate, 'yyyy-MM-dd') === dateString;
-    }).length;
+    });
 
-    let dotColor = "bg-gray-400";
-    if (status === 'started') dotColor = "bg-amber-500";
-    else if (status === 'arrived') dotColor = "bg-purple-500";
-    else if (status === 'onBoard') dotColor = "bg-teal-500";
-    else if (status === 'accepted') dotColor = "bg-blue-500";
-    else if (status === 'completed') dotColor = "bg-green-500";
+    if (dayReservations.length === 0) return null;
+
+    const getDotColor = (status?: string) => {
+      if (status === 'started') return "bg-amber-500";
+      if (status === 'arrived') return "bg-purple-500";
+      if (status === 'onBoard') return "bg-teal-500";
+      if (status === 'accepted') return "bg-blue-500";
+      if (status === 'completed') return "bg-green-500";
+      return "bg-gray-400";
+    };
 
     return (
       <div className="absolute bottom-0.5 left-0 right-0 flex justify-center">
         <div className="flex items-center gap-0.5">
-          <span className={`h-1.5 w-1.5 rounded-full ${dotColor}`}></span>
-          {count > 1 && <span className="text-[10px] font-medium">{count}</span>}
+          {dayReservations.slice(0, 3).map((reservation, index) => (
+            <span 
+              key={`${reservation.id}-${index}`} 
+              className={`h-1.5 w-1.5 rounded-full ${getDotColor(reservation.status)}`}
+            ></span>
+          ))}
+          {dayReservations.length > 3 && (
+            <span className="text-[9px] font-bold ml-0.5">+{dayReservations.length - 3}</span>
+          )}
         </div>
       </div>
     );
