@@ -71,6 +71,11 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
           setTimeout(() => {
             checkUserStatus(session.user.id);
           }, 0);
+        } else {
+          // Rediriger vers la landing page si déconnecté
+          if (window.location.pathname !== '/welcome' && window.location.pathname !== '/auth') {
+            navigate('/welcome');
+          }
         }
       }
     );
@@ -85,6 +90,11 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
         setTimeout(() => {
           checkUserStatus(session.user.id);
         }, 0);
+      } else {
+        // Rediriger vers la landing page si pas de session
+        if (window.location.pathname !== '/welcome' && window.location.pathname !== '/auth') {
+          navigate('/welcome');
+        }
       }
     });
 
@@ -94,7 +104,7 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
   const signOut = async () => {
     await supabase.auth.signOut();
     setUserStatus(null);
-    navigate('/auth');
+    navigate('/welcome');
   };
 
   const value = {

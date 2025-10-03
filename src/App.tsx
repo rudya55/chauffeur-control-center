@@ -17,6 +17,7 @@ import Terms from "@/pages/Terms";
 import Accounting from "@/pages/Accounting";
 import Auth from "@/pages/Auth";
 import Admin from "@/pages/Admin";
+import Landing from "@/pages/Landing";
 import NotFound from "@/pages/NotFound";
 
 function App() {
@@ -30,6 +31,7 @@ function App() {
         <AuthProvider>
           <LanguageProvider>
             <Routes>
+              <Route path="/welcome" element={<Landing />} />
               <Route path="/auth" element={<Auth />} />
               <Route path="/" element={<ProtectedRoute><AppLayout /></ProtectedRoute>}>
                 <Route index element={<Home />} />
