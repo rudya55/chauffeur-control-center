@@ -270,52 +270,44 @@ const Calendar = () => {
       </div>
       
       <div className="flex flex-col gap-6">
-        <Card className="hover-scale border-t-4 border-t-indigo-500">
-          <CardHeader className="pb-2 bg-gradient-to-r from-indigo-50 to-white dark:from-indigo-950/20 dark:to-background">
-            <div className="flex justify-between items-center">
-              <CardTitle className="flex items-center text-xl">
-                <CalendarIcon className="mr-2 h-5 w-5 text-indigo-600" />
-                Calendrier
-              </CardTitle>
-            </div>
-          </CardHeader>
-          <CardContent className="pt-2">
-            <CalendarComponent
-              mode="single"
-              selected={selectedDate || undefined}
-              onSelect={(day) => setSelectedDate(day)}
-              className="rounded-md border"
-              locale={fr}
-              showOutsideDays={viewMode === "month"}
-              modifiers={{
-                booked: (date) => Boolean(daysWithReservations[format(date, 'yyyy-MM-dd')]),
-                hidden: (date) => {
-                  if (!selectedDate) return false;
-                  if (viewMode === 'day') {
-                    return format(date, 'yyyy-MM-dd') !== format(selectedDate, 'yyyy-MM-dd');
-                  }
-                  if (viewMode === 'week') {
-                    const start = startOfWeek(selectedDate, { locale: fr });
-                    const end = endOfWeek(selectedDate, { locale: fr });
-                    return date < start || date > end;
-                  }
-                  return false; // month: show all
-                },
-              }}
-              modifiersStyles={{
-                booked: { textDecoration: 'none' },
-              }}
-              components={{
-                DayContent: ({ date }) => (
-                  <div className="relative w-full h-full flex items-center justify-center transition-all" style={getDayStyle(date)}>
-                    <div>{format(date, 'd')}</div>
-                    {renderDayContent(date)}
-                  </div>
-                )
-              }}
-            />
-          </CardContent>
-        </Card>
+        {viewMode === "month" && (
+          <Card className="hover-scale border-t-4 border-t-indigo-500">
+            <CardHeader className="pb-2 bg-gradient-to-r from-indigo-50 to-white dark:from-indigo-950/20 dark:to-background">
+              <div className="flex justify-between items-center">
+                <CardTitle className="flex items-center text-xl">
+                  <CalendarIcon className="mr-2 h-5 w-5 text-indigo-600" />
+                  Calendrier
+                </CardTitle>
+              </div>
+            </CardHeader>
+            <CardContent className="pt-2">
+              <CalendarComponent
+                mode="single"
+                selected={selectedDate || undefined}
+                onSelect={(day) => setSelectedDate(day)}
+                className="rounded-md border"
+                locale={fr}
+                showOutsideDays={viewMode === "month"}
+                modifiers={{
+                  booked: (date) => Boolean(daysWithReservations[format(date, 'yyyy-MM-dd')]),
+                  hidden: (date) => false,
+                }}
+                modifiersStyles={{
+                  booked: { textDecoration: 'none' },
+                }}
+                components={{
+                  DayContent: ({ date }) => (
+                    <div className="relative w-full h-full flex items-center justify-center transition-all" style={getDayStyle(date)}>
+                      <div>{format(date, 'd')}</div>
+                      {renderDayContent(date)}
+                    </div>
+                  )
+                }}
+              />
+            </CardContent>
+          </Card>
+        )}
+
         
         <Card className="hover-scale border-t-4 border-t-pink-500">
           <CardHeader className="pb-2 bg-gradient-to-r from-pink-50 to-white dark:from-pink-950/20 dark:to-background">
