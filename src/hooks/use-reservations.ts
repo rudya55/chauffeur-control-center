@@ -311,11 +311,11 @@ export const useReservations = () => {
 
   // Déplacer automatiquement toute réservation marquée 'completed' vers l'onglet Terminé
   useEffect(() => {
-    const completedInCurrent = myReservations.filter(r => r.status === 'completed');
+    const completedInCurrent = myReservations.filter(r => r.status === 'completed' || r.status === 'onBoard');
     if (completedInCurrent.length === 0) return;
 
     // Retirer des réservations en cours
-    setMyReservations(prev => prev.filter(r => r.status !== 'completed'));
+    setMyReservations(prev => prev.filter(r => r.status !== 'completed' && r.status !== 'onBoard'));
 
     // Ajouter aux terminées en évitant les doublons
     setCompletedReservations(prev => {
@@ -324,11 +324,12 @@ export const useReservations = () => {
         .filter(r => !existing.has(r.id))
         .map(r => ({
           ...r,
+          status: 'completed' as const,
           dropoffTime: r.dropoffTime || new Date().toISOString()
         }));
       return [...prev, ...toAdd];
     });
-  }, [myReservations, setMyReservations, setCompletedReservations]);
+  }, [myReservations]);
 
   // Synchroniser depuis le calendrier (localStorage) pour déplacer auto les "completed"
   useEffect(() => {
