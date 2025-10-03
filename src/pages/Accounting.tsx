@@ -21,12 +21,12 @@ const Accounting = () => {
       
       <div className="container mx-auto p-4 md:p-6">
         <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-          <TabsList className="grid w-full grid-cols-5 mb-6">
-            <TabsTrigger value="dashboard">Tableau de bord</TabsTrigger>
-            <TabsTrigger value="invoices">Factures</TabsTrigger>
-            <TabsTrigger value="expenses">Dépenses</TabsTrigger>
-            <TabsTrigger value="reports">Rapports</TabsTrigger>
-            <TabsTrigger value="history">Historique</TabsTrigger>
+          <TabsList className="grid w-full grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-2 bg-card p-2 h-auto">
+            <TabsTrigger value="dashboard" className="text-xs sm:text-sm py-2">Tableau de bord</TabsTrigger>
+            <TabsTrigger value="invoices" className="text-xs sm:text-sm py-2">Factures</TabsTrigger>
+            <TabsTrigger value="expenses" className="text-xs sm:text-sm py-2">Dépenses</TabsTrigger>
+            <TabsTrigger value="reports" className="text-xs sm:text-sm py-2">Rapports</TabsTrigger>
+            <TabsTrigger value="history" className="text-xs sm:text-sm py-2">Historique</TabsTrigger>
           </TabsList>
 
           <TabsContent value="dashboard">
