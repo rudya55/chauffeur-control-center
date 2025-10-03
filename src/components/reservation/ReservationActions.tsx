@@ -1,11 +1,12 @@
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
 import { Button } from "@/components/ui/button";
 import { ReservationType } from "@/types/reservation";
 import CircularTimer from "@/components/CircularTimer";
-import { Car, CheckCircle, MessageCircle, PlayCircle, Star, User, X } from "lucide-react";
+import { Car, CheckCircle, MessageCircle, PlayCircle, Star, User, X, Clock } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { parseISO, differenceInSeconds, addHours } from "date-fns";
 
 type ReservationActionsProps = {
   reservation: ReservationType;
@@ -37,6 +38,44 @@ const ReservationActions = ({
   const [rating, setRating] = useState<number | null>(null);
   const [comment, setComment] = useState<string>("");
   const [open, setOpen] = useState(false);
+  const [canStartRide, setCanStartRide] = useState(false);
+  const [timeRemaining, setTimeRemaining] = useState<string>("");
+
+  // Testing mode: 10 seconds before ride, Production: 2 hours before ride
+  const TESTING_MODE = true;
+  const ALLOWED_TIME_BEFORE_START = TESTING_MODE ? 10 : 7200; // 10 seconds or 2 hours in seconds
+
+  useEffect(() => {
+    if (type === 'current' && reservation.status === 'accepted') {
+      const checkTimer = () => {
+        const now = new Date();
+        const rideStartTime = parseISO(reservation.date);
+        const allowedStartTime = new Date(rideStartTime.getTime() - ALLOWED_TIME_BEFORE_START * 1000);
+        const secondsUntilAllowed = differenceInSeconds(allowedStartTime, now);
+
+        if (secondsUntilAllowed <= 0) {
+          setCanStartRide(true);
+          setTimeRemaining("");
+        } else {
+          setCanStartRide(false);
+          const hours = Math.floor(secondsUntilAllowed / 3600);
+          const minutes = Math.floor((secondsUntilAllowed % 3600) / 60);
+          const seconds = secondsUntilAllowed % 60;
+          
+          if (TESTING_MODE) {
+            setTimeRemaining(`${seconds}s`);
+          } else {
+            setTimeRemaining(`${hours}h ${minutes}m`);
+          }
+        }
+      };
+
+      checkTimer();
+      const interval = setInterval(checkTimer, 1000);
+
+      return () => clearInterval(interval);
+    }
+  }, [type, reservation.status, reservation.date, ALLOWED_TIME_BEFORE_START, TESTING_MODE]);
 
   const handleRatingClick = (selectedRating: number) => {
     setRating(selectedRating);
@@ -109,14 +148,23 @@ const ReservationActions = ({
 
         <div className={cn("flex gap-2", fullscreenMode && "flex-col")}>
           {showStartButton && onStartRide && (
-            <Button 
-              onClick={() => onStartRide(reservation.id)}
-              variant="default"
-              className={getButtonClass(fullscreenMode ? "w-full" : "")}
-            >
-              <PlayCircle className="mr-2 h-4 w-4" />
-              Démarrer la course
-            </Button>
+            <div className={cn("flex flex-col gap-2", fullscreenMode && "w-full")}>
+              <Button 
+                onClick={() => onStartRide(reservation.id)}
+                variant="default"
+                className={getButtonClass(fullscreenMode ? "w-full" : "")}
+                disabled={!canStartRide}
+              >
+                <PlayCircle className="mr-2 h-4 w-4" />
+                Démarrer la course
+              </Button>
+              {!canStartRide && timeRemaining && (
+                <div className="flex items-center justify-center gap-2 text-sm text-muted-foreground">
+                  <Clock className="h-4 w-4" />
+                  <span>Disponible dans: {timeRemaining}</span>
+                </div>
+              )}
+            </div>
           )}
 
           {showArrivedButton && onArrived && (
