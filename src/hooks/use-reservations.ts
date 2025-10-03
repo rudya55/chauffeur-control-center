@@ -306,12 +306,8 @@ export const useReservations = () => {
   // Sauvegarder les réservations dans localStorage à chaque changement
   useEffect(() => {
     localStorage.setItem('myReservations', JSON.stringify(myReservations));
-  }, [myReservations]);
-
-  // Sauvegarder les réservations terminées dans localStorage à chaque changement
-  useEffect(() => {
     localStorage.setItem('completedReservations', JSON.stringify(completedReservations));
-  }, [completedReservations]);
+  }, [myReservations, completedReservations]);
 
   return {
     upcomingReservations,
