@@ -14,17 +14,17 @@ const HOUR_HEIGHT = 48; // px per hour
 const getEventClassesDay = (status?: string) => {
   switch (status) {
     case "started":
-      return "bg-accent/40 border-accent";
+      return "bg-amber-400 border-amber-500 text-white font-semibold shadow-md";
     case "arrived":
-      return "bg-secondary/30 border-secondary";
+      return "bg-purple-400 border-purple-500 text-white font-semibold shadow-md";
     case "onBoard":
-      return "bg-primary/20 border-primary";
+      return "bg-teal-400 border-teal-500 text-white font-semibold shadow-md";
     case "accepted":
-      return "bg-ring/10 border-ring";
+      return "bg-blue-500 border-blue-600 text-white font-semibold shadow-md";
     case "completed":
-      return "bg-foreground/10 border-foreground/30";
+      return "bg-green-500 border-green-600 text-white font-semibold shadow-md";
     default:
-      return "bg-muted/50 border-muted";
+      return "bg-gray-300 border-gray-400 text-gray-800";
   }
 };
 

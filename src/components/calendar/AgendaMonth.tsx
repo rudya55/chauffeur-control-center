@@ -32,17 +32,17 @@ const AgendaMonth: React.FC<AgendaMonthProps> = ({ selectedDate, reservations, o
   const getEventClasses = (status?: string) => {
     switch (status) {
       case "started":
-        return "bg-accent/60 text-accent-foreground";
+        return "bg-amber-400 text-white font-semibold";
       case "arrived":
-        return "bg-secondary/50 text-secondary-foreground";
+        return "bg-purple-400 text-white font-semibold";
       case "onBoard":
-        return "bg-primary/40 text-primary-foreground";
+        return "bg-teal-400 text-white font-semibold";
       case "accepted":
-        return "bg-ring/30 text-foreground";
+        return "bg-blue-500 text-white font-semibold";
       case "completed":
-        return "bg-foreground/20 text-foreground";
+        return "bg-green-500 text-white font-semibold";
       default:
-        return "bg-muted/60 text-muted-foreground";
+        return "bg-gray-300 text-gray-800";
     }
   };
 
