@@ -86,10 +86,9 @@ const ReservationActions = ({
   };
 
   const handleSubmit = () => {
-    if (rating) {
-      onComplete?.(reservation.id, rating, comment);
-      setOpen(false);
-    }
+    const finalRating = rating ?? 5; // Par défaut 5 si l'utilisateur ne choisit pas
+    onComplete?.(reservation.id, finalRating, comment);
+    setOpen(false);
   };
 
   // Increase button sizes in fullscreen mode
