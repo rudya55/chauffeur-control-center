@@ -11,6 +11,8 @@ import ReservationDetails from "@/components/reservation/ReservationDetails";
 import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
 import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
+import AgendaDay from "@/components/calendar/AgendaDay";
+import AgendaWeek from "@/components/calendar/AgendaWeek";
 
 const Calendar = () => {
   const [date, setDate] = useState<Date>(new Date());
