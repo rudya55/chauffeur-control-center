@@ -14,6 +14,45 @@ export type Database = {
   }
   public: {
     Tables: {
+      driver_documents: {
+        Row: {
+          document_name: string
+          document_type: string
+          document_url: string
+          id: string
+          rejection_reason: string | null
+          status: string | null
+          uploaded_at: string
+          user_id: string
+          verified_at: string | null
+          verified_by: string | null
+        }
+        Insert: {
+          document_name: string
+          document_type: string
+          document_url: string
+          id?: string
+          rejection_reason?: string | null
+          status?: string | null
+          uploaded_at?: string
+          user_id: string
+          verified_at?: string | null
+          verified_by?: string | null
+        }
+        Update: {
+          document_name?: string
+          document_type?: string
+          document_url?: string
+          id?: string
+          rejection_reason?: string | null
+          status?: string | null
+          uploaded_at?: string
+          user_id?: string
+          verified_at?: string | null
+          verified_by?: string | null
+        }
+        Relationships: []
+      }
       profiles: {
         Row: {
           avatar_url: string | null
@@ -21,6 +60,7 @@ export type Database = {
           email: string | null
           full_name: string | null
           id: string
+          status: string | null
           updated_at: string
         }
         Insert: {
@@ -29,6 +69,7 @@ export type Database = {
           email?: string | null
           full_name?: string | null
           id: string
+          status?: string | null
           updated_at?: string
         }
         Update: {
@@ -37,6 +78,7 @@ export type Database = {
           email?: string | null
           full_name?: string | null
           id?: string
+          status?: string | null
           updated_at?: string
         }
         Relationships: []

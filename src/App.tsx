@@ -16,6 +16,7 @@ import Settings from "@/pages/Settings";
 import Terms from "@/pages/Terms";
 import Accounting from "@/pages/Accounting";
 import Auth from "@/pages/Auth";
+import Admin from "@/pages/Admin";
 import NotFound from "@/pages/NotFound";
 
 function App() {
@@ -38,6 +39,7 @@ function App() {
                 <Route path="accounting" element={<Accounting />} />
                 <Route path="contact" element={<Contact />} />
                 <Route path="settings" element={<Settings />} />
+                <Route path="admin" element={<Admin />} />
                 <Route path="terms" element={<Terms />} />
                 <Route path="*" element={<NotFound />} />
               </Route>

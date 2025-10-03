@@ -2,11 +2,13 @@ import { createContext, useContext, useEffect, useState, ReactNode } from 'react
 import { User, Session } from '@supabase/supabase-js';
 import { supabase } from '@/integrations/supabase/client';
 import { useNavigate } from 'react-router-dom';
+import { toast } from 'sonner';
 
 interface AuthContextType {
   user: User | null;
   session: Session | null;
   loading: boolean;
+  userStatus: string | null;
   signOut: () => Promise<void>;
 }
 
@@ -14,6 +16,7 @@ const AuthContext = createContext<AuthContextType>({
   user: null,
   session: null,
   loading: true,
+  userStatus: null,
   signOut: async () => {},
 });
 
@@ -32,8 +35,29 @@ interface AuthProviderProps {
 export const AuthProvider = ({ children }: AuthProviderProps) => {
   const [user, setUser] = useState<User | null>(null);
   const [session, setSession] = useState<Session | null>(null);
+  const [userStatus, setUserStatus] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
+
+  const checkUserStatus = async (userId: string) => {
+    const { data, error } = await supabase
+      .from('profiles')
+      .select('status')
+      .eq('id', userId)
+      .maybeSingle();
+
+    if (!error && data) {
+      setUserStatus(data.status);
+      
+      if (data.status === 'pending') {
+        toast.info('Votre compte est en attente d\'approbation');
+      } else if (data.status === 'rejected') {
+        toast.error('Votre compte a été rejeté');
+        await supabase.auth.signOut();
+        navigate('/auth');
+      }
+    }
+  };
 
   useEffect(() => {
     // Set up auth state listener FIRST
@@ -42,6 +66,12 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
         setSession(session);
         setUser(session?.user ?? null);
         setLoading(false);
+        
+        if (session?.user) {
+          setTimeout(() => {
+            checkUserStatus(session.user.id);
+          }, 0);
+        }
       }
     );
 
@@ -50,6 +80,12 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
       setSession(session);
       setUser(session?.user ?? null);
       setLoading(false);
+      
+      if (session?.user) {
+        setTimeout(() => {
+          checkUserStatus(session.user.id);
+        }, 0);
+      }
     });
 
     return () => subscription.unsubscribe();
@@ -57,6 +93,7 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
 
   const signOut = async () => {
     await supabase.auth.signOut();
+    setUserStatus(null);
     navigate('/auth');
   };
 
@@ -64,6 +101,7 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
     user,
     session,
     loading,
+    userStatus,
     signOut,
   };
 

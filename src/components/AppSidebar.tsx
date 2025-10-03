@@ -13,7 +13,8 @@ import {
   Sun,
   Bell,
   Wallet,
-  LogOut
+  LogOut,
+  Shield
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useIsMobile } from "@/hooks/use-mobile";
@@ -30,7 +31,7 @@ import {
 } from "@/components/ui/sidebar";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { 
   Dialog, 
   DialogContent, 
@@ -44,6 +45,7 @@ import { useTheme } from "next-themes";
 import ThemeToggle from "./ThemeToggle";
 import NotificationBell from "./NotificationBell";
 import { useAuth } from "@/hooks/use-auth";
+import { supabase } from "@/integrations/supabase/client";
 
 interface AppSidebarProps {
   isOpen?: boolean;
@@ -58,11 +60,29 @@ const AppSidebar = ({ isOpen = false, onClose }: AppSidebarProps) => {
   const [avatarUrl, setAvatarUrl] = useState("/profile-photo.jpg");
   const { t } = useLanguage();
   const navigate = useNavigate();
-  const { signOut } = useAuth();
+  const { signOut, user } = useAuth();
+  const [isAdmin, setIsAdmin] = useState(false);
   
   // Driver information
   const driverName = "Jean Dupont";
   const driverRating = 4.8;
+  
+  useEffect(() => {
+    const checkAdminRole = async () => {
+      if (!user) return;
+      
+      const { data } = await supabase
+        .from("user_roles")
+        .select("role")
+        .eq("user_id", user.id)
+        .eq("role", "admin")
+        .maybeSingle();
+      
+      setIsAdmin(!!data);
+    };
+    
+    checkAdminRole();
+  }, [user]);
   
   const menuItems = [
     { title: t("home"), url: "/", icon: Home },
@@ -70,6 +90,7 @@ const AppSidebar = ({ isOpen = false, onClose }: AppSidebarProps) => {
     { title: t("reservations"), url: "/reservations", icon: FileText },
     { title: t("accounting"), url: "/accounting", icon: Wallet },
     { title: t("analytics"), url: "/analytics", icon: BarChart4 },
+    ...(isAdmin ? [{ title: "Administration", url: "/admin", icon: Shield }] : []),
     { title: t("settings"), url: "/settings", icon: Settings },
     { title: t("contact"), url: "/contact", icon: Mail },
     { title: t("general_conditions"), url: "/terms", icon: FileTextIcon },
