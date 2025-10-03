@@ -121,12 +121,11 @@ const Settings = () => {
       <PageHeader title="settings" />
       
       <Tabs defaultValue="profile" className="w-full">
-        <TabsList className="grid w-full grid-cols-2 sm:grid-cols-4 lg:grid-cols-7 mb-6 h-auto gap-2 bg-card p-2">
+        <TabsList className="grid w-full grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 mb-6 h-auto gap-2 bg-card p-2">
           <TabsTrigger value="profile" className="text-xs sm:text-sm">Profil</TabsTrigger>
           <TabsTrigger value="map" className="text-xs sm:text-sm">Carte</TabsTrigger>
           <TabsTrigger value="notifications" className="text-xs sm:text-sm">Notifications</TabsTrigger>
           <TabsTrigger value="payment" className="text-xs sm:text-sm">Paiement</TabsTrigger>
-          <TabsTrigger value="security" className="text-xs sm:text-sm">Sécurité</TabsTrigger>
           <TabsTrigger value="language" className="text-xs sm:text-sm">Langues</TabsTrigger>
           <TabsTrigger value="documents" className="text-xs sm:text-sm">Documents</TabsTrigger>
         </TabsList>
@@ -507,61 +506,6 @@ const Settings = () => {
           </div>
         </TabsContent>
         
-        <TabsContent value="security" className="bg-card text-card-foreground rounded-lg shadow p-4 md:p-6">
-          <div>
-            <h3 className="text-lg font-medium mb-4 flex items-center">
-              <Lock className="mr-2 h-5 w-5" />
-              Sécurité du compte
-            </h3>
-            
-            <form className="space-y-4">
-              <div className="space-y-2">
-                <Label htmlFor="current-password">Mot de passe actuel</Label>
-                <Input id="current-password" type="password" />
-              </div>
-              
-              <div className="space-y-2">
-                <Label htmlFor="new-password">Nouveau mot de passe</Label>
-                <Input id="new-password" type="password" />
-              </div>
-              
-              <div className="space-y-2">
-                <Label htmlFor="confirm-password">Confirmer le mot de passe</Label>
-                <Input id="confirm-password" type="password" />
-              </div>
-              
-              <Button type="submit" className="w-full">Mettre à jour le mot de passe</Button>
-            </form>
-            
-            <div className="mt-8 space-y-4">
-              <h3 className="text-lg font-medium">Autres paramètres de sécurité</h3>
-              
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="font-medium">Authentification à deux facteurs</p>
-                  <p className="text-sm text-muted-foreground">Ajouter une couche de sécurité supplémentaire</p>
-                </div>
-                <Button variant="outline">Activer</Button>
-              </div>
-              
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="font-medium">Sessions actives</p>
-                  <p className="text-sm text-muted-foreground">Gérer les appareils connectés</p>
-                </div>
-                <Button variant="outline">Gérer</Button>
-              </div>
-              
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="font-medium">Supprimer le compte</p>
-                  <p className="text-sm text-muted-foreground">Supprimer définitivement votre compte</p>
-                </div>
-                <Button variant="destructive">Supprimer</Button>
-              </div>
-            </div>
-          </div>
-        </TabsContent>
         
         <TabsContent value="language" className="bg-card text-card-foreground rounded-lg shadow p-4 md:p-6">
           <div className="space-y-6">

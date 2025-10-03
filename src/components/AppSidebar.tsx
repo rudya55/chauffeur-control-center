@@ -12,7 +12,8 @@ import {
   Moon,
   Sun,
   Bell,
-  Wallet
+  Wallet,
+  LogOut
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useIsMobile } from "@/hooks/use-mobile";
@@ -42,6 +43,7 @@ import { useNavigate } from "react-router-dom";
 import { useTheme } from "next-themes";
 import ThemeToggle from "./ThemeToggle";
 import NotificationBell from "./NotificationBell";
+import { useAuth } from "@/hooks/use-auth";
 
 interface AppSidebarProps {
   isOpen?: boolean;
@@ -56,6 +58,7 @@ const AppSidebar = ({ isOpen = false, onClose }: AppSidebarProps) => {
   const [avatarUrl, setAvatarUrl] = useState("/profile-photo.jpg");
   const { t } = useLanguage();
   const navigate = useNavigate();
+  const { signOut } = useAuth();
   
   // Driver information
   const driverName = "Jean Dupont";
@@ -173,6 +176,17 @@ const AppSidebar = ({ isOpen = false, onClose }: AppSidebarProps) => {
           </SidebarGroupContent>
         </SidebarGroup>
       </SidebarContent>
+
+      <div className="p-3 border-t">
+        <Button 
+          variant="outline" 
+          className="w-full flex items-center gap-2"
+          onClick={signOut}
+        >
+          <LogOut className="h-4 w-4" />
+          <span>Déconnexion</span>
+        </Button>
+      </div>
     </div>
   );
 };
