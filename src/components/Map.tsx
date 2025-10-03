@@ -1,8 +1,9 @@
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef } from 'react';
 import { cn } from '@/lib/utils';
 import { useTheme as useNextTheme } from 'next-themes';
 import { Menu, Car } from 'lucide-react';
-import ReactDOM from 'react-dom/client';
+import L from 'leaflet';
+import 'leaflet/dist/leaflet.css';
 
 interface MapProps {
   className?: string;
@@ -20,337 +21,160 @@ const Map = ({
   onMenuToggle
 }: MapProps) => {
   const mapRef = useRef<HTMLDivElement>(null);
-  const mapInstanceRef = useRef<any>(null);
-  const markerRef = useRef<any>(null);
-  const polylineRef = useRef<any>(null);
+  const mapInstanceRef = useRef<L.Map | null>(null);
+  const markerRef = useRef<L.Marker | null>(null);
+  const polylineRef = useRef<L.Polyline | null>(null);
   const { theme } = useNextTheme();
-  
-  // Google Maps API key
-  const apiKey = "AIzaSyBInRJxBA3-aLlx6o7Np8Mic0yXHLnaFQE";
-
 
   useEffect(() => {
-    // Load Google Maps API script
-    const loadMap = () => {
-      if (!window.google) {
-        const script = document.createElement('script');
-        script.src = `https://maps.googleapis.com/maps/api/js?key=${apiKey}&libraries=places,marker`;
+    if (!mapRef.current || mapInstanceRef.current) return;
 
-        script.async = true;
-        script.defer = true;
-        script.onload = initMap;
-        document.head.appendChild(script);
-      } else {
-        initMap();
-      }
-    };
+    // Initialize map
+    const map = L.map(mapRef.current).setView([center.lat, center.lng], zoom);
 
-    // Initialize the map
-    const initMap = () => {
-      if (mapRef.current && window.google) {
-        // Set map styles based on theme
-        const darkMapStyles = [
-          { elementType: 'geometry', stylers: [{ color: '#1a2639' }] }, // Darker blue background
-          { elementType: 'labels.text.stroke', stylers: [{ color: '#1a2639' }] },
-          { elementType: 'labels.text.fill', stylers: [{ color: '#d4af37' }] }, // Gold text
-          {
-            featureType: 'administrative.locality',
-            elementType: 'labels.text.fill',
-            stylers: [{ color: '#d4af37' }] // Gold for localities
-          },
-          {
-            featureType: 'poi',
-            elementType: 'labels',
-            stylers: [{ visibility: 'off' }]
-          },
-          {
-            featureType: 'road',
-            elementType: 'geometry',
-            stylers: [{ color: '#4a6491' }] // Lighter blue for roads
-          },
-          {
-            featureType: 'road',
-            elementType: 'geometry.stroke',
-            stylers: [{ color: '#6a84b1' }] // Even lighter blue for road strokes
-          },
-          {
-            featureType: 'road',
-            elementType: 'labels.text.fill',
-            stylers: [{ color: '#d4af37' }] // Gold text for roads
-          },
-          {
-            featureType: 'road.highway',
-            elementType: 'geometry',
-            stylers: [{ color: '#5d7bb0' }] // Light blue for highways
-          },
-          {
-            featureType: 'road.highway',
-            elementType: 'geometry.stroke',
-            stylers: [{ color: '#8fa8d5' }] // Even lighter blue for highway strokes
-          },
-          {
-            featureType: 'transit',
-            elementType: 'geometry',
-            stylers: [{ color: '#2f3948' }]
-          },
-          {
-            featureType: 'water',
-            elementType: 'geometry',
-            stylers: [{ color: '#0e1626' }] // Darker blue for water
-          },
-          {
-            featureType: 'water',
-            elementType: 'labels.text.fill',
-            stylers: [{ color: '#515c6d' }]
-          }
-        ];
-        
-        const lightMapStyles = [
-          {
-            featureType: "poi",
-            elementType: "labels",
-            stylers: [{ visibility: "off" }]
-          }
-        ];
-
-        const mapOptions = {
-          center: center,
-          zoom: zoom,
-          disableDefaultUI: false,
-          zoomControl: true,
-          mapTypeControl: false,
-          streetViewControl: false,
-          styles: theme === 'dark' ? darkMapStyles : lightMapStyles
-        };
-
-        // @ts-ignore
-        mapInstanceRef.current = new window.google.maps.Map(mapRef.current, mapOptions);
-
-        // Créer un élément DOM pour l'icône de voiture (pour Advanced Marker)
-        const carIconDiv = document.createElement('div');
-        const root = ReactDOM.createRoot(carIconDiv);
-        root.render(
-          <div style={{ 
-            width: '40px', 
-            height: '40px', 
-            display: 'flex', 
-            alignItems: 'center', 
-            justifyContent: 'center',
-            background: theme === 'dark' ? '#d4af37' : '#1a73e8',
-            borderRadius: '50%',
-            border: '3px solid white',
-            boxShadow: '0 2px 6px rgba(0,0,0,0.3)'
-          }}>
-            <Car color="white" size={20} />
-          </div>
-        );
-
-        // Créer le marqueur voiture avec fallback si AdvancedMarkerElement indisponible
-        const hasAdvanced = Boolean((window as any)?.google?.maps?.marker?.AdvancedMarkerElement);
-        if (hasAdvanced) {
-          // @ts-ignore
-          markerRef.current = new window.google.maps.marker.AdvancedMarkerElement({
-            position: center,
-            map: mapInstanceRef.current,
-            content: carIconDiv,
-            title: "Position"
-          });
-        } else {
-          // @ts-ignore
-          markerRef.current = new window.google.maps.Marker({
-            position: center,
-            map: mapInstanceRef.current,
-            icon: {
-              // @ts-ignore
-              path: window.google.maps.SymbolPath.CIRCLE,
-              scale: 12,
-              fillColor: theme === 'dark' ? '#d4af37' : '#1a73e8',
-              fillOpacity: 1,
-              strokeColor: '#ffffff',
-              strokeWeight: 3,
-            },
-            label: { text: '🚗', fontSize: '14px' },
-            title: 'Position'
-          });
-        }
-
-        // Si nous avons un itinéraire, on affiche une polyline
-        if (route && route.length > 1) {
-          const path = route.map(point => ({ lat: point.lat, lng: point.lng }));
-          
-          // @ts-ignore
-          polylineRef.current = new window.google.maps.Polyline({
-            path: path,
-            geodesic: true,
-            strokeColor: theme === 'dark' ? '#d4af37' : '#FF0000', // Gold in dark mode, red in light mode
-            strokeOpacity: 1.0,
-            strokeWeight: 3
-          });
-          
-          polylineRef.current.setMap(mapInstanceRef.current);
-          
-          // Ajuster la vue pour inclure tout l'itinéraire
-          // @ts-ignore
-          const bounds = new window.google.maps.LatLngBounds();
-          path.forEach(point => bounds.extend(point));
-          mapInstanceRef.current.fitBounds(bounds);
-        } else {
-          // Try to get user's location
-          if (navigator.geolocation) {
-            navigator.geolocation.getCurrentPosition(
-              (position) => {
-                const userLocation = {
-                  lat: position.coords.latitude,
-                  lng: position.coords.longitude
-                };
-                
-                if (mapInstanceRef.current && markerRef.current) {
-                  mapInstanceRef.current.setCenter(userLocation);
-                  if (markerRef.current?.setPosition) {
-                    markerRef.current.setPosition(userLocation);
-                  } else {
-                    // Advanced Marker
-                    try {
-                      markerRef.current.position = userLocation;
-                    } catch {}
-                  }
-                }
-              },
-              () => {
-                console.log("Error: The Geolocation service failed.");
-              }
-            );
-          }
-        }
-      }
-    };
-
-    if (!apiKey) return;
-    loadMap();
-
-
-    // Update map when theme changes
-    if (mapInstanceRef.current) {
-      const darkMapStyles = [
-        { elementType: 'geometry', stylers: [{ color: '#1a2639' }] },
-        { elementType: 'labels.text.stroke', stylers: [{ color: '#1a2639' }] },
-        { elementType: 'labels.text.fill', stylers: [{ color: '#d4af37' }] },
-        {
-          featureType: 'administrative.locality',
-          elementType: 'labels.text.fill',
-          stylers: [{ color: '#d4af37' }]
-        },
-        {
-          featureType: 'poi',
-          elementType: 'labels',
-          stylers: [{ visibility: 'off' }]
-        },
-        {
-          featureType: 'road',
-          elementType: 'geometry',
-          stylers: [{ color: '#4a6491' }]
-        },
-        {
-          featureType: 'road',
-          elementType: 'geometry.stroke',
-          stylers: [{ color: '#6a84b1' }]
-        },
-        {
-          featureType: 'road',
-          elementType: 'labels.text.fill',
-          stylers: [{ color: '#d4af37' }]
-        },
-        {
-          featureType: 'road.highway',
-          elementType: 'geometry',
-          stylers: [{ color: '#5d7bb0' }]
-        },
-        {
-          featureType: 'road.highway',
-          elementType: 'geometry.stroke',
-          stylers: [{ color: '#8fa8d5' }]
-        },
-        {
-          featureType: 'transit',
-          elementType: 'geometry',
-          stylers: [{ color: '#2f3948' }]
-        },
-        {
-          featureType: 'water',
-          elementType: 'geometry',
-          stylers: [{ color: '#0e1626' }]
-        },
-        {
-          featureType: 'water',
-          elementType: 'labels.text.fill',
-          stylers: [{ color: '#515c6d' }]
-        }
-      ];
-      
-      const lightMapStyles = [
-        { featureType: "poi", elementType: "labels", stylers: [{ visibility: "off" }] }
-      ];
-      
-      const styles = theme === 'dark' ? darkMapStyles : lightMapStyles;
-      
-      mapInstanceRef.current.setOptions({ styles });
-      
-      if (markerRef.current) {
-        const isAdvanced = 'content' in markerRef.current;
-        if (isAdvanced) {
-          // Recréer l'icône de voiture avec la nouvelle couleur
-          const carIconDiv = document.createElement('div');
-          const root = ReactDOM.createRoot(carIconDiv);
-          root.render(
-            <div style={{ 
-              width: '40px', 
-              height: '40px', 
-              display: 'flex', 
-              alignItems: 'center', 
-              justifyContent: 'center',
-              background: theme === 'dark' ? '#d4af37' : '#1a73e8',
-              borderRadius: '50%',
-              border: '3px solid white',
-              boxShadow: '0 2px 6px rgba(0,0,0,0.3)'
-            }}>
-              <Car color="white" size={20} />
-            </div>
-          );
-          // @ts-ignore
-          markerRef.current.content = carIconDiv;
-        } else if (markerRef.current.setIcon) {
-          // @ts-ignore
-          markerRef.current.setIcon({
-            // @ts-ignore
-            path: window.google.maps.SymbolPath.CIRCLE,
-            scale: 12,
-            fillColor: theme === 'dark' ? '#d4af37' : '#1a73e8',
-            fillOpacity: 1,
-            strokeColor: '#ffffff',
-            strokeWeight: 3,
-          });
-          // @ts-ignore
-          markerRef.current.setLabel({ text: '🚗', fontSize: '14px' });
-        }
-      }
-
-      if (polylineRef.current) {
-        polylineRef.current.setOptions({
-          strokeColor: theme === 'dark' ? '#d4af37' : '#FF0000' // Gold in dark mode, red in light mode
+    // Add tile layer based on theme
+    const tileLayer = theme === 'dark'
+      ? L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
+          attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>',
+          maxZoom: 19
+        })
+      : L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+          attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
+          maxZoom: 19
         });
+
+    tileLayer.addTo(map);
+    mapInstanceRef.current = map;
+
+    // Create custom car icon
+    const carIcon = L.divIcon({
+      html: `<div style="
+        width: 40px; 
+        height: 40px; 
+        display: flex; 
+        align-items: center; 
+        justify-content: center;
+        background: ${theme === 'dark' ? '#d4af37' : '#1a73e8'};
+        border-radius: 50%;
+        border: 3px solid white;
+        box-shadow: 0 2px 6px rgba(0,0,0,0.3);
+      ">
+        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M19 17h2c.6 0 1-.4 1-1v-3c0-.9-.7-1.7-1.5-1.9C18.7 10.6 16 10 16 10s-1.3-1.4-2.2-2.3c-.5-.4-1.1-.7-1.8-.7H5c-.6 0-1.1.4-1.4.9l-1.4 2.9A3.7 3.7 0 0 0 2 12v4c0 .6.4 1 1 1h2"/>
+          <circle cx="7" cy="17" r="2"/>
+          <path d="M9 17h6"/>
+          <circle cx="17" cy="17" r="2"/>
+        </svg>
+      </div>`,
+      className: 'custom-car-marker',
+      iconSize: [40, 40],
+      iconAnchor: [20, 20]
+    });
+
+    // Add marker
+    const marker = L.marker([center.lat, center.lng], { icon: carIcon }).addTo(map);
+    markerRef.current = marker;
+
+    // Handle route
+    if (route && route.length > 1) {
+      const latLngs: [number, number][] = route.map(point => [point.lat, point.lng]);
+      const polyline = L.polyline(latLngs, {
+        color: theme === 'dark' ? '#d4af37' : '#FF0000',
+        weight: 3
+      }).addTo(map);
+      polylineRef.current = polyline;
+      
+      // Fit bounds to show entire route
+      map.fitBounds(polyline.getBounds());
+    } else {
+      // Try to get user's location
+      if (navigator.geolocation) {
+        navigator.geolocation.getCurrentPosition(
+          (position) => {
+            const userLocation: [number, number] = [
+              position.coords.latitude,
+              position.coords.longitude
+            ];
+            
+            map.setView(userLocation, zoom);
+            marker.setLatLng(userLocation);
+          },
+          (error) => {
+            console.log("Geolocation error:", error);
+          }
+        );
       }
     }
 
     return () => {
-      // Cleanup
-      if (polylineRef.current) {
-        polylineRef.current.setMap(null);
+      if (mapInstanceRef.current) {
+        mapInstanceRef.current.remove();
+        mapInstanceRef.current = null;
+        markerRef.current = null;
+        polylineRef.current = null;
       }
-      mapInstanceRef.current = null;
-      markerRef.current = null;
-      polylineRef.current = null;
     };
-  }, [center, zoom, route, theme, apiKey]);
+  }, [center.lat, center.lng, zoom, route.length]);
+
+  // Update theme
+  useEffect(() => {
+    if (!mapInstanceRef.current) return;
+
+    // Remove old tile layer
+    mapInstanceRef.current.eachLayer((layer) => {
+      if (layer instanceof L.TileLayer) {
+        mapInstanceRef.current?.removeLayer(layer);
+      }
+    });
+
+    // Add new tile layer based on theme
+    const tileLayer = theme === 'dark'
+      ? L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
+          attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>',
+          maxZoom: 19
+        })
+      : L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+          attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
+          maxZoom: 19
+        });
+
+    tileLayer.addTo(mapInstanceRef.current);
+
+    // Update marker icon
+    if (markerRef.current) {
+      const carIcon = L.divIcon({
+        html: `<div style="
+          width: 40px; 
+          height: 40px; 
+          display: flex; 
+          align-items: center; 
+          justify-content: center;
+          background: ${theme === 'dark' ? '#d4af37' : '#1a73e8'};
+          border-radius: 50%;
+          border: 3px solid white;
+          box-shadow: 0 2px 6px rgba(0,0,0,0.3);
+        ">
+          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M19 17h2c.6 0 1-.4 1-1v-3c0-.9-.7-1.7-1.5-1.9C18.7 10.6 16 10 16 10s-1.3-1.4-2.2-2.3c-.5-.4-1.1-.7-1.8-.7H5c-.6 0-1.1.4-1.4.9l-1.4 2.9A3.7 3.7 0 0 0 2 12v4c0 .6.4 1 1 1h2"/>
+            <circle cx="7" cy="17" r="2"/>
+            <path d="M9 17h6"/>
+            <circle cx="17" cy="17" r="2"/>
+          </svg>
+        </div>`,
+        className: 'custom-car-marker',
+        iconSize: [40, 40],
+        iconAnchor: [20, 20]
+      });
+      markerRef.current.setIcon(carIcon);
+    }
+
+    // Update polyline color
+    if (polylineRef.current) {
+      polylineRef.current.setStyle({
+        color: theme === 'dark' ? '#d4af37' : '#FF0000'
+      });
+    }
+  }, [theme]);
 
   // Handle menu toggle click
   const handleMenuToggle = () => {
@@ -362,18 +186,13 @@ const Map = ({
     }
   };
 
-
   return (
-
-    <div 
-      className={cn("h-full w-full rounded-lg overflow-hidden relative", className)} 
-    >
+    <div className={cn("h-full w-full rounded-lg overflow-hidden relative", className)}>
       <div ref={mapRef} className="h-full w-full" />
       
       {/* Menu toggle button */}
-
       <button 
-        className="absolute top-4 left-4 z-50 bg-card text-foreground border p-2 rounded-md shadow-md"
+        className="absolute top-4 left-4 z-[1000] bg-card text-foreground border p-2 rounded-md shadow-md hover:bg-accent transition-colors"
         onClick={handleMenuToggle}
         aria-label="Toggle menu"
       >
@@ -382,12 +201,5 @@ const Map = ({
     </div>
   );
 };
-
-// Add the missing google type definition for TypeScript
-declare global {
-  interface Window {
-    google: any;
-  }
-}
 
 export default Map;
