@@ -16,22 +16,22 @@ const OnlineStatusToggle = ({ className }: OnlineStatusToggleProps) => {
   };
 
   return (
-    <div className={cn("flex items-center px-6 py-2 bg-white rounded-full shadow-md", className)}>
-      <CarTaxiFront size={18} className={cn(
-        "mr-2",
+    <div className={cn("flex items-center gap-2 sm:gap-3 px-3 py-1.5 sm:px-6 sm:py-2 bg-white/95 dark:bg-card/95 backdrop-blur-sm rounded-full shadow-md", className)}>
+      <CarTaxiFront size={16} className={cn(
+        "sm:w-[18px] sm:h-[18px] flex-shrink-0",
         isOnline ? "text-green-600" : "text-gray-500"
       )} />
       <span className={cn(
-        "text-lg font-medium",
+        "text-sm sm:text-base md:text-lg font-medium whitespace-nowrap",
         isOnline ? "text-green-600" : "text-gray-500"
       )}>
         {isOnline ? 'En ligne' : 'Hors ligne'}
       </span>
-      <div className="flex-1"></div>
       <Switch 
         checked={isOnline} 
         onCheckedChange={handleToggle}
         className={cn(
+          "scale-90 sm:scale-100",
           isOnline ? "bg-green-600" : "bg-gray-400"
         )}
       />

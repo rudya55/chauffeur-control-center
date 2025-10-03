@@ -13,12 +13,12 @@ const Home = () => {
       </div>
       
       {/* Status toggle at top center */}
-      <div className="absolute top-4 left-1/2 transform -translate-x-1/2 z-10">
+      <div className="absolute top-3 sm:top-4 left-1/2 transform -translate-x-1/2 z-10 w-auto px-2">
         <OnlineStatusToggle />
       </div>
 
       {/* Page header with menu button only, no title */}
-      <div className="absolute top-4 left-4 z-10">
+      <div className="absolute top-3 sm:top-4 left-2 sm:left-4 z-10">
         <PageHeader 
           title="" 
           showBackButton={false} 

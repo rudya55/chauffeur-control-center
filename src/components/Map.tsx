@@ -228,38 +228,38 @@ const Map = ({
     <div className={cn("h-full w-full rounded-lg overflow-hidden relative", className)}>
       <div ref={mapRef} className="h-full w-full" />
       
-      {/* Contrôles de zoom à droite */}
-      <div className="absolute top-4 right-4 z-[1000] flex flex-col gap-2">
+      {/* Contrôles de zoom à droite - responsive */}
+      <div className="absolute top-3 sm:top-4 right-3 sm:right-4 z-[1000] flex flex-col gap-1.5 sm:gap-2">
         <button 
-          className="bg-card text-foreground border p-2 rounded-md shadow-md hover:bg-accent transition-colors"
+          className="bg-card text-foreground border p-1.5 sm:p-2 rounded-md shadow-md hover:bg-accent transition-colors"
           onClick={handleZoomIn}
           aria-label="Zoom in"
         >
-          <Plus className="h-5 w-5" />
+          <Plus className="h-4 w-4 sm:h-5 sm:w-5" />
         </button>
         <button 
-          className="bg-card text-foreground border p-2 rounded-md shadow-md hover:bg-accent transition-colors"
+          className="bg-card text-foreground border p-1.5 sm:p-2 rounded-md shadow-md hover:bg-accent transition-colors"
           onClick={handleZoomOut}
           aria-label="Zoom out"
         >
-          <Minus className="h-5 w-5" />
+          <Minus className="h-4 w-4 sm:h-5 sm:w-5" />
         </button>
         <button 
-          className="bg-card text-foreground border p-2 rounded-md shadow-md hover:bg-accent transition-colors"
+          className="bg-card text-foreground border p-1.5 sm:p-2 rounded-md shadow-md hover:bg-accent transition-colors"
           onClick={handleLocate}
           aria-label="Me localiser"
         >
-          <Navigation className="h-5 w-5" />
+          <Navigation className="h-4 w-4 sm:h-5 sm:w-5" />
         </button>
       </div>
       
       {/* Menu toggle button */}
       <button 
-        className="absolute top-4 left-4 z-[1000] bg-card text-foreground border p-2 rounded-md shadow-md hover:bg-accent transition-colors"
+        className="absolute top-3 sm:top-4 left-3 sm:left-4 z-[1000] bg-card text-foreground border p-1.5 sm:p-2 rounded-md shadow-md hover:bg-accent transition-colors"
         onClick={handleMenuToggle}
         aria-label="Toggle menu"
       >
-        <Menu className="h-5 w-5 text-foreground" />
+        <Menu className="h-4 w-4 sm:h-5 sm:w-5 text-foreground" />
       </button>
     </div>
   );

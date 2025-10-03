@@ -99,19 +99,19 @@ const AppSidebar = ({ isOpen = false, onClose }: AppSidebarProps) => {
     );
 
   return (
-    <div className="h-full flex flex-col bg-background border-r">
-      <div className="flex flex-col p-4 border-b">
+    <div className="h-full flex flex-col bg-background border-r w-full">
+      <div className="flex flex-col p-3 sm:p-4 border-b">
         <Dialog>
           <DialogTrigger asChild>
-            <div className="flex flex-col items-center mb-4 cursor-pointer">
-              <Avatar className="h-16 w-16 mb-2">
+            <div className="flex flex-col items-center mb-3 sm:mb-4 cursor-pointer">
+              <Avatar className="h-14 w-14 sm:h-16 sm:w-16 mb-2">
                 <AvatarImage src={avatarUrl} alt="Driver" />
                 <AvatarFallback>JD</AvatarFallback>
               </Avatar>
-              <h3 className="font-medium text-base">{driverName}</h3>
+              <h3 className="font-medium text-sm sm:text-base">{driverName}</h3>
               <div className="flex items-center">
-                <span className="text-sm font-medium text-yellow-500">{driverRating}</span>
-                <span className="text-sm text-yellow-500 ml-1">★</span>
+                <span className="text-xs sm:text-sm font-medium text-yellow-500">{driverRating}</span>
+                <span className="text-xs sm:text-sm text-yellow-500 ml-1">★</span>
               </div>
             </div>
           </DialogTrigger>
@@ -150,7 +150,7 @@ const AppSidebar = ({ isOpen = false, onClose }: AppSidebarProps) => {
         </div>
       </div>
 
-      <SidebarContent className="p-2 flex-1">
+      <SidebarContent className="p-2 flex-1 overflow-y-auto">
         <SidebarGroup>
           <SidebarGroupContent>
             <SidebarMenu>
@@ -163,8 +163,8 @@ const AppSidebar = ({ isOpen = false, onClose }: AppSidebarProps) => {
                       className={getNavClasses}
                       onClick={handleNavLinkClick}
                     >
-                      <item.icon className="h-5 w-5" />
-                      <span>{item.title}</span>
+                      <item.icon className="h-5 w-5 flex-shrink-0" />
+                      <span className="text-sm sm:text-base">{item.title}</span>
                     </NavLink>
                   </SidebarMenuButton>
                 </SidebarMenuItem>
