@@ -3,13 +3,20 @@ import { ReservationType } from "@/types/reservation";
 import { toast } from "sonner";
 
 // Sample data for development
+// Helpers pour générer des dates relatives à aujourd'hui
+const atDaysFromNow = (days: number, hours: number, minutes: number) => {
+  const d = new Date();
+  d.setDate(d.getDate() + days);
+  d.setHours(hours, minutes, 0, 0);
+  return d.toISOString();
+};
 const initialUpcomingReservations: ReservationType[] = [
   {
     id: "1",
     clientName: "Jean Dupont",
     pickupAddress: "1 Avenue des Champs-Élysées, Paris",
     destination: "Aéroport Charles de Gaulle, Paris",
-    date: "2025-05-20T08:30:00",
+    date: atDaysFromNow(1, 8, 30),
     phone: "+33612345678",
     flightNumber: "AF1234",
     dispatcher: "TaxiCorp",
@@ -32,7 +39,7 @@ const initialUpcomingReservations: ReservationType[] = [
     clientName: "Marie Lefevre",
     pickupAddress: "15 Rue de Rivoli, Paris",
     destination: "Gare de Lyon, Paris",
-    date: "2025-05-22T14:15:00",
+    date: atDaysFromNow(3, 14, 15),
     phone: "+33687654321",
     flightNumber: "",
     dispatcher: "LuxDrive",
@@ -57,7 +64,7 @@ const initialMyReservations: ReservationType[] = [
     clientName: "Pierre Leroy",
     pickupAddress: "Hôtel Ritz, Paris",
     destination: "Tour Eiffel, Paris",
-    date: "2025-05-18T18:45:00",
+    date: atDaysFromNow(0, 18, 45),
     phone: "+33698765432",
     flightNumber: "",
     dispatcher: "LuxDrive",
@@ -82,9 +89,9 @@ const initialCompletedReservations: ReservationType[] = [
     clientName: "Sophie Bernard",
     pickupAddress: "14 Rue de la Paix, Paris",
     destination: "Musée du Louvre, Paris",
-    date: "2025-05-14T10:30:00",
-    actualPickupTime: "2025-05-14T10:35:00",
-    dropoffTime: "2025-05-14T11:15:00",
+    date: atDaysFromNow(-10, 10, 30),
+    actualPickupTime: atDaysFromNow(-10, 10, 35),
+    dropoffTime: atDaysFromNow(-10, 11, 15),
     distance: "5.2 km",
     duration: "40 min",
     phone: "+33654321987",
@@ -144,6 +151,12 @@ export const useReservations = () => {
       const calendarReservations = JSON.parse(localStorage.getItem('calendarReservations') || '[]');
       calendarReservations.push(updatedReservation);
       localStorage.setItem('calendarReservations', JSON.stringify(calendarReservations));
+      // Notifier le calendrier immédiatement
+      try {
+        window.dispatchEvent(new StorageEvent('storage', { key: 'calendarReservations' }));
+      } catch (_) {
+        window.dispatchEvent(new Event('calendarReservationsUpdated'));
+      }
       
       toast.success(`Réservation pour ${reservation.clientName} acceptée`);
     } else {
@@ -237,6 +250,11 @@ export const useReservations = () => {
     const calendarReservations = JSON.parse(localStorage.getItem('calendarReservations') || '[]');
     const updatedCalendarReservations = calendarReservations.filter((res: ReservationType) => res.id !== id);
     localStorage.setItem('calendarReservations', JSON.stringify(updatedCalendarReservations));
+    try {
+      window.dispatchEvent(new StorageEvent('storage', { key: 'calendarReservations' }));
+    } catch (_) {
+      window.dispatchEvent(new Event('calendarReservationsUpdated'));
+    }
     
     toast.success(`Course pour ${reservationToComplete.clientName} terminée`);
   };
@@ -248,6 +266,11 @@ export const useReservations = () => {
       res.id === id ? { ...res, status: newStatus } : res
     );
     localStorage.setItem('calendarReservations', JSON.stringify(updatedCalendarReservations));
+    try {
+      window.dispatchEvent(new StorageEvent('storage', { key: 'calendarReservations' }));
+    } catch (_) {
+      window.dispatchEvent(new Event('calendarReservationsUpdated'));
+    }
   };
   
   // Ouvrir le chat avec un dispatcher

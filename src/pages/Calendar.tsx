@@ -15,7 +15,7 @@ import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
 const Calendar = () => {
   const [date, setDate] = useState<Date>(new Date());
   const [reservations, setReservations] = useState<ReservationType[]>([]);
-  const [selectedDate, setSelectedDate] = useState<Date | null>(null);
+  const [selectedDate, setSelectedDate] = useState<Date | null>(new Date());
   const [selectedReservation, setSelectedReservation] = useState<ReservationType | null>(null);
   const [showReservationDetails, setShowReservationDetails] = useState(false);
   const [viewMode, setViewMode] = useState<"day" | "week" | "month">("month");
