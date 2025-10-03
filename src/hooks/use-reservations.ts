@@ -330,6 +330,54 @@ export const useReservations = () => {
     });
   }, [myReservations, setMyReservations, setCompletedReservations]);
 
+  // Synchroniser depuis le calendrier (localStorage) pour déplacer auto les "completed"
+  useEffect(() => {
+    const syncFromCalendar = () => {
+      try {
+        const calendar = JSON.parse(localStorage.getItem('calendarReservations') || '[]') as ReservationType[];
+        if (!Array.isArray(calendar)) return;
+        const completedInCalendar: ReservationType[] = calendar.filter((r: ReservationType) => r.status === 'completed');
+        if (completedInCalendar.length === 0) return;
+
+        const completedIds = new Set(completedInCalendar.map(r => r.id));
+
+        // Retirer de mes réservations celles terminées
+        setMyReservations(prev => prev.filter(r => !completedIds.has(r.id)));
+
+        // Ajouter aux terminées (sans doublons)
+        setCompletedReservations(prev => {
+          const existing = new Set(prev.map(r => r.id));
+          const toAdd: ReservationType[] = completedInCalendar
+            .filter(r => !existing.has(r.id))
+            .map(r => ({
+              ...r,
+              status: 'completed' as ReservationType['status'],
+              dropoffTime: r.dropoffTime || new Date().toISOString()
+            }));
+          return toAdd.length ? [...prev, ...toAdd] : prev;
+        });
+      } catch (e) {
+        console.error('Sync calendar -> completed failed', e);
+      }
+    };
+
+    // Écouter les mises à jour du calendrier
+    const storageHandler = (e: StorageEvent) => {
+      if (e.key === 'calendarReservations') syncFromCalendar();
+    };
+
+    window.addEventListener('calendarReservationsUpdated', syncFromCalendar as EventListener);
+    window.addEventListener('storage', storageHandler);
+
+    // Sync immédiat au montage
+    syncFromCalendar();
+
+    return () => {
+      window.removeEventListener('calendarReservationsUpdated', syncFromCalendar as EventListener);
+      window.removeEventListener('storage', storageHandler);
+    };
+  }, [setMyReservations, setCompletedReservations]);
+
   return {
     upcomingReservations,
     myReservations,
