@@ -27,9 +27,9 @@ const PageHeader = ({ title, showBackButton = true, className, onMenuToggle }: P
           variant="ghost" 
           size="icon" 
           onClick={() => window.dispatchEvent(new CustomEvent('toggle-sidebar'))}
-          className="mr-2"
+          className="p-2 hover:bg-accent rounded-md transition-colors"
         >
-          <Menu className="h-5 w-5" />
+          <Menu className="h-6 w-6" />
         </Button>
         
         {showBackButton && (
