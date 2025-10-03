@@ -14,6 +14,7 @@ import { cn } from "@/lib/utils";
 import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
 import AgendaDay from "@/components/calendar/AgendaDay";
 import AgendaWeek from "@/components/calendar/AgendaWeek";
+import AgendaMonth from "@/components/calendar/AgendaMonth";
 
 const Calendar = () => {
   const [date, setDate] = useState<Date>(new Date());
@@ -285,45 +286,8 @@ const Calendar = () => {
       </div>
       
       <div className="flex flex-col gap-6">
-        {viewMode === "month" && (
-          <Card className="hover-scale border-t-4 border-t-indigo-500">
-            <CardHeader className="pb-2 bg-gradient-to-r from-indigo-50 to-white dark:from-indigo-950/20 dark:to-background">
-              <div className="flex justify-between items-center">
-                <CardTitle className="flex items-center text-xl">
-                  <CalendarIcon className="mr-2 h-5 w-5 text-indigo-600" />
-                  Calendrier
-                </CardTitle>
-              </div>
-            </CardHeader>
-            <CardContent className="pt-2">
-              <CalendarComponent
-                mode="single"
-                selected={selectedDate || undefined}
-                onSelect={(day) => setSelectedDate(day)}
-                className="rounded-md border"
-                locale={fr}
-                showOutsideDays={viewMode === "month"}
-                modifiers={{
-                  booked: (date) => Boolean(daysWithReservations[format(date, 'yyyy-MM-dd')]),
-                  hidden: (date) => false,
-                }}
-                modifiersStyles={{
-                  booked: { textDecoration: 'none' },
-                }}
-                components={{
-                  DayContent: ({ date }) => (
-                    <div className="relative w-full h-full flex items-center justify-center transition-all" style={getDayStyle(date)}>
-                      <div>{format(date, 'd')}</div>
-                      {renderDayContent(date)}
-                    </div>
-                  )
-                }}
-              />
-            </CardContent>
-          </Card>
-        )}
+        {/* Plus de mini-calendrier: uniquement les vues agenda */}
 
-        
         <Card className="hover-scale border-t-4 border-t-pink-500">
           <CardHeader className="pb-2 bg-gradient-to-r from-pink-50 to-white dark:from-pink-950/20 dark:to-background">
             <div className="flex items-center justify-between gap-2 flex-wrap">
@@ -364,60 +328,13 @@ const Calendar = () => {
                   />
                 )}
 
-                {viewMode === "month" && viewReservations.length === 0 ? (
-                  <div className="text-center py-8 text-muted-foreground">
-                    Aucune réservation pour cette date
-                  </div>
-                ) : viewMode === "month" ? (
-                  <div className="space-y-4">
-                    {viewReservations.map((reservation) => (
-                      <div 
-                        key={reservation.id}
-                        className={cn(
-                          "p-4 border-2 rounded-lg cursor-pointer transition-all hover:shadow-lg hover-scale",
-                          getStatusColor(reservation.status)
-                        )}
-                        onClick={() => handleOpenReservationDetails(reservation)}
-                      >
-                        <div className="flex justify-between items-start mb-2">
-                          <div>
-                            <p className="font-medium text-lg">{reservation.clientName}</p>
-                            <p className="text-sm">
-                              {format(parseISO(reservation.date), 'dd/MM/yyyy HH:mm')}
-                            </p>
-                          </div>
-                          <Badge variant="outline" className={cn(
-                            "border-2 font-semibold", 
-                            reservation.status === 'accepted' && "bg-blue-500 text-white border-blue-600",
-                            reservation.status === 'started' && "bg-amber-500 text-white border-amber-600",
-                            reservation.status === 'arrived' && "bg-purple-500 text-white border-purple-600",
-                            reservation.status === 'onBoard' && "bg-teal-500 text-white border-teal-600",
-                            reservation.status === 'completed' && "bg-green-500 text-white border-green-600",
-                          )}>
-                            {reservation.status === 'accepted' && "Acceptée"}
-                            {reservation.status === 'started' && "En route"}
-                            {reservation.status === 'arrived' && "Arrivé"}
-                            {reservation.status === 'onBoard' && "Client à bord"}
-                            {reservation.status === 'completed' && "Terminée"}
-                          </Badge>
-                        </div>
-                        <div className="space-y-1 text-sm">
-                          <p className="flex items-center">
-                            <span className="font-medium mr-1">De:</span> {reservation.pickupAddress}
-                          </p>
-                          <p className="flex items-center">
-                            <span className="font-medium mr-1">À:</span> {reservation.destination}
-                          </p>
-                          {reservation.dispatcher && (
-                            <p className="text-xs text-muted-foreground mt-2">
-                              Via {reservation.dispatcher} {reservation.dispatcherLogo}
-                            </p>
-                          )}
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                ) : null}
+                {viewMode === "month" && (
+                  <AgendaMonth
+                    selectedDate={selectedDate}
+                    reservations={reservations}
+                    onSelect={handleOpenReservationDetails}
+                  />
+                )}
               </div>
             )}
           </CardContent>
