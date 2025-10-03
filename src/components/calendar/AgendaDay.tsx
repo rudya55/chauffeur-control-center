@@ -1,5 +1,6 @@
 import React, { useEffect, useMemo, useRef } from "react";
 import { parseISO, isValid, format } from "date-fns";
+import { fr } from "date-fns/locale";
 import { ReservationType } from "@/types/reservation";
 
 type AgendaDayProps = {
@@ -60,6 +61,10 @@ const AgendaDay: React.FC<AgendaDayProps> = ({ date, reservations, onSelect }) =
 
   return (
     <div className="w-full border rounded-lg overflow-hidden bg-card">
+      {/* Day label header */}
+      <div className="px-3 py-2 border-b bg-card/80 backdrop-blur">
+        <div className="text-sm font-semibold text-foreground">{format(date, "EEEE d MMMM yyyy", { locale: fr })}</div>
+      </div>
       <div className="flex">
         {/* Time gutter */}
         <div className="w-14 border-r bg-card/70">

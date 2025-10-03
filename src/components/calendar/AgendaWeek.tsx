@@ -94,54 +94,59 @@ const ScrollableWeekGrid: React.FC<{
   };
 
   return (
-    <div ref={scrollRef} className="relative flex-1 overflow-auto max-h-[70vh]">
-      <div className="grid grid-cols-7">
-        {days.map((day) => {
-          const dayKey = format(day, "yyyy-MM-dd");
-          const dayReservations = reservations.filter((r) => {
-            const d = parseISO(r.date);
-            return isValid(d) && format(d, "yyyy-MM-dd") === dayKey;
-          });
+    <div className="relative flex-1">
+      {/* Top day headers row */}
+      <div className="grid grid-cols-7 border-b bg-card/80 backdrop-blur sticky top-0 z-10">
+        {days.map((day) => (
+          <div key={format(day, "yyyy-MM-dd")} className="px-2 py-2 text-sm font-semibold text-foreground">
+            {format(day, "EEE d", { locale: fr })}
+          </div>
+        ))}
+      </div>
+      <div ref={scrollRef} className="relative flex-1 overflow-auto h-[70vh]">
+        <div className="grid grid-cols-7">
+          {days.map((day) => {
+            const dayKey = format(day, "yyyy-MM-dd");
+            const dayReservations = reservations.filter((r) => {
+              const d = parseISO(r.date);
+              return isValid(d) && format(d, "yyyy-MM-dd") === dayKey;
+            });
 
-          return (
-            <div key={dayKey} className="relative border-l" style={{ height: `${contentHeight}px` }}>
-              {/* Header */}
-              <div className="sticky top-0 z-10 bg-card/80 backdrop-blur px-2 py-1 border-b">
-                <div className="text-xs font-medium">{format(day, "EEE d", { locale: fr })}</div>
+            return (
+              <div key={dayKey} className="relative border-l" style={{ height: `${contentHeight}px` }}>
+                {/* Hour lines */}
+                {Array.from({ length: 24 }).map((_, i) => (
+                  <div key={i} className="absolute left-0 right-0 border-t" style={{ top: `${i * HOUR_HEIGHT}px` }} />
+                ))}
+
+                {/* Now indicator */}
+                {dayKey === todayKey && (
+                  <div className="absolute left-0 right-0 h-[2px] bg-destructive" style={{ top: `${getTop(new Date())}px` }} />
+                )}
+
+                {/* Events */}
+                {dayReservations.map((res) => {
+                  const d = parseISO(res.date);
+                  const top = getTop(d);
+                  return (
+                    <button
+                      key={res.id}
+                      onClick={() => onSelect(res)}
+                      className={`absolute left-1 right-1 border rounded-md p-1.5 text-left shadow-sm hover:shadow-md transition ${getEventClasses(
+                        res.status
+                      )}`}
+                      style={{ top, height: 44 }}
+                      aria-label={`${res.clientName} ${format(d, "HH:mm")}`}
+                    >
+                      <div className="text-[11px] font-medium truncate">{format(d, "HH:mm")} • {res.clientName}</div>
+                      <div className="text-[10px] text-muted-foreground truncate">{res.pickupAddress} → {res.destination}</div>
+                    </button>
+                  );
+                })}
               </div>
-
-              {/* Hour lines */}
-              {Array.from({ length: 24 }).map((_, i) => (
-                <div key={i} className="absolute left-0 right-0 border-t" style={{ top: `${i * HOUR_HEIGHT}px` }} />
-              ))}
-
-              {/* Now indicator */}
-              {dayKey === todayKey && (
-                <div className="absolute left-0 right-0 h-[2px] bg-destructive" style={{ top: `${getTop(new Date())}px` }} />
-              )}
-
-              {/* Events */}
-              {dayReservations.map((res) => {
-                const d = parseISO(res.date);
-                const top = getTop(d);
-                return (
-                  <button
-                    key={res.id}
-                    onClick={() => onSelect(res)}
-                    className={`absolute left-1 right-1 border rounded-md p-1.5 text-left shadow-sm hover:shadow-md transition ${getEventClasses(
-                      res.status
-                    )}`}
-                    style={{ top, height: 44 }}
-                    aria-label={`${res.clientName} ${format(d, "HH:mm")}`}
-                  >
-                    <div className="text-[11px] font-medium truncate">{format(d, "HH:mm")} • {res.clientName}</div>
-                    <div className="text-[10px] text-muted-foreground truncate">{res.pickupAddress} → {res.destination}</div>
-                  </button>
-                );
-              })}
-            </div>
-          );
-        })}
+            );
+          })}
+        </div>
       </div>
     </div>
   );
