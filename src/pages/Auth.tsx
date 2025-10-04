@@ -7,6 +7,8 @@ import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { toast } from "sonner";
 import { Loader2, Lock, Mail, User, ArrowLeft, Car } from "lucide-react";
+import { loginSchema, signupSchema, resetPasswordSchema } from "@/lib/validations/auth";
+import type { LoginFormData, SignupFormData, ResetPasswordFormData } from "@/lib/validations/auth";
 
 const Auth = () => {
   const navigate = useNavigate();
@@ -47,9 +49,23 @@ const Auth = () => {
     setLoading(true);
 
     try {
-      const { error } = await supabase.auth.signInWithPassword({
+      // Validate input
+      const formData: LoginFormData = {
         email: loginEmail,
         password: loginPassword,
+      };
+      
+      const validation = loginSchema.safeParse(formData);
+      if (!validation.success) {
+        const firstError = validation.error.errors[0];
+        toast.error(firstError.message);
+        setLoading(false);
+        return;
+      }
+
+      const { error } = await supabase.auth.signInWithPassword({
+        email: validation.data.email,
+        password: validation.data.password,
       });
 
       if (error) {
@@ -70,34 +86,34 @@ const Auth = () => {
 
   const handleSignup = async (e: React.FormEvent) => {
     e.preventDefault();
-    
-    if (signupPassword !== signupConfirmPassword) {
-      toast.error("Les mots de passe ne correspondent pas");
-      return;
-    }
-
-    if (signupPassword.length < 6) {
-      toast.error("Le mot de passe doit contenir au moins 6 caractères");
-      return;
-    }
-
-    if (!fullName.trim()) {
-      toast.error("Veuillez entrer votre nom complet");
-      return;
-    }
-
     setLoading(true);
 
     try {
+      // Validate input
+      const formData: SignupFormData = {
+        email: signupEmail,
+        password: signupPassword,
+        confirmPassword: signupConfirmPassword,
+        fullName: fullName,
+      };
+      
+      const validation = signupSchema.safeParse(formData);
+      if (!validation.success) {
+        const firstError = validation.error.errors[0];
+        toast.error(firstError.message);
+        setLoading(false);
+        return;
+      }
+
       const redirectUrl = `${window.location.origin}/`;
       
       const { error } = await supabase.auth.signUp({
-        email: signupEmail,
-        password: signupPassword,
+        email: validation.data.email,
+        password: validation.data.password,
         options: {
           emailRedirectTo: redirectUrl,
           data: {
-            full_name: fullName
+            full_name: validation.data.fullName
           }
         }
       });
@@ -124,7 +140,20 @@ const Auth = () => {
     setLoading(true);
 
     try {
-      const { error } = await supabase.auth.resetPasswordForEmail(resetEmail, {
+      // Validate input
+      const formData: ResetPasswordFormData = {
+        email: resetEmail,
+      };
+      
+      const validation = resetPasswordSchema.safeParse(formData);
+      if (!validation.success) {
+        const firstError = validation.error.errors[0];
+        toast.error(firstError.message);
+        setLoading(false);
+        return;
+      }
+
+      const { error } = await supabase.auth.resetPasswordForEmail(validation.data.email, {
         redirectTo: `${window.location.origin}/auth`,
       });
 

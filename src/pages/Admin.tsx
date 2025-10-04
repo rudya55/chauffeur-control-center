@@ -10,6 +10,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { toast } from "sonner";
 import { Loader2, CheckCircle, XCircle, FileText, Users } from "lucide-react";
+import { DocumentRejectionDialog } from "@/components/admin/DocumentRejectionDialog";
 import {
   Table,
   TableBody,
@@ -53,6 +54,8 @@ const Admin = () => {
   const [selectedUser, setSelectedUser] = useState<PendingUser | null>(null);
   const [userDocuments, setUserDocuments] = useState<UserDocument[]>([]);
   const [showDocumentsDialog, setShowDocumentsDialog] = useState(false);
+  const [showRejectionDialog, setShowRejectionDialog] = useState(false);
+  const [selectedDocument, setSelectedDocument] = useState<UserDocument | null>(null);
 
   useEffect(() => {
     checkAdminRole();
@@ -179,7 +182,9 @@ const Admin = () => {
     }
   };
 
-  const handleRejectDocument = async (docId: string, reason: string) => {
+  const handleRejectDocument = async (reason: string) => {
+    if (!selectedDocument) return;
+
     const { error } = await supabase
       .from("driver_documents")
       .update({ 
@@ -188,7 +193,7 @@ const Admin = () => {
         verified_at: new Date().toISOString(),
         verified_by: user?.id
       })
-      .eq("id", docId);
+      .eq("id", selectedDocument.id);
 
     if (error) {
       toast.error("Erreur lors du rejet du document");
@@ -199,6 +204,11 @@ const Admin = () => {
     if (selectedUser) {
       loadUserDocuments(selectedUser.id);
     }
+  };
+
+  const openRejectionDialog = (doc: UserDocument) => {
+    setSelectedDocument(doc);
+    setShowRejectionDialog(true);
   };
 
   if (loading) {
@@ -396,9 +406,7 @@ const Admin = () => {
                           <Button
                             variant="destructive"
                             size="sm"
-                            onClick={() =>
-                              handleRejectDocument(doc.id, "Document non conforme")
-                            }
+                            onClick={() => openRejectionDialog(doc)}
                           >
                             <XCircle className="h-4 w-4 mr-1" />
                             Rejeter
@@ -440,6 +448,13 @@ const Admin = () => {
           </div>
         </DialogContent>
       </Dialog>
+
+      <DocumentRejectionDialog
+        open={showRejectionDialog}
+        onOpenChange={setShowRejectionDialog}
+        onConfirm={handleRejectDocument}
+        documentName={selectedDocument?.document_name || ""}
+      />
     </div>
   );
 };
