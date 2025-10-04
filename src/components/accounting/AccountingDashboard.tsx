@@ -1,31 +1,91 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { TrendingUp, TrendingDown, DollarSign, AlertCircle } from "lucide-react";
 import { AreaChart, PieChart } from "@/components/ui/chart";
+import { useState, useEffect } from "react";
+import { supabase } from "@/integrations/supabase/client";
+
 
 const AccountingDashboard = () => {
-  // Mock data
-  const monthlyData = [
-    { month: "Jan", revenus: 4500, depenses: 2100 },
-    { month: "Fev", revenus: 5200, depenses: 2300 },
-    { month: "Mar", revenus: 4800, depenses: 2200 },
-    { month: "Avr", revenus: 5500, depenses: 2400 },
-    { month: "Mai", revenus: 6200, depenses: 2600 },
-    { month: "Jun", revenus: 5800, depenses: 2500 },
-  ];
+  const [totalRevenue, setTotalRevenue] = useState(0);
+  const [totalExpenses, setTotalExpenses] = useState(0);
+  const [monthlyData, setMonthlyData] = useState<any[]>([]);
+  const [expenseCategories, setExpenseCategories] = useState<any[]>([]);
 
-  const expenseCategories = [
-    { name: "Maintenance", value: 800, fill: "hsl(142, 76%, 36%)" },
-    { name: "Assurance", value: 400, fill: "hsl(217, 91%, 60%)" },
-    { name: "Péage", value: 300, fill: "hsl(48, 96%, 53%)" },
-    { name: "Parking", value: 250, fill: "hsl(280, 87%, 65%)" },
-    { name: "Nettoyage", value: 200, fill: "hsl(31, 97%, 72%)" },
-  ];
+  useEffect(() => {
+    fetchAccountingData();
+    
+    // Subscribe to realtime changes
+    const channel = supabase
+      .channel('accounting-changes')
+      .on('postgres_changes', {
+        event: '*',
+        schema: 'public',
+        table: 'accounting_transactions'
+      }, () => {
+        fetchAccountingData();
+      })
+      .subscribe();
 
-  const totalRevenue = 32000;
-  const totalExpenses = 14100;
+    return () => {
+      supabase.removeChannel(channel);
+    };
+  }, []);
+
+  const fetchAccountingData = async () => {
+    const { data: transactions } = await supabase
+      .from('accounting_transactions')
+      .select('*')
+      .order('transaction_date', { ascending: false });
+
+    if (transactions) {
+      // Calculate total revenue
+      const revenue = transactions
+        .filter(t => t.transaction_type === 'revenue')
+        .reduce((sum, t) => sum + parseFloat(String(t.amount || '0')), 0);
+      setTotalRevenue(revenue);
+
+      // Calculate total expenses and commissions
+      const expenses = transactions
+        .filter(t => t.transaction_type === 'expense' || t.transaction_type === 'commission')
+        .reduce((sum, t) => sum + parseFloat(String(t.amount || '0')), 0);
+      setTotalExpenses(expenses);
+
+      // Group by month
+      const monthlyStats: any = {};
+      transactions.forEach(t => {
+        const month = new Date(t.transaction_date).toLocaleDateString('fr-FR', { month: 'short' });
+        if (!monthlyStats[month]) {
+          monthlyStats[month] = { month, revenus: 0, depenses: 0 };
+        }
+        if (t.transaction_type === 'revenue') {
+          monthlyStats[month].revenus += parseFloat(String(t.amount || '0'));
+        } else {
+          monthlyStats[month].depenses += parseFloat(String(t.amount || '0'));
+        }
+      });
+      setMonthlyData(Object.values(monthlyStats));
+
+      // Expense categories
+      const categories: any = {};
+      transactions
+        .filter(t => t.transaction_type !== 'revenue')
+        .forEach(t => {
+          const cat = t.category || 'Autre';
+          categories[cat] = (categories[cat] || 0) + parseFloat(String(t.amount || '0'));
+        });
+      setExpenseCategories(
+        Object.entries(categories).map(([name, value], i) => ({
+          name,
+          value: Number(value),
+          fill: `hsl(${i * 60}, 70%, 50%)`
+        }))
+      );
+    }
+  };
+
   const netProfit = totalRevenue - totalExpenses;
-  const profitMargin = ((netProfit / totalRevenue) * 100).toFixed(1);
-  const pendingInvoices = 3;
+  const profitMargin = totalRevenue > 0 ? ((netProfit / totalRevenue) * 100).toFixed(1) : '0';
+  const pendingInvoices = 0;
 
   return (
     <div className="space-y-6 animate-fade-in">
@@ -80,7 +140,7 @@ const AccountingDashboard = () => {
           <CardContent>
             <div className="text-2xl font-bold text-orange-600">{pendingInvoices}</div>
             <p className="text-xs mt-1 text-orange-600">
-              Total: 3,450€
+              En temps réel
             </p>
           </CardContent>
         </Card>
