@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import PageHeader from "@/components/PageHeader";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -43,25 +43,94 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { supabase } from "@/integrations/supabase/client";
+import { useAuth } from "@/hooks/use-auth";
 
 const Settings = () => {
   const { t } = useLanguage();
-  const [avatar, setAvatar] = useState("/profile-photo.jpg");
+  const { user } = useAuth();
+  const [profile, setProfile] = useState<any>(null);
+  const [avatar, setAvatar] = useState("");
   const [darkMode, setDarkMode] = useState(false);
   const [emailNotifications, setEmailNotifications] = useState(true);
   const [pushNotifications, setPushNotifications] = useState(true);
   const [showPaymentDialog, setShowPaymentDialog] = useState(false);
   const [paymentMethod, setPaymentMethod] = useState("card");
   const [documentFile, setDocumentFile] = useState<File | null>(null);
-  const [documents, setDocuments] = useState([
-    { id: "1", name: "Permis de conduire", type: "pdf", date: "2025-04-15", size: "2.3 MB" },
-    { id: "2", name: "Assurance véhicule", type: "pdf", date: "2025-03-22", size: "1.5 MB" },
-    { id: "3", name: "Carte grise", type: "pdf", date: "2025-01-10", size: "650 KB" },
-  ]);
+  const [documents, setDocuments] = useState<any[]>([]);
+  const [firstName, setFirstName] = useState("");
+  const [lastName, setLastName] = useState("");
+  const [email, setEmail] = useState("");
+  const [phone, setPhone] = useState("");
+  const [address, setAddress] = useState("");
+
+  useEffect(() => {
+    if (user) {
+      fetchProfile();
+      fetchDocuments();
+    }
+  }, [user]);
+
+  const fetchProfile = async () => {
+    if (!user) return;
+    
+    const { data: profileData } = await supabase
+      .from('profiles')
+      .select('*')
+      .eq('id', user.id)
+      .single();
+
+    if (profileData) {
+      setProfile(profileData);
+      setEmail(profileData.email || user.email || '');
+      setAvatar(profileData.avatar_url || '');
+      const fullName = profileData.full_name || '';
+      const nameParts = fullName.split(' ');
+      setFirstName(nameParts[0] || '');
+      setLastName(nameParts.slice(1).join(' ') || '');
+    }
+  };
+
+  const fetchDocuments = async () => {
+    if (!user) return;
+
+    const { data } = await supabase
+      .from('driver_documents')
+      .select('*')
+      .eq('user_id', user.id)
+      .order('uploaded_at', { ascending: false });
+
+    if (data) {
+      setDocuments(data.map(doc => ({
+        id: doc.id,
+        name: doc.document_name,
+        type: doc.document_type,
+        date: new Date(doc.uploaded_at).toLocaleDateString('fr-FR'),
+        size: 'N/A',
+        status: doc.status,
+        url: doc.document_url
+      })));
+    }
+  };
   
-  const handleSaveProfile = (e: React.FormEvent) => {
+  const handleSaveProfile = async (e: React.FormEvent) => {
     e.preventDefault();
-    toast.success("Profil mis à jour avec succès");
+    if (!user) return;
+
+    const { error } = await supabase
+      .from('profiles')
+      .update({
+        full_name: `${firstName} ${lastName}`,
+        email: email,
+        avatar_url: avatar
+      })
+      .eq('id', user.id);
+
+    if (error) {
+      toast.error("Erreur lors de la mise à jour du profil");
+    } else {
+      toast.success("Profil mis à jour avec succès");
+    }
   };
   
   const handleSaveNotifications = (e: React.FormEvent) => {
@@ -84,31 +153,50 @@ const Settings = () => {
     setShowPaymentDialog(false);
   };
 
-  const handleDocumentUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleDocumentUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
-    if (file) {
+    if (file && user) {
       setDocumentFile(file);
-      // En production, vous enverriez le fichier à un serveur ici
-      const newDocument = {
-        id: (documents.length + 1).toString(),
-        name: file.name,
-        type: file.name.split('.').pop() || "unknown",
-        date: new Date().toISOString().split('T')[0],
-        size: `${(file.size / 1024).toFixed(1)} KB`
-      };
-      setDocuments([...documents, newDocument]);
-      toast.success("Document téléchargé avec succès");
+      
+      // Upload to Supabase storage would go here
+      const { error } = await supabase
+        .from('driver_documents')
+        .insert({
+          user_id: user.id,
+          document_name: file.name,
+          document_type: file.name.split('.').pop() || 'unknown',
+          document_url: `temp-url-${file.name}`,
+          status: 'pending'
+        });
+
+      if (error) {
+        toast.error("Erreur lors du téléchargement du document");
+      } else {
+        toast.success("Document téléchargé avec succès");
+        fetchDocuments();
+      }
     }
   };
 
-  const handleDeleteDocument = (id: string) => {
-    setDocuments(documents.filter(doc => doc.id !== id));
-    toast.success("Document supprimé");
+  const handleDeleteDocument = async (id: string) => {
+    const { error } = await supabase
+      .from('driver_documents')
+      .delete()
+      .eq('id', id);
+
+    if (error) {
+      toast.error("Erreur lors de la suppression");
+    } else {
+      toast.success("Document supprimé");
+      fetchDocuments();
+    }
   };
 
   const handleViewDocument = (id: string) => {
-    // En production, vous récupéreriez le document depuis votre serveur
-    toast.info(`Affichage du document ${id}`);
+    const doc = documents.find(d => d.id === id);
+    if (doc?.url) {
+      window.open(doc.url, '_blank');
+    }
   };
 
   const handleDownloadDocument = (id: string) => {
@@ -134,8 +222,10 @@ const Settings = () => {
           <form onSubmit={handleSaveProfile}>
             <div className="flex flex-col items-center mb-6">
               <Avatar className="h-24 w-24 mb-4">
-                <AvatarImage src={avatar} alt="Avatar" />
-                <AvatarFallback className="bg-primary text-primary-foreground">JD</AvatarFallback>
+                <AvatarImage src={avatar || undefined} alt="Avatar" />
+                <AvatarFallback className="bg-primary text-primary-foreground">
+                  {firstName.charAt(0)}{lastName.charAt(0)}
+                </AvatarFallback>
               </Avatar>
               
               <Label 
@@ -157,27 +247,53 @@ const Settings = () => {
               <div className="flex flex-col gap-4">
                 <div className="space-y-2">
                   <Label htmlFor="firstName" className="text-foreground">Prénom</Label>
-                  <Input id="firstName" defaultValue="Jean" className="bg-background text-foreground" />
+                  <Input 
+                    id="firstName" 
+                    value={firstName} 
+                    onChange={(e) => setFirstName(e.target.value)}
+                    className="bg-background text-foreground" 
+                  />
                 </div>
                 <div className="space-y-2">
                   <Label htmlFor="lastName" className="text-foreground">Nom</Label>
-                  <Input id="lastName" defaultValue="Dupont" className="bg-background text-foreground" />
+                  <Input 
+                    id="lastName" 
+                    value={lastName} 
+                    onChange={(e) => setLastName(e.target.value)}
+                    className="bg-background text-foreground" 
+                  />
                 </div>
               </div>
               
               <div className="space-y-2">
                 <Label htmlFor="email" className="text-foreground">Email</Label>
-                <Input id="email" type="email" defaultValue="jean.dupont@example.com" className="bg-background text-foreground" />
+                <Input 
+                  id="email" 
+                  type="email" 
+                  value={email} 
+                  onChange={(e) => setEmail(e.target.value)}
+                  className="bg-background text-foreground" 
+                />
               </div>
               
               <div className="space-y-2">
                 <Label htmlFor="phone" className="text-foreground">Téléphone</Label>
-                <Input id="phone" defaultValue="+33 6 12 34 56 78" className="bg-background text-foreground" />
+                <Input 
+                  id="phone" 
+                  value={phone} 
+                  onChange={(e) => setPhone(e.target.value)}
+                  className="bg-background text-foreground" 
+                />
               </div>
               
               <div className="space-y-2">
                 <Label htmlFor="address" className="text-foreground">Adresse</Label>
-                <Input id="address" defaultValue="123 Rue de Paris" className="bg-background text-foreground" />
+                <Input 
+                  id="address" 
+                  value={address} 
+                  onChange={(e) => setAddress(e.target.value)}
+                  className="bg-background text-foreground" 
+                />
               </div>
               
               <div className="flex items-center space-x-2">
