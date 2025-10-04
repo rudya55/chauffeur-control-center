@@ -83,6 +83,104 @@ export type Database = {
         }
         Relationships: []
       }
+      reservations: {
+        Row: {
+          actual_pickup_time: string | null
+          amount: number
+          client_name: string
+          comment: string | null
+          commission: number
+          created_at: string
+          date: string
+          destination: string
+          dispatcher: string
+          dispatcher_logo: string | null
+          distance: string | null
+          driver_amount: number
+          driver_id: string | null
+          dropoff_time: string | null
+          duration: string | null
+          flight_number: string | null
+          id: string
+          luggage: number
+          passengers: number
+          payment_type: string
+          phone: string
+          pickup_address: string
+          rating: number | null
+          route: Json | null
+          status: string
+          updated_at: string
+          vehicle_type: string
+        }
+        Insert: {
+          actual_pickup_time?: string | null
+          amount: number
+          client_name: string
+          comment?: string | null
+          commission: number
+          created_at?: string
+          date: string
+          destination: string
+          dispatcher: string
+          dispatcher_logo?: string | null
+          distance?: string | null
+          driver_amount: number
+          driver_id?: string | null
+          dropoff_time?: string | null
+          duration?: string | null
+          flight_number?: string | null
+          id?: string
+          luggage?: number
+          passengers?: number
+          payment_type: string
+          phone: string
+          pickup_address: string
+          rating?: number | null
+          route?: Json | null
+          status?: string
+          updated_at?: string
+          vehicle_type: string
+        }
+        Update: {
+          actual_pickup_time?: string | null
+          amount?: number
+          client_name?: string
+          comment?: string | null
+          commission?: number
+          created_at?: string
+          date?: string
+          destination?: string
+          dispatcher?: string
+          dispatcher_logo?: string | null
+          distance?: string | null
+          driver_amount?: number
+          driver_id?: string | null
+          dropoff_time?: string | null
+          duration?: string | null
+          flight_number?: string | null
+          id?: string
+          luggage?: number
+          passengers?: number
+          payment_type?: string
+          phone?: string
+          pickup_address?: string
+          rating?: number | null
+          route?: Json | null
+          status?: string
+          updated_at?: string
+          vehicle_type?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "reservations_driver_id_fkey"
+            columns: ["driver_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       user_roles: {
         Row: {
           id: string
