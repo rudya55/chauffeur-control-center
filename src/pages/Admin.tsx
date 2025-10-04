@@ -9,8 +9,9 @@ import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { toast } from "sonner";
-import { Loader2, CheckCircle, XCircle, FileText, Users } from "lucide-react";
+import { Loader2, CheckCircle, XCircle, FileText, Users, Plus } from "lucide-react";
 import { DocumentRejectionDialog } from "@/components/admin/DocumentRejectionDialog";
+import CreateReservationForm from "@/components/reservation/CreateReservationForm";
 import {
   Table,
   TableBody,
@@ -233,9 +234,28 @@ const Admin = () => {
     return labels[type] || type;
   };
 
+  const [showCreateDialog, setShowCreateDialog] = useState(false);
+
   return (
     <div className="p-4 sm:p-6">
-      <PageHeader title="Administration" />
+      <div className="flex justify-between items-center mb-6">
+        <PageHeader title="Administration" />
+        <Dialog open={showCreateDialog} onOpenChange={setShowCreateDialog}>
+          <Button onClick={() => setShowCreateDialog(true)}>
+            <Plus className="h-4 w-4 mr-2" />
+            Nouvelle réservation
+          </Button>
+          <DialogContent className="max-w-3xl max-h-[90vh] overflow-y-auto">
+            <DialogHeader>
+              <DialogTitle>Créer une nouvelle réservation</DialogTitle>
+            </DialogHeader>
+            <CreateReservationForm onSuccess={() => {
+              setShowCreateDialog(false);
+              toast.success("Réservation créée ! Elle sera visible sur l'app chauffeur.");
+            }} />
+          </DialogContent>
+        </Dialog>
+      </div>
 
       <Tabs defaultValue="pending" className="w-full">
         <TabsList className="grid w-full grid-cols-2 mb-6">
