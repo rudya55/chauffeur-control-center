@@ -1,8 +1,9 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { supabase } from "@/integrations/supabase/client";
 import {
   Select,
   SelectContent,
@@ -38,13 +39,53 @@ interface Expense {
 }
 
 const ExpenseManagement = () => {
-  const [expenses, setExpenses] = useState<Expense[]>([
-    { id: "1", date: "2024-01-05", category: "Parking", description: "Parking aéroport", amount: 25 },
-    { id: "2", date: "2024-01-10", category: "Maintenance", description: "Révision véhicule", amount: 250 },
-    { id: "3", date: "2024-01-15", category: "Assurance", description: "Prime mensuelle", amount: 120 },
-    { id: "4", date: "2024-01-20", category: "Péage", description: "Autoroute A1", amount: 15 },
-    { id: "5", date: "2024-02-05", category: "Nettoyage", description: "Lavage intérieur", amount: 45 },
-  ]);
+  const [expenses, setExpenses] = useState<Expense[]>([]);
+
+  useEffect(() => {
+    fetchExpenses();
+    
+    const channel = supabase
+      .channel('expense-changes')
+      .on(
+        'postgres_changes',
+        {
+          event: '*',
+          schema: 'public',
+          table: 'accounting_transactions'
+        },
+        () => {
+          fetchExpenses();
+        }
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
+  }, []);
+
+  const fetchExpenses = async () => {
+    const { data, error } = await supabase
+      .from('accounting_transactions')
+      .select('*')
+      .eq('transaction_type', 'expense')
+      .order('transaction_date', { ascending: false });
+
+    if (error) {
+      console.error('Error fetching expenses:', error);
+      return;
+    }
+
+    const formattedExpenses: Expense[] = (data || []).map(e => ({
+      id: e.id,
+      date: e.transaction_date.split('T')[0],
+      category: e.category,
+      description: e.description || '',
+      amount: Number(e.amount)
+    }));
+
+    setExpenses(formattedExpenses);
+  };
 
   const [newExpense, setNewExpense] = useState({
     category: "",
@@ -77,28 +118,46 @@ const ExpenseManagement = () => {
     fill: categoryColors[name] || categoryColors["Autre"],
   }));
 
-  const handleAddExpense = () => {
+  const handleAddExpense = async () => {
     if (!newExpense.category || !newExpense.amount) {
       toast.error("Veuillez remplir tous les champs obligatoires");
       return;
     }
 
-    const expense: Expense = {
-      id: String(expenses.length + 1),
-      date: new Date().toISOString().split("T")[0],
-      category: newExpense.category,
-      description: newExpense.description,
-      amount: parseFloat(newExpense.amount),
-    };
+    const { error } = await supabase
+      .from('accounting_transactions')
+      .insert({
+        transaction_type: 'expense',
+        category: newExpense.category,
+        description: newExpense.description,
+        amount: parseFloat(newExpense.amount),
+        transaction_date: new Date().toISOString(),
+        payment_status: 'completed'
+      });
 
-    setExpenses([...expenses, expense]);
+    if (error) {
+      toast.error("Erreur lors de l'ajout de la dépense");
+      console.error('Error adding expense:', error);
+      return;
+    }
+
     setNewExpense({ category: "", description: "", amount: "" });
     toast.success("Dépense ajoutée avec succès");
     setIsDialogOpen(false);
   };
 
-  const handleDeleteExpense = (id: string) => {
-    setExpenses(expenses.filter((e) => e.id !== id));
+  const handleDeleteExpense = async (id: string) => {
+    const { error } = await supabase
+      .from('accounting_transactions')
+      .delete()
+      .eq('id', id);
+
+    if (error) {
+      toast.error("Erreur lors de la suppression");
+      console.error('Error deleting expense:', error);
+      return;
+    }
+
     toast.success("Dépense supprimée");
   };
 

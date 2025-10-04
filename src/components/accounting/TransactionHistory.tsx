@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
@@ -18,6 +18,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { Search, ArrowUpCircle, ArrowDownCircle } from "lucide-react";
+import { supabase } from "@/integrations/supabase/client";
 
 interface Transaction {
   id: string;
@@ -31,19 +32,53 @@ interface Transaction {
 const TransactionHistory = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [filterType, setFilterType] = useState<string>("all");
+  const [transactions, setTransactions] = useState<Transaction[]>([]);
 
-  const [transactions] = useState<Transaction[]>([
-    { id: "1", date: "2024-02-20", type: "revenue", category: "Course", description: "Paris - Orly", amount: 65 },
-    { id: "2", date: "2024-02-20", type: "expense", category: "Carburant", description: "Station Total", amount: 45 },
-    { id: "3", date: "2024-02-19", type: "revenue", category: "Course", description: "Gare du Nord - CDG", amount: 85 },
-    { id: "4", date: "2024-02-19", type: "expense", category: "Péage", description: "Autoroute A1", amount: 8 },
-    { id: "5", date: "2024-02-18", type: "revenue", category: "Course", description: "La Défense - Versailles", amount: 55 },
-    { id: "6", date: "2024-02-18", type: "expense", category: "Maintenance", description: "Changement pneus", amount: 280 },
-    { id: "7", date: "2024-02-17", type: "revenue", category: "Course", description: "Montparnasse - Le Bourget", amount: 72 },
-    { id: "8", date: "2024-02-17", type: "expense", category: "Carburant", description: "Station Shell", amount: 50 },
-    { id: "9", date: "2024-02-16", type: "revenue", category: "Course", description: "République - Roissy", amount: 95 },
-    { id: "10", date: "2024-02-16", type: "expense", category: "Assurance", description: "Prime mensuelle", amount: 120 },
-  ]);
+  useEffect(() => {
+    fetchTransactions();
+    
+    const channel = supabase
+      .channel('transaction-history-changes')
+      .on(
+        'postgres_changes',
+        {
+          event: '*',
+          schema: 'public',
+          table: 'accounting_transactions'
+        },
+        () => {
+          fetchTransactions();
+        }
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
+  }, []);
+
+  const fetchTransactions = async () => {
+    const { data, error } = await supabase
+      .from('accounting_transactions')
+      .select('*')
+      .order('transaction_date', { ascending: false });
+
+    if (error) {
+      console.error('Error fetching transactions:', error);
+      return;
+    }
+
+    const formattedTransactions: Transaction[] = (data || []).map(t => ({
+      id: t.id,
+      date: t.transaction_date,
+      type: t.transaction_type as "revenue" | "expense",
+      category: t.category,
+      description: t.description || '',
+      amount: Number(t.amount)
+    }));
+
+    setTransactions(formattedTransactions);
+  };
 
   const filteredTransactions = transactions
     .filter((t) => {

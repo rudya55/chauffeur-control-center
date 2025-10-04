@@ -1,25 +1,90 @@
+import { useState, useEffect } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Download, FileText, TrendingUp, TrendingDown } from "lucide-react";
 import { BarChart, LineChart } from "@/components/ui/chart";
 import { toast } from "sonner";
+import { supabase } from "@/integrations/supabase/client";
 
 const FinancialReports = () => {
-  const monthlyData = [
-    { month: "Janvier", revenus: 4500, depenses: 2100, benefice: 2400 },
-    { month: "Février", revenus: 5200, depenses: 2300, benefice: 2900 },
-    { month: "Mars", revenus: 4800, depenses: 2200, benefice: 2600 },
-    { month: "Avril", revenus: 5500, depenses: 2400, benefice: 3100 },
-    { month: "Mai", revenus: 6200, depenses: 2600, benefice: 3600 },
-    { month: "Juin", revenus: 5800, depenses: 2500, benefice: 3300 },
-  ];
+  const [monthlyData, setMonthlyData] = useState<any[]>([]);
+  const [kpis, setKpis] = useState<any[]>([]);
 
-  const kpis = [
-    { label: "Revenus moyens", value: "5,167€", trend: "+8.5%", isPositive: true },
-    { label: "Dépenses moyennes", value: "2,350€", trend: "+3.2%", isPositive: false },
-    { label: "Bénéfice moyen", value: "2,817€", trend: "+12.4%", isPositive: true },
-    { label: "Taux de marge", value: "54.5%", trend: "+2.1%", isPositive: true },
-  ];
+  useEffect(() => {
+    fetchFinancialData();
+    
+    const channel = supabase
+      .channel('financial-reports-changes')
+      .on(
+        'postgres_changes',
+        {
+          event: '*',
+          schema: 'public',
+          table: 'accounting_transactions'
+        },
+        () => {
+          fetchFinancialData();
+        }
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
+  }, []);
+
+  const fetchFinancialData = async () => {
+    const { data, error } = await supabase
+      .from('accounting_transactions')
+      .select('*');
+
+    if (error) {
+      console.error('Error fetching financial data:', error);
+      return;
+    }
+
+    // Group by month
+    const monthlyStats: Record<string, { revenus: number; depenses: number; benefice: number }> = {};
+    
+    data?.forEach((transaction) => {
+      const date = new Date(transaction.transaction_date);
+      const monthKey = date.toLocaleString('fr-FR', { month: 'long', year: 'numeric' });
+      
+      if (!monthlyStats[monthKey]) {
+        monthlyStats[monthKey] = { revenus: 0, depenses: 0, benefice: 0 };
+      }
+      
+      const amount = Number(transaction.amount);
+      if (transaction.transaction_type === 'revenue') {
+        monthlyStats[monthKey].revenus += amount;
+      } else {
+        monthlyStats[monthKey].depenses += amount;
+      }
+      monthlyStats[monthKey].benefice = monthlyStats[monthKey].revenus - monthlyStats[monthKey].depenses;
+    });
+
+    const formattedMonthlyData = Object.entries(monthlyStats).map(([month, stats]) => ({
+      month: month.charAt(0).toUpperCase() + month.slice(1),
+      ...stats
+    }));
+
+    setMonthlyData(formattedMonthlyData);
+
+    // Calculate KPIs
+    const totalRevenue = formattedMonthlyData.reduce((sum, m) => sum + m.revenus, 0);
+    const totalExpense = formattedMonthlyData.reduce((sum, m) => sum + m.depenses, 0);
+    const avgRevenue = formattedMonthlyData.length > 0 ? totalRevenue / formattedMonthlyData.length : 0;
+    const avgExpense = formattedMonthlyData.length > 0 ? totalExpense / formattedMonthlyData.length : 0;
+    const avgProfit = avgRevenue - avgExpense;
+    const marginRate = avgRevenue > 0 ? (avgProfit / avgRevenue) * 100 : 0;
+
+    setKpis([
+      { label: "Revenus moyens", value: `${avgRevenue.toFixed(0)}€`, trend: "+8.5%", isPositive: true },
+      { label: "Dépenses moyennes", value: `${avgExpense.toFixed(0)}€`, trend: "+3.2%", isPositive: false },
+      { label: "Bénéfice moyen", value: `${avgProfit.toFixed(0)}€`, trend: "+12.4%", isPositive: true },
+      { label: "Taux de marge", value: `${marginRate.toFixed(1)}%`, trend: "+2.1%", isPositive: true },
+    ]);
+  };
 
   const handleExportPDF = () => {
     toast.success("Export PDF du rapport en cours...");

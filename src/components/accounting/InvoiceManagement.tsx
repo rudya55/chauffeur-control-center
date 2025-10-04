@@ -1,8 +1,9 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
+import { supabase } from "@/integrations/supabase/client";
 import {
   Select,
   SelectContent,
@@ -21,6 +22,44 @@ import { cn } from "@/lib/utils";
 const InvoiceManagement = () => {
   const [periodType, setPeriodType] = useState<"day" | "week" | "month" | "year">("week");
   const [selectedDate, setSelectedDate] = useState<Date>(new Date());
+  const [invoiceData, setInvoiceData] = useState({
+    totalRides: 0,
+    totalAmount: 0,
+    commission: 0,
+    driverEarnings: 0,
+  });
+
+  useEffect(() => {
+    fetchInvoiceData();
+  }, [periodType, selectedDate]);
+
+  const fetchInvoiceData = async () => {
+    const { start, end } = getPeriodDates();
+    
+    const { data: reservations, error: resError } = await supabase
+      .from('reservations')
+      .select('*')
+      .eq('status', 'completed')
+      .gte('dropoff_time', start.toISOString())
+      .lte('dropoff_time', end.toISOString());
+
+    if (resError) {
+      console.error('Error fetching invoice data:', resError);
+      return;
+    }
+
+    const totalRides = reservations?.length || 0;
+    const totalAmount = reservations?.reduce((sum, r) => sum + Number(r.amount), 0) || 0;
+    const commission = reservations?.reduce((sum, r) => sum + Number(r.commission), 0) || 0;
+    const driverEarnings = reservations?.reduce((sum, r) => sum + Number(r.driver_amount), 0) || 0;
+
+    setInvoiceData({
+      totalRides,
+      totalAmount,
+      commission,
+      driverEarnings,
+    });
+  };
 
   // Fonction pour calculer les dates de début et fin selon le type de période
   const getPeriodDates = () => {
@@ -37,14 +76,6 @@ const InvoiceManagement = () => {
   };
 
   const { start, end } = getPeriodDates();
-
-  // Données simulées pour la période (à remplacer par de vraies données)
-  const invoiceData = {
-    totalRides: periodType === "day" ? 8 : periodType === "week" ? 42 : periodType === "month" ? 156 : 1842,
-    totalAmount: periodType === "day" ? 420 : periodType === "week" ? 2850 : periodType === "month" ? 10240 : 125680,
-    commission: periodType === "day" ? 84 : periodType === "week" ? 570 : periodType === "month" ? 2048 : 25136,
-    driverEarnings: periodType === "day" ? 336 : periodType === "week" ? 2280 : periodType === "month" ? 8192 : 100544,
-  };
 
   const handleDownloadPDF = () => {
     const periodLabel = periodType === "day" ? "Journée" : periodType === "week" ? "Semaine" : periodType === "month" ? "Mois" : "Année";
