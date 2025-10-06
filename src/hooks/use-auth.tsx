@@ -72,8 +72,9 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
             checkUserStatus(session.user.id);
           }, 0);
         } else {
-          // Rediriger vers la landing page si déconnecté
-          if (window.location.pathname !== '/welcome' && window.location.pathname !== '/auth') {
+          // Rediriger vers la landing page si déconnecté (laisser accès aux pages publiques)
+          const publicPaths = ['/welcome', '/auth', '/booking'] as const;
+          if (!publicPaths.includes(window.location.pathname as typeof publicPaths[number])) {
             navigate('/welcome');
           }
         }
@@ -91,8 +92,9 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
           checkUserStatus(session.user.id);
         }, 0);
       } else {
-        // Rediriger vers la landing page si pas de session
-        if (window.location.pathname !== '/welcome' && window.location.pathname !== '/auth') {
+        // Rediriger vers la landing page si pas de session (laisser accès aux pages publiques)
+        const publicPaths = ['/welcome', '/auth', '/booking'] as const;
+        if (!publicPaths.includes(window.location.pathname as typeof publicPaths[number])) {
           navigate('/welcome');
         }
       }
