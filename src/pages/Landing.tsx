@@ -94,6 +94,14 @@ const Landing = () => {
           >
             Se connecter
           </Button>
+          <Button 
+            size="lg" 
+            variant="secondary" 
+            className="text-lg px-8 py-6 rounded-xl hover-scale"
+            onClick={() => navigate('/booking')}
+          >
+            Réserver un trajet
+          </Button>
         </div>
 
         {/* Stats avec compteurs animés */}
