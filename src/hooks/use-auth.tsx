@@ -72,11 +72,8 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
             checkUserStatus(session.user.id);
           }, 0);
         } else {
-          // Rediriger vers la landing page si déconnecté (laisser accès aux pages publiques)
-          const publicPaths = ['/welcome', '/auth', '/booking'] as const;
-          if (!publicPaths.includes(window.location.pathname as typeof publicPaths[number])) {
-            navigate('/welcome');
-          }
+          // Utilisateur déconnecté: ne pas forcer de redirection ici
+          // Les pages protégées sont gérées par ProtectedRoute
         }
       }
     );
