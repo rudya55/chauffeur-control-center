@@ -61,6 +61,66 @@ export type Database = {
           },
         ]
       }
+      airport_packages: {
+        Row: {
+          active: boolean | null
+          airport_zone_id: string
+          created_at: string
+          description: string | null
+          destination_zone_id: string | null
+          extra_waiting_price: number | null
+          flat_rate: number
+          id: string
+          included_waiting_time: number | null
+          package_name: string
+          updated_at: string
+          vehicle_type: string
+        }
+        Insert: {
+          active?: boolean | null
+          airport_zone_id: string
+          created_at?: string
+          description?: string | null
+          destination_zone_id?: string | null
+          extra_waiting_price?: number | null
+          flat_rate: number
+          id?: string
+          included_waiting_time?: number | null
+          package_name: string
+          updated_at?: string
+          vehicle_type: string
+        }
+        Update: {
+          active?: boolean | null
+          airport_zone_id?: string
+          created_at?: string
+          description?: string | null
+          destination_zone_id?: string | null
+          extra_waiting_price?: number | null
+          flat_rate?: number
+          id?: string
+          included_waiting_time?: number | null
+          package_name?: string
+          updated_at?: string
+          vehicle_type?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "airport_packages_airport_zone_id_fkey"
+            columns: ["airport_zone_id"]
+            isOneToOne: false
+            referencedRelation: "geographic_zones"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "airport_packages_destination_zone_id_fkey"
+            columns: ["destination_zone_id"]
+            isOneToOne: false
+            referencedRelation: "geographic_zones"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       driver_documents: {
         Row: {
           document_name: string
@@ -99,6 +159,96 @@ export type Database = {
           verified_by?: string | null
         }
         Relationships: []
+      }
+      geographic_zones: {
+        Row: {
+          coordinates: Json
+          created_at: string
+          description: string | null
+          id: string
+          name: string
+          updated_at: string
+          zone_type: string
+        }
+        Insert: {
+          coordinates: Json
+          created_at?: string
+          description?: string | null
+          id?: string
+          name: string
+          updated_at?: string
+          zone_type: string
+        }
+        Update: {
+          coordinates?: Json
+          created_at?: string
+          description?: string | null
+          id?: string
+          name?: string
+          updated_at?: string
+          zone_type?: string
+        }
+        Relationships: []
+      }
+      pricing_rules: {
+        Row: {
+          active: boolean | null
+          base_price: number
+          created_at: string
+          id: string
+          is_flat_rate: boolean | null
+          name: string
+          price_per_km: number | null
+          price_per_minute: number | null
+          updated_at: string
+          vehicle_type: string
+          zone_from_id: string | null
+          zone_to_id: string | null
+        }
+        Insert: {
+          active?: boolean | null
+          base_price: number
+          created_at?: string
+          id?: string
+          is_flat_rate?: boolean | null
+          name: string
+          price_per_km?: number | null
+          price_per_minute?: number | null
+          updated_at?: string
+          vehicle_type: string
+          zone_from_id?: string | null
+          zone_to_id?: string | null
+        }
+        Update: {
+          active?: boolean | null
+          base_price?: number
+          created_at?: string
+          id?: string
+          is_flat_rate?: boolean | null
+          name?: string
+          price_per_km?: number | null
+          price_per_minute?: number | null
+          updated_at?: string
+          vehicle_type?: string
+          zone_from_id?: string | null
+          zone_to_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "pricing_rules_zone_from_id_fkey"
+            columns: ["zone_from_id"]
+            isOneToOne: false
+            referencedRelation: "geographic_zones"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "pricing_rules_zone_to_id_fkey"
+            columns: ["zone_to_id"]
+            isOneToOne: false
+            referencedRelation: "geographic_zones"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       profiles: {
         Row: {

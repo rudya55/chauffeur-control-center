@@ -19,6 +19,8 @@ import Auth from "@/pages/Auth";
 import Admin from "@/pages/Admin";
 import Landing from "@/pages/Landing";
 import NotFound from "@/pages/NotFound";
+import ClientBooking from "@/pages/ClientBooking";
+import PricingConfig from "@/pages/PricingConfig";
 
 function App() {
   return (
@@ -33,6 +35,7 @@ function App() {
             <Routes>
               <Route path="/welcome" element={<Landing />} />
               <Route path="/auth" element={<Auth />} />
+              <Route path="/booking" element={<ClientBooking />} />
               <Route path="/" element={<ProtectedRoute><AppLayout /></ProtectedRoute>}>
                 <Route index element={<Home />} />
                 <Route path="analytics" element={<Analytics />} />
@@ -42,6 +45,7 @@ function App() {
                 <Route path="contact" element={<Contact />} />
                 <Route path="settings" element={<Settings />} />
                 <Route path="admin" element={<Admin />} />
+                <Route path="pricing-config" element={<PricingConfig />} />
                 <Route path="terms" element={<Terms />} />
                 <Route path="*" element={<NotFound />} />
               </Route>
