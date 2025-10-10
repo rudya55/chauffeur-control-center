@@ -40,7 +40,7 @@ export default function PricingConfig() {
   // Airport package form state
   const [packageName, setPackageName] = useState("");
   const [airportZone, setAirportZone] = useState("");
-  const [packageDestZone, setPackageDestZone] = useState("");
+  const [packageDestZone, setPackageDestZone] = useState("none");
   const [packageVehicleType, setPackageVehicleType] = useState("standard");
   const [flatRate, setFlatRate] = useState("");
   const [waitingTime, setWaitingTime] = useState("30");
@@ -107,7 +107,7 @@ export default function PricingConfig() {
     const { error } = await supabase.from("airport_packages").insert({
       package_name: packageName,
       airport_zone_id: airportZone,
-      destination_zone_id: packageDestZone || null,
+      destination_zone_id: packageDestZone === "none" ? null : packageDestZone || null,
       vehicle_type: packageVehicleType,
       flat_rate: parseFloat(flatRate),
       included_waiting_time: parseInt(waitingTime),
@@ -167,7 +167,7 @@ export default function PricingConfig() {
   const resetPackageForm = () => {
     setPackageName("");
     setAirportZone("");
-    setPackageDestZone("");
+    setPackageDestZone("none");
     setFlatRate("");
     setWaitingTime("30");
   };
@@ -369,7 +369,7 @@ export default function PricingConfig() {
                         <SelectValue placeholder="Destination (optionnel)" />
                       </SelectTrigger>
                       <SelectContent>
-                        <SelectItem value="">Aucune</SelectItem>
+                        <SelectItem value="none">Aucune</SelectItem>
                         {zones.map((z) => <SelectItem key={z.id} value={z.id}>{z.name}</SelectItem>)}
                       </SelectContent>
                     </Select>
