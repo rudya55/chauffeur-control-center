@@ -57,6 +57,7 @@ const Admin = () => {
   const [showDocumentsDialog, setShowDocumentsDialog] = useState(false);
   const [showRejectionDialog, setShowRejectionDialog] = useState(false);
   const [selectedDocument, setSelectedDocument] = useState<UserDocument | null>(null);
+  const [showCreateDialog, setShowCreateDialog] = useState(false);
 
   useEffect(() => {
     checkAdminRole();
@@ -233,8 +234,6 @@ const Admin = () => {
     };
     return labels[type] || type;
   };
-
-  const [showCreateDialog, setShowCreateDialog] = useState(false);
 
   return (
     <div className="p-4 sm:p-6">
