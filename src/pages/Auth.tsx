@@ -177,12 +177,54 @@ const Auth = () => {
           <div className="inline-flex items-center justify-center w-16 h-16 mx-auto bg-primary/10 rounded-full">
             <Car className="w-8 h-8 text-primary" />
           </div>
-          <CardTitle className="text-2xl font-bold">Connexion</CardTitle>
-          <CardDescription>Connectez-vous à votre espace chauffeur</CardDescription>
+          <CardTitle className="text-2xl font-bold">
+            {mode === 'reset' ? 'Réinitialiser le mot de passe' : 'Connexion'}
+          </CardTitle>
+          <CardDescription>
+            {mode === 'reset' 
+              ? 'Entrez votre email pour recevoir un lien de réinitialisation' 
+              : 'Connectez-vous à votre espace chauffeur'}
+          </CardDescription>
         </CardHeader>
 
         <CardContent>
-          <form onSubmit={handleLogin} className="space-y-4">
+          {mode === 'reset' ? (
+            <form onSubmit={handleResetPassword} className="space-y-4">
+              <div className="space-y-2">
+                <Label htmlFor="reset-email" className="flex items-center gap-2">
+                  <Mail className="h-4 w-4" />
+                  Email
+                </Label>
+                <Input
+                  id="reset-email"
+                  type="email"
+                  placeholder="votre@email.com"
+                  value={resetEmail}
+                  onChange={(e) => setResetEmail(e.target.value)}
+                  required
+                  disabled={loading}
+                  className="bg-background"
+                />
+              </div>
+
+              <Button type="submit" className="w-full" disabled={loading}>
+                {loading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                Envoyer le lien de réinitialisation
+              </Button>
+
+              <div className="text-center mt-4">
+                <button
+                  type="button"
+                  onClick={() => setMode('login')}
+                  className="text-sm text-primary hover:underline"
+                  disabled={loading}
+                >
+                  Retour à la connexion
+                </button>
+              </div>
+            </form>
+          ) : (
+            <form onSubmit={handleLogin} className="space-y-4">
             <div className="space-y-2">
               <Label htmlFor="login-email" className="flex items-center gap-2">
                 <Mail className="h-4 w-4" />
@@ -221,7 +263,19 @@ const Auth = () => {
               {loading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
               Se connecter
             </Button>
+
+            <div className="text-center mt-4">
+              <button
+                type="button"
+                onClick={() => setMode('reset')}
+                className="text-sm text-primary hover:underline"
+                disabled={loading}
+              >
+              Mot de passe oublié ?
+              </button>
+            </div>
           </form>
+          )}
         </CardContent>
       </Card>
     </div>
