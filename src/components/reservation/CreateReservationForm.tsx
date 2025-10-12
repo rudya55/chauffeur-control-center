@@ -199,6 +199,9 @@ const CreateReservationForm = ({ onSuccess }: CreateReservationFormProps) => {
             <SelectContent>
               <SelectItem value="card">Carte</SelectItem>
               <SelectItem value="cash">Espèces</SelectItem>
+              <SelectItem value="transfer">Virement</SelectItem>
+              <SelectItem value="paypal">PayPal</SelectItem>
+              <SelectItem value="stripe">Stripe</SelectItem>
             </SelectContent>
           </Select>
         </div>

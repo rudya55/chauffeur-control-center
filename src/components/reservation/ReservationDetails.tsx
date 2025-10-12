@@ -21,7 +21,7 @@ type ReservationDetailsProps = {
   amount?: string;
   driverAmount?: string;
   commission?: string;
-  paymentType?: 'cash' | 'card' | 'transfer' | 'paypal';
+  paymentType?: 'cash' | 'card' | 'transfer' | 'paypal' | 'stripe';
   flightStatus?: 'on-time' | 'delayed' | 'landed' | 'boarding' | 'cancelled';
   placardText?: string;
   pickupGPS?: {lat: number, lng: number};

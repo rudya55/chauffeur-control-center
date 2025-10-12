@@ -1,7 +1,7 @@
 
 // Type definitions for reservation data
 export type VehicleType = 'standard' | 'berline' | 'van' | 'mini-bus' | 'first-class';
-export type PaymentType = 'cash' | 'card' | 'transfer' | 'paypal';
+export type PaymentType = 'cash' | 'card' | 'transfer' | 'paypal' | 'stripe';
 
 export type ReservationType = {
   id: string;
