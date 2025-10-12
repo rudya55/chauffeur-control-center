@@ -14,8 +14,7 @@ import {
   Bell,
   Wallet,
   LogOut,
-  Shield,
-  DollarSign
+  Shield
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useIsMobile } from "@/hooks/use-mobile";
@@ -92,8 +91,7 @@ const AppSidebar = ({ isOpen = false, onClose }: AppSidebarProps) => {
     { title: t("accounting"), url: "/accounting", icon: Wallet },
     { title: t("analytics"), url: "/analytics", icon: BarChart4 },
     ...(isAdmin ? [
-      { title: "Administration", url: "/admin", icon: Shield },
-      { title: "Configuration tarifs", url: "/pricing-config", icon: DollarSign }
+      { title: "Administration", url: "/admin", icon: Shield }
     ] : []),
     { title: t("settings"), url: "/settings", icon: Settings },
     { title: t("contact"), url: "/contact", icon: Mail },
