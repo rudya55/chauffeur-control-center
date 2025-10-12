@@ -6,27 +6,19 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { toast } from "sonner";
-import { Loader2, Lock, Mail, User, ArrowLeft, Car, Phone, MapPin, Building } from "lucide-react";
+import { Loader2, Lock, Mail, Car } from "lucide-react";
 import { loginSchema, signupSchema, resetPasswordSchema } from "@/lib/validations/auth";
 import type { LoginFormData, SignupFormData, ResetPasswordFormData } from "@/lib/validations/auth";
 
 const Auth = () => {
   const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
-  const [mode, setMode] = useState<'login' | 'signup' | 'reset'>('login');
+  const [mode, setMode] = useState<'login' | 'reset'>('login');
   
   // Login state
   const [loginEmail, setLoginEmail] = useState("");
   const [loginPassword, setLoginPassword] = useState("");
   
-  // Signup state
-  const [signupEmail, setSignupEmail] = useState("");
-  const [signupPassword, setSignupPassword] = useState("");
-  const [signupConfirmPassword, setSignupConfirmPassword] = useState("");
-  const [fullName, setFullName] = useState("");
-  const [phone, setPhone] = useState("");
-  const [address, setAddress] = useState("");
-  const [city, setCity] = useState("");
   
   // Reset state
   const [resetEmail, setResetEmail] = useState("");
@@ -87,59 +79,6 @@ const Auth = () => {
     }
   };
 
-  const handleSignup = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setLoading(true);
-
-    try {
-      // Validate input
-      const formData: SignupFormData = {
-        email: signupEmail,
-        password: signupPassword,
-        confirmPassword: signupConfirmPassword,
-        fullName: fullName,
-      };
-      
-      const validation = signupSchema.safeParse(formData);
-      if (!validation.success) {
-        const firstError = validation.error.errors[0];
-        toast.error(firstError.message);
-        setLoading(false);
-        return;
-      }
-
-      const redirectUrl = `${window.location.origin}/`;
-      
-      const { error } = await supabase.auth.signUp({
-        email: validation.data.email,
-        password: validation.data.password,
-        options: {
-          emailRedirectTo: redirectUrl,
-          data: {
-            full_name: validation.data.fullName,
-            phone: phone,
-            address: address,
-            city: city
-          }
-        }
-      });
-
-      if (error) {
-        if (error.message.includes("User already registered")) {
-          toast.error("Cet email est déjà utilisé");
-        } else {
-          toast.error(error.message);
-        }
-      } else {
-        toast.success("Inscription réussie ! Votre compte est en attente d'approbation.");
-        setMode('login');
-      }
-    } catch (error) {
-      toast.error("Une erreur est survenue");
-    } finally {
-      setLoading(false);
-    }
-  };
 
   const handleResetPassword = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -184,13 +123,11 @@ const Auth = () => {
             <Car className="w-8 h-8 text-primary" />
           </div>
           <CardTitle className="text-2xl font-bold">
-            {mode === 'reset' ? 'Réinitialiser le mot de passe' : mode === 'signup' ? 'Inscription Chauffeur' : 'Connexion'}
+            {mode === 'reset' ? 'Réinitialiser le mot de passe' : 'Connexion'}
           </CardTitle>
           <CardDescription>
             {mode === 'reset' 
               ? 'Entrez votre email pour recevoir un lien de réinitialisation' 
-              : mode === 'signup'
-              ? 'Créez votre compte chauffeur avec vos identifiants'
               : 'Connectez-vous à votre espace chauffeur'}
           </CardDescription>
         </CardHeader>
@@ -228,143 +165,6 @@ const Auth = () => {
                   disabled={loading}
                 >
                   Retour à la connexion
-                </button>
-              </div>
-            </form>
-          ) : mode === 'signup' ? (
-            <form onSubmit={handleSignup} className="space-y-4 max-h-[60vh] overflow-y-auto pr-2">
-              <div className="space-y-2">
-                <Label htmlFor="signup-fullname" className="flex items-center gap-2">
-                  <User className="h-4 w-4" />
-                  Nom complet *
-                </Label>
-                <Input
-                  id="signup-fullname"
-                  type="text"
-                  placeholder="Jean Dupont"
-                  value={fullName}
-                  onChange={(e) => setFullName(e.target.value)}
-                  required
-                  disabled={loading}
-                  className="bg-background"
-                />
-              </div>
-
-              <div className="space-y-2">
-                <Label htmlFor="signup-email" className="flex items-center gap-2">
-                  <Mail className="h-4 w-4" />
-                  Email (Identifiant) *
-                </Label>
-                <Input
-                  id="signup-email"
-                  type="email"
-                  placeholder="votre@email.com"
-                  value={signupEmail}
-                  onChange={(e) => setSignupEmail(e.target.value)}
-                  required
-                  disabled={loading}
-                  className="bg-background"
-                />
-              </div>
-
-              <div className="space-y-2">
-                <Label htmlFor="signup-phone" className="flex items-center gap-2">
-                  <Phone className="h-4 w-4" />
-                  Téléphone *
-                </Label>
-                <Input
-                  id="signup-phone"
-                  type="tel"
-                  placeholder="+33 6 12 34 56 78"
-                  value={phone}
-                  onChange={(e) => setPhone(e.target.value)}
-                  required
-                  disabled={loading}
-                  className="bg-background"
-                />
-              </div>
-
-              <div className="space-y-2">
-                <Label htmlFor="signup-address" className="flex items-center gap-2">
-                  <MapPin className="h-4 w-4" />
-                  Adresse *
-                </Label>
-                <Input
-                  id="signup-address"
-                  type="text"
-                  placeholder="123 rue de la République"
-                  value={address}
-                  onChange={(e) => setAddress(e.target.value)}
-                  required
-                  disabled={loading}
-                  className="bg-background"
-                />
-              </div>
-
-              <div className="space-y-2">
-                <Label htmlFor="signup-city" className="flex items-center gap-2">
-                  <Building className="h-4 w-4" />
-                  Ville *
-                </Label>
-                <Input
-                  id="signup-city"
-                  type="text"
-                  placeholder="Paris"
-                  value={city}
-                  onChange={(e) => setCity(e.target.value)}
-                  required
-                  disabled={loading}
-                  className="bg-background"
-                />
-              </div>
-
-              <div className="space-y-2">
-                <Label htmlFor="signup-password" className="flex items-center gap-2">
-                  <Lock className="h-4 w-4" />
-                  Mot de passe *
-                </Label>
-                <Input
-                  id="signup-password"
-                  type="password"
-                  placeholder="••••••••"
-                  value={signupPassword}
-                  onChange={(e) => setSignupPassword(e.target.value)}
-                  required
-                  disabled={loading}
-                  className="bg-background"
-                />
-              </div>
-
-              <div className="space-y-2">
-                <Label htmlFor="signup-confirm-password" className="flex items-center gap-2">
-                  <Lock className="h-4 w-4" />
-                  Confirmer le mot de passe *
-                </Label>
-                <Input
-                  id="signup-confirm-password"
-                  type="password"
-                  placeholder="••••••••"
-                  value={signupConfirmPassword}
-                  onChange={(e) => setSignupConfirmPassword(e.target.value)}
-                  required
-                  disabled={loading}
-                  className="bg-background"
-                />
-              </div>
-
-              <Button type="submit" className="w-full" disabled={loading}>
-                {loading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-                S'inscrire
-              </Button>
-
-              <div className="text-center mt-4">
-                <button
-                  type="button"
-                  onClick={() => setMode('login')}
-                  className="text-sm text-primary hover:underline"
-                  disabled={loading}
-                >
-                  Déjà un compte ? Se connecter
                 </button>
               </div>
             </form>
@@ -409,7 +209,7 @@ const Auth = () => {
               Se connecter
             </Button>
 
-            <div className="flex flex-col gap-2 mt-4">
+            <div className="text-center mt-4">
               <button
                 type="button"
                 onClick={() => setMode('reset')}
@@ -417,14 +217,6 @@ const Auth = () => {
                 disabled={loading}
               >
                 Mot de passe oublié ?
-              </button>
-              <button
-                type="button"
-                onClick={() => setMode('signup')}
-                className="text-sm text-primary hover:underline"
-                disabled={loading}
-              >
-                Pas encore de compte ? S'inscrire
               </button>
             </div>
           </form>
