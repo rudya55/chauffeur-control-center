@@ -6,7 +6,7 @@ const config: CapacitorConfig = {
   webDir: 'dist',
   server: {
     url: 'https://3d0f7271-7b44-4ac9-be75-60d1de24adaa.lovableproject.com?forceHideBadge=true',
-    cleartext: true
+    cleartext: false  // SÉCURITÉ: Forcer HTTPS uniquement
   },
   plugins: {
     SplashScreen: {

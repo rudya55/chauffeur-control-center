@@ -3,7 +3,7 @@ import { cn } from '@/lib/utils';
 import { useTheme as useNextTheme } from 'next-themes';
 import { Menu, Plus, Minus, Navigation } from 'lucide-react';
 
-const GOOGLE_MAPS_API_KEY = 'AIzaSyBx8F2o93lp2-zzeC-AoZwPRdR5JIuB9Lg';
+const GOOGLE_MAPS_API_KEY = import.meta.env.VITE_GOOGLE_MAPS_API_KEY;
 
 declare global {
   interface Window {
