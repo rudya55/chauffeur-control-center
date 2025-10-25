@@ -1,0 +1,27 @@
+{ 
+  "_comment": "Collez ici le CONTENU COMPLET de votre vrai google-services.json depuis Firebase Console, puis renommez ce fichier en google-services.json",
+  "_howto": [
+    "1) Ouvrez https://console.firebase.google.com",
+    "2) Sélectionnez votre projet > roue dentée (Paramètres du projet) > Général",
+    "3) Dans 'Vos applications', ajoutez/configurez Android avec le package: com.vtcdispatch.app",
+    "4) Téléchargez google-services.json",
+    "5) Ouvrez le fichier et copiez TOUT le JSON ici (remplacez ce contenu)",
+    "6) Renommez ce fichier en: google-services.json (même dossier)",
+    "7) Recompilez l'APK"
+  ],
+  "project_info": {
+    "project_number": "REPLACE_ME",
+    "project_id": "REPLACE_ME",
+    "storage_bucket": "REPLACE_ME"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "REPLACE_ME",
+        "android_client_info": { "package_name": "com.vtcdispatch.app" }
+      },
+      "api_key": [ { "current_key": "REPLACE_ME" } ]
+    }
+  ],
+  "configuration_version": "1"
+}
