@@ -1,0 +1,53 @@
+name: Apply FCM migration
+
+on:
+  workflow_dispatch:
+    inputs:
+      sql_file:
+        description: 'SQL file to apply'
+        required: false
+        default: 'MIGRATION_FCM_TOKENS.sql'
+
+jobs:
+  apply-sql:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Validate inputs
+        run: |
+          if [ -z "${{ github.event.inputs.sql_file }}" ]; then
+            echo "::error::sql_file input is empty" && exit 1
+          fi
+          if [ ! -f "${{ github.event.inputs.sql_file }}" ]; then
+            echo "::error::SQL file not found: ${{ github.event.inputs.sql_file }}" && ls -la && exit 1
+          fi
+
+      - name: Install PostgreSQL client
+        run: |
+          sudo apt-get update -y
+          sudo apt-get install -y postgresql-client
+
+      - name: Apply SQL to Supabase (Lovable)
+        env:
+          SUPABASE_DB_URL: ${{ secrets.SUPABASE_DB_URL }}
+        run: |
+          if [ -z "$SUPABASE_DB_URL" ]; then
+            echo "::error::Missing secret SUPABASE_DB_URL. Add it in GitHub > Settings > Secrets and variables > Actions" && exit 1
+          fi
+          echo "Applying ${{ github.event.inputs.sql_file }} to database..."
+          # Hide sensitive connection info from logs
+          SAFE_URL="${SUPABASE_DB_URL%:*}:****@${SUPABASE_DB_URL#*@}"
+          echo "Connecting with: $SAFE_URL" | sed 's/:[^@]*@/:****@/'
+
+          # Execute SQL
+          psql "$SUPABASE_DB_URL" -v ON_ERROR_STOP=1 -f "${{ github.event.inputs.sql_file }}"
+
+      - name: Verify table exists
+        env:
+          SUPABASE_DB_URL: ${{ secrets.SUPABASE_DB_URL }}
+        run: |
+          echo "Verifying table public.fcm_tokens exists..."
+          psql "$SUPABASE_DB_URL" -v ON_ERROR_STOP=1 -c "\dt public.fcm_tokens"
+          echo "Verification done."
