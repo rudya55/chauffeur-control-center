@@ -23,19 +23,17 @@ export const signupSchema = z.object({
   password: z
     .string()
     .min(6, { message: "Le mot de passe doit contenir au moins 6 caractères" })
-    .max(100, { message: "Le mot de passe est trop long" })
-    .regex(/[a-z]/, { message: "Le mot de passe doit contenir au moins une minuscule" })
-    .regex(/[A-Z]/, { message: "Le mot de passe doit contenir au moins une majuscule" })
-    .regex(/[0-9]/, { message: "Le mot de passe doit contenir au moins un chiffre" }),
-  confirmPassword: z.string(),
-  fullName: z
+    .max(100, { message: "Le mot de passe est trop long" }),
+  name: z
     .string()
     .trim()
     .min(2, { message: "Le nom doit contenir au moins 2 caractères" })
     .max(100, { message: "Le nom est trop long" }),
-}).refine((data) => data.password === data.confirmPassword, {
-  message: "Les mots de passe ne correspondent pas",
-  path: ["confirmPassword"],
+  phone: z
+    .string()
+    .trim()
+    .min(10, { message: "Le numéro de téléphone est invalide" })
+    .max(20, { message: "Le numéro de téléphone est trop long" }),
 });
 
 export const resetPasswordSchema = z.object({
