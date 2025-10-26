@@ -1,27 +1,52 @@
-{ 
-  "_comment": "Collez ici le CONTENU COMPLET de votre vrai google-services.json depuis Firebase Console, puis renommez ce fichier en google-services.json",
+{
+  "_comment": "⚠️ TEMPLATE FILE - REMPLACEZ CE FICHIER PAR LE VRAI google-services.json depuis Firebase Console",
+  "_instructions": "Ce fichier est un TEMPLATE. Ne le modifiez pas directement. Suivez les étapes ci-dessous:",
   "_howto": [
-    "1) Ouvrez https://console.firebase.google.com",
-    "2) Sélectionnez votre projet > roue dentée (Paramètres du projet) > Général",
-    "3) Dans 'Vos applications', ajoutez/configurez Android avec le package: com.vtcdispatch.app",
-    "4) Téléchargez google-services.json",
-    "5) Ouvrez le fichier et copiez TOUT le JSON ici (remplacez ce contenu)",
-    "6) Renommez ce fichier en: google-services.json (même dossier)",
-    "7) Recompilez l'APK"
+    "📖 GUIDE COMPLET: Consultez FIREBASE_CONFIGURATION_GUIDE.md à la racine du projet",
+    "",
+    "🚀 ÉTAPES RAPIDES:",
+    "1) Allez sur https://console.firebase.google.com",
+    "2) Créez un projet ou sélectionnez votre projet existant",
+    "3) Ajoutez une application Android:",
+    "   - Cliquez sur l'icône Android",
+    "   - Package Android: com.vtcdispatch.app",
+    "   - Cliquez sur 'Enregistrer l'application'",
+    "4) Téléchargez le fichier google-services.json",
+    "5) SUPPRIMEZ ce fichier template (google-services.json.template)",
+    "6) PLACEZ le fichier téléchargé ici: android/app/google-services.json",
+    "7) Recompilez l'APK: npx cap sync android && cd android && ./gradlew assembleDebug",
+    "",
+    "⚠️ IMPORTANT: Ne commitez JAMAIS le vrai google-services.json dans Git!",
+    "⚠️ Le fichier est automatiquement ignoré par .gitignore"
   ],
-  "project_info": {
-    "project_number": "REPLACE_ME",
-    "project_id": "REPLACE_ME",
-    "storage_bucket": "REPLACE_ME"
+  "_example_structure": {
+    "project_info": {
+      "project_number": "123456789012",
+      "project_id": "votre-projet-firebase-id",
+      "storage_bucket": "votre-projet-firebase-id.appspot.com"
+    },
+    "client": [
+      {
+        "client_info": {
+          "mobilesdk_app_id": "1:123456789012:android:abcdef123456",
+          "android_client_info": {
+            "package_name": "com.vtcdispatch.app"
+          }
+        },
+        "oauth_client": [],
+        "api_key": [
+          {
+            "current_key": "AIzaSyXXXXXXXXXXXXXXXXXXXXXXXXXXXXX"
+          }
+        ],
+        "services": {
+          "appinvite_service": {
+            "other_platform_oauth_client": []
+          }
+        }
+      }
+    ],
+    "configuration_version": "1"
   },
-  "client": [
-    {
-      "client_info": {
-        "mobilesdk_app_id": "REPLACE_ME",
-        "android_client_info": { "package_name": "com.vtcdispatch.app" }
-      },
-      "api_key": [ { "current_key": "REPLACE_ME" } ]
-    }
-  ],
-  "configuration_version": "1"
+  "_note": "La structure ci-dessus (_example_structure) montre à quoi ressemble un vrai google-services.json. Le vôtre doit avoir des valeurs réelles, pas des placeholders."
 }

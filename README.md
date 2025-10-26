@@ -4,6 +4,22 @@
 
 **URL**: https://lovable.dev/projects/3d0f7271-7b44-4ac9-be75-60d1de24adaa
 
+## 🔥 Firebase Configuration Required
+
+**⚠️ IMPORTANT:** Before using push notifications, you need to configure Firebase:
+
+1. **For Android App**: Configure `google-services.json`
+2. **For Web/PWA**: Configure Firebase environment variables in `.env`
+
+📖 **[Complete Firebase Setup Guide](FIREBASE_CONFIGURATION_GUIDE.md)** - Follow this guide step-by-step
+
+### Quick Links
+- 🔔 [Notifications Guide](NOTIFICATIONS_GUIDE.md) - How to send push notifications
+- 📱 [Mobile Migration Guide](GUIDE_MIGRATION_MOBILE.md) - Supabase database setup
+- 🔧 [Firebase Setup](FIREBASE_SETUP.md) - Original Firebase documentation
+
+---
+
 ## How can I edit this code?
 
 There are several ways of editing your application.

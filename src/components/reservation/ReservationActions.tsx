@@ -41,8 +41,8 @@ const ReservationActions = ({
   const [canStartRide, setCanStartRide] = useState(false);
   const [timeRemaining, setTimeRemaining] = useState<string>("");
 
-  // Testing mode: 10 seconds before ride, Production: 2 hours before ride
-  const TESTING_MODE = true;
+  // Production mode: 2 hours before ride (changed from testing mode)
+  const TESTING_MODE = false;
   const ALLOWED_TIME_BEFORE_START = TESTING_MODE ? 10 : 7200; // 10 seconds or 2 hours in seconds
 
   useEffect(() => {
