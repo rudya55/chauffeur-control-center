@@ -4,10 +4,12 @@ const config: CapacitorConfig = {
   appId: 'com.vtcdispatch.app',
   appName: 'VTC Dispatch',
   webDir: 'dist',
-  server: {
-    url: 'https://3d0f7271-7b44-4ac9-be75-60d1de24adaa.lovableproject.com?forceHideBadge=true',
-    cleartext: true
-  },
+  // Important: pour charger les assets locaux intégrés dans l'APK, ne pas définir server.url
+  // Si vous souhaitez pointer vers un serveur distant en dev, décommentez et adaptez.
+  // server: {
+  //   url: 'https://example.com',
+  //   cleartext: true
+  // },
   plugins: {
     SplashScreen: {
       launchShowDuration: 2000,

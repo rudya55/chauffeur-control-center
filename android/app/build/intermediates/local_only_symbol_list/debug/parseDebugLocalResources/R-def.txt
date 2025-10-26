@@ -10,6 +10,7 @@ mipmap ic_launcher_foreground
 mipmap ic_launcher_round
 string app_name
 string custom_url_scheme
+string firebase_database_url
 string gcm_defaultSenderId
 string google_api_key
 string google_app_id
