@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Connexion Supabase</title>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 50px auto;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        .container {
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        h1 { color: #333; }
+        .test-section {
+            margin: 20px 0;
+            padding: 15px;
+            background: #f9f9f9;
+            border-left: 4px solid #4CAF50;
+        }
+        .error {
+            border-left-color: #f44336;
+            background: #ffebee;
+        }
+        .success {
+            border-left-color: #4CAF50;
+            background: #e8f5e9;
+        }
+        input, button {
+            display: block;
+            width: 100%;
+            padding: 10px;
+            margin: 10px 0;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 14px;
+        }
+        button {
+            background: #4CAF50;
+            color: white;
+            border: none;
+            cursor: pointer;
+            font-weight: bold;
+        }
+        button:hover {
+            background: #45a049;
+        }
+        .result {
+            padding: 10px;
+            margin: 10px 0;
+            border-radius: 5px;
+            font-family: monospace;
+            white-space: pre-wrap;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🔍 Diagnostic Supabase - VTC Dispatch</h1>
+        
+        <div class="test-section">
+            <h3>Configuration actuelle</h3>
+            <div id="config"></div>
+        </div>
+
+        <div class="test-section">
+            <h3>Test 1: Connexion Supabase</h3>
+            <button onclick="testConnection()">Tester la connexion</button>
+            <div id="connection-result" class="result"></div>
+        </div>
+
+        <div class="test-section">
+            <h3>Test 2: Inscription</h3>
+            <input type="text" id="signup-name" placeholder="Nom complet">
+            <input type="tel" id="signup-phone" placeholder="Téléphone">
+            <input type="email" id="signup-email" placeholder="Email">
+            <input type="password" id="signup-password" placeholder="Mot de passe">
+            <button onclick="testSignup()">Tester l'inscription</button>
+            <div id="signup-result" class="result"></div>
+        </div>
+
+        <div class="test-section">
+            <h3>Test 3: Connexion</h3>
+            <input type="email" id="login-email" placeholder="Email">
+            <input type="password" id="login-password" placeholder="Mot de passe">
+            <button onclick="testLogin()">Tester la connexion</button>
+            <div id="login-result" class="result"></div>
+        </div>
+    </div>
+
+    <script>
+        // Configuration Supabase
+        const SUPABASE_URL = 'https://nulrmprnorszvsdenxqa.supabase.co';
+        const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im51bHJtcHJub3JzenZzZGVueHFhIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MzUyNTYwOTMsImV4cCI6MjA1MDgzMjA5M30.DIsmV4cCI6MjA3ZXKGkq2SB2F0HM7NdFQNjWTwsTYZf9Z70dFQyHDAwc';
+
+        const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+        // Afficher la config
+        document.getElementById('config').innerHTML = `
+            <strong>URL:</strong> ${SUPABASE_URL}<br>
+            <strong>Clé anon (début):</strong> ${SUPABASE_ANON_KEY.substring(0, 50)}...
+        `;
+
+        async function testConnection() {
+            const result = document.getElementById('connection-result');
+            result.innerHTML = '⏳ Test en cours...';
+            
+            try {
+                const { data, error } = await supabase.auth.getSession();
+                
+                if (error) {
+                    result.className = 'result error';
+                    result.innerHTML = `❌ Erreur de connexion:\n${JSON.stringify(error, null, 2)}`;
+                } else {
+                    result.className = 'result success';
+                    result.innerHTML = `✅ Connexion réussie!\nSession: ${data.session ? 'Active' : 'Aucune'}`;
+                }
+            } catch (err) {
+                result.className = 'result error';
+                result.innerHTML = `❌ Erreur:\n${err.message}`;
+            }
+        }
+
+        async function testSignup() {
+            const result = document.getElementById('signup-result');
+            const name = document.getElementById('signup-name').value;
+            const phone = document.getElementById('signup-phone').value;
+            const email = document.getElementById('signup-email').value;
+            const password = document.getElementById('signup-password').value;
+
+            if (!name || !phone || !email || !password) {
+                result.className = 'result error';
+                result.innerHTML = '❌ Veuillez remplir tous les champs';
+                return;
+            }
+
+            result.innerHTML = '⏳ Inscription en cours...';
+
+            try {
+                const { data, error } = await supabase.auth.signUp({
+                    email: email,
+                    password: password,
+                    options: {
+                        data: {
+                            name: name,
+                            phone: phone,
+                        }
+                    }
+                });
+
+                if (error) {
+                    result.className = 'result error';
+                    result.innerHTML = `❌ Erreur d'inscription:\n${JSON.stringify(error, null, 2)}`;
+                } else {
+                    result.className = 'result success';
+                    result.innerHTML = `✅ Inscription réussie!\nUtilisateur: ${data.user?.email}\nID: ${data.user?.id}`;
+                }
+            } catch (err) {
+                result.className = 'result error';
+                result.innerHTML = `❌ Erreur:\n${err.message}`;
+            }
+        }
+
+        async function testLogin() {
+            const result = document.getElementById('login-result');
+            const email = document.getElementById('login-email').value;
+            const password = document.getElementById('login-password').value;
+
+            if (!email || !password) {
+                result.className = 'result error';
+                result.innerHTML = '❌ Veuillez remplir tous les champs';
+                return;
+            }
+
+            result.innerHTML = '⏳ Connexion en cours...';
+
+            try {
+                const { data, error } = await supabase.auth.signInWithPassword({
+                    email: email,
+                    password: password,
+                });
+
+                if (error) {
+                    result.className = 'result error';
+                    result.innerHTML = `❌ Erreur de connexion:\n${JSON.stringify(error, null, 2)}`;
+                } else {
+                    result.className = 'result success';
+                    result.innerHTML = `✅ Connexion réussie!\nUtilisateur: ${data.user?.email}\nSession active: ${!!data.session}`;
+                }
+            } catch (err) {
+                result.className = 'result error';
+                result.innerHTML = `❌ Erreur:\n${err.message}`;
+            }
+        }
+    </script>
+</body>
+</html>
