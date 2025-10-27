@@ -1,0 +1,53 @@
+┌─────────────────────────────────────────────────────────────┐
+│   GUIDE VISUEL : Récupérer vos clés Supabase              │
+└─────────────────────────────────────────────────────────────┘
+
+📍 Étape 1 : Connexion
+   → Allez sur : https://supabase.com/dashboard
+   → Connectez-vous avec votre compte
+
+📍 Étape 2 : Sélectionner votre projet
+   → Cliquez sur votre projet : "nulrmprnorszvsdenxqa"
+   → OU créez un nouveau projet si nécessaire
+
+📍 Étape 3 : Récupérer les clés
+   1. Dans le menu de gauche, cliquez sur l'icône ⚙️ "Project Settings"
+   2. Cliquez sur "API" dans le sous-menu
+   3. Vous verrez 2 informations importantes :
+
+   ┌─────────────────────────────────────────────┐
+   │ Project URL                                  │
+   │ https://VOTRE-PROJET.supabase.co            │
+   └─────────────────────────────────────────────┘
+
+   ┌─────────────────────────────────────────────┐
+   │ anon public                                  │
+   │ eyJhbGciOiJIUzI1NiIsInR5cCI6IkpX...         │
+   │ (une très longue clé)                        │
+   └─────────────────────────────────────────────┘
+
+   4. COPIEZ CES 2 VALEURS ✂️
+
+📍 Étape 4 : Me les envoyer
+   → Envoyez-moi :
+     1. Votre Project URL
+     2. Votre anon public key
+
+   Je vais mettre à jour le .env et reconstruire l'APK !
+
+┌─────────────────────────────────────────────────────────────┐
+│  ⚠️  IMPORTANT                                              │
+│                                                             │
+│  Si vous n'avez PAS de projet Supabase :                   │
+│  → Cliquez sur "New project"                               │
+│  → Choisissez un nom (ex: "vtc-dispatch")                  │
+│  → Choisissez un mot de passe pour la base                 │
+│  → Attendez 2 minutes que le projet soit créé              │
+│  → Puis récupérez les clés comme ci-dessus                 │
+└─────────────────────────────────────────────────────────────┘
+
+🎯 Ensuite, je vais :
+   ✅ Mettre à jour votre .env avec les bonnes clés
+   ✅ Reconstruire l'APK v2.9 fonctionnel
+   ✅ Le publier sur GitHub
+   ✅ Vous pourrez vous connecter et créer votre compte !

@@ -32,6 +32,35 @@ const Map = ({
   const polylineRef = useRef<google.maps.Polyline | null>(null);
   const { theme } = useNextTheme();
   const [isLoaded, setIsLoaded] = useState(false);
+  const [currentPosition, setCurrentPosition] = useState<{ lat: number; lng: number } | null>(null);
+
+  // Get user's current position
+  useEffect(() => {
+    if (navigator.geolocation) {
+      navigator.geolocation.getCurrentPosition(
+        (position) => {
+          const pos = {
+            lat: position.coords.latitude,
+            lng: position.coords.longitude,
+          };
+          setCurrentPosition(pos);
+          console.log('Position obtenue:', pos);
+        },
+        (error) => {
+          console.error('Erreur géolocalisation:', error);
+          setCurrentPosition(center); // Use default if geolocation fails
+        },
+        {
+          enableHighAccuracy: true,
+          timeout: 10000,
+          maximumAge: 0
+        }
+      );
+    } else {
+      console.warn('Géolocalisation non supportée');
+      setCurrentPosition(center);
+    }
+  }, [center]);
 
   // Load Google Maps API
   useEffect(() => {
@@ -137,8 +166,11 @@ const Map = ({
       },
     ] : [];
 
+    // Use currentPosition if available, otherwise use center prop
+    const initialCenter = currentPosition || center;
+    
     const map = new google.maps.Map(mapRef.current, {
-      center,
+      center: initialCenter,
       zoom,
       styles: mapStyles,
       disableDefaultUI: true,
@@ -149,7 +181,7 @@ const Map = ({
 
     // Add marker
     const marker = new google.maps.Marker({
-      position: center,
+      position: initialCenter,
       map,
       icon: {
         path: google.maps.SymbolPath.CIRCLE,
@@ -178,24 +210,6 @@ const Map = ({
       const bounds = new google.maps.LatLngBounds();
       route.forEach(point => bounds.extend(point));
       map.fitBounds(bounds);
-    } else {
-      // Try to get user's location
-      if (navigator.geolocation) {
-        navigator.geolocation.getCurrentPosition(
-          (position) => {
-            const userLocation = {
-              lat: position.coords.latitude,
-              lng: position.coords.longitude
-            };
-            
-            map.setCenter(userLocation);
-            marker.setPosition(userLocation);
-          },
-          (error) => {
-            console.log("Geolocation error:", error);
-          }
-        );
-      }
     }
 
     return () => {
@@ -210,6 +224,14 @@ const Map = ({
       }
     };
   }, [isLoaded, center.lat, center.lng, zoom, route.length]);
+
+  // Update map center and marker when currentPosition is available
+  useEffect(() => {
+    if (!mapInstanceRef.current || !markerRef.current || !currentPosition) return;
+    
+    mapInstanceRef.current.setCenter(currentPosition);
+    markerRef.current.setPosition(currentPosition);
+  }, [currentPosition]);
 
   // Update theme
   useEffect(() => {
