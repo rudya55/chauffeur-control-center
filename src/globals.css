@@ -75,11 +75,3 @@
     @apply bg-background text-foreground;
   }
 }
-  }
-
-  /* Appliquer la couleur or et le gras pour le texte en mode sombre */
-  .dark body {
-    color: theme('colors.or');
-    font-weight: bold;
-  }
-}
