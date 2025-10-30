@@ -2,6 +2,8 @@
 import { Menu } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import ThemeToggle from "@/components/ThemeToggle";
+import NotificationBell from "@/components/NotificationBell";
 
 interface MobileHeaderProps {
   isOpen: boolean;
@@ -37,6 +39,10 @@ const MobileHeader = ({ isOpen, onToggle }: MobileHeaderProps) => {
             </div>
           </div>
         </div>
+      </div>
+      <div className="flex items-center gap-2">
+        <NotificationBell />
+        <ThemeToggle />
       </div>
     </header>
   );
