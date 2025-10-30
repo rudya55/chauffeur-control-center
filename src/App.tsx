@@ -27,6 +27,8 @@ function App() {
     <ThemeProvider
       attribute="class"
       defaultTheme="dark"
+      enableSystem={false}
+      storageKey="vite-ui-theme"
       disableTransitionOnChange
     >
       <Router>

@@ -31,7 +31,7 @@ const ThemeToggle = ({ className = "" }: ThemeToggleProps) => {
       {theme === "dark" ? (
         <Sun className="h-5 w-5 text-primary" />
       ) : (
-        <Moon className="h-5 w-5" />
+        <Moon className="h-5 w-5 text-foreground" />
       )}
       <span className="sr-only">Toggle theme</span>
     </Button>
