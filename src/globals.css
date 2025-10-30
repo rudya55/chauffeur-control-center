@@ -65,21 +65,11 @@
     --input: 220 26% 25%;
     --ring: 43 74% 49%;
   }
-}
 
-@layer base {
   * {
     @apply border-border;
   }
   body {
     @apply bg-background text-foreground;
-  }
-}
-  }
-
-  /* Appliquer la couleur or et le gras pour le texte en mode sombre */
-  .dark body {
-    color: theme('colors.or');
-    font-weight: bold;
   }
 }
