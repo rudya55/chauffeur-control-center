@@ -9,6 +9,7 @@ import { toast } from "sonner";
 import { Loader2, Lock, Mail, Car } from "lucide-react";
 import { loginSchema, signupSchema, resetPasswordSchema } from "@/lib/validations/auth";
 import type { LoginFormData, SignupFormData, ResetPasswordFormData } from "@/lib/validations/auth";
+import ThemeToggle from "@/components/ThemeToggle";
 
 const Auth = () => {
   const navigate = useNavigate();
@@ -187,6 +188,11 @@ const Auth = () => {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-background via-background to-primary/5 flex items-center justify-center p-4">
+      {/* Theme toggle in top-right corner */}
+      <div className="absolute top-4 right-4">
+        <ThemeToggle />
+      </div>
+      
       <Card className="w-full max-w-md shadow-2xl">
         <CardHeader className="text-center space-y-4">
           <div className="inline-flex items-center justify-center w-16 h-16 mx-auto bg-primary/10 rounded-full">
