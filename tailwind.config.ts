@@ -20,6 +20,9 @@ export default {
 		},
 		extend: {
 			colors: {
+        'bleu-nuit': '#1a2332',
+        'or': '#d4af37',
+        'bleu-jour': '#007aff', // Un bleu standard pour le mode jour
 				border: 'hsl(var(--border))',
 				input: 'hsl(var(--input))',
 				ring: 'hsl(var(--ring))',
