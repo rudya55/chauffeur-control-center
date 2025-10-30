@@ -5,8 +5,8 @@
 
 @layer base {
   :root {
-    --background: 0 0% 100%;
-    --foreground: 222.2 84% 4.9%;
+    --background: 0 0% 100%; /* Fond blanc */
+    --foreground: 222.2 84% 4.9%; /* Texte bleu foncé par défaut */
 
     --card: 0 0% 100%;
     --card-foreground: 222.2 84% 4.9%;
@@ -37,33 +37,33 @@
   }
 
   .dark {
-    --background: 220 70% 15%; /* Navy blue (bleu nuit) background */
-    --foreground: 45 90% 60%; /* Gold text */
+    --background: 220 26% 14%; /* Correspond à #1a2332 */
+    --foreground: 43 74% 49%; /* Correspond à #d4af37 */
 
-    --card: 220 70% 15%;
-    --card-foreground: 45 90% 60%;
+    --card: 220 26% 14%;
+    --card-foreground: 43 74% 49%;
 
-    --popover: 220 70% 15%;
-    --popover-foreground: 45 90% 60%;
+    --popover: 220 26% 14%;
+    --popover-foreground: 43 74% 49%;
 
-    --primary: 45 90% 60%; /* Gold primary */
-    --primary-foreground: 220 70% 15%;
+    --primary: 43 74% 49%;
+    --primary-foreground: 220 26% 14%;
 
-    --secondary: 220 60% 20%; /* Darker navy blue */
-    --secondary-foreground: 45 90% 60%;
+    --secondary: 220 26% 20%;
+    --secondary-foreground: 43 74% 49%;
 
-    --muted: 220 60% 20%; 
-    --muted-foreground: 45 70% 55%; /* Slightly dimmed gold */
+    --muted: 220 26% 20%;
+    --muted-foreground: 43 74% 40%;
 
-    --accent: 220 60% 20%;
-    --accent-foreground: 45 90% 60%;
+    --accent: 220 26% 20%;
+    --accent-foreground: 43 74% 49%;
 
-    --destructive: 0 70% 45%; /* Deep red */
-    --destructive-foreground: 45 90% 60%;
+    --destructive: 0 63% 31%;
+    --destructive-foreground: 43 74% 49%;
 
-    --border: 220 60% 25%;
-    --input: 220 60% 25%;
-    --ring: 45 90% 60%;
+    --border: 220 26% 25%;
+    --input: 220 26% 25%;
+    --ring: 43 74% 49%;
   }
 }
 
@@ -74,10 +74,12 @@
   body {
     @apply bg-background text-foreground;
   }
-  
-  /* Make ALL text gold and bold in dark mode */
-  .dark * {
-    @apply text-primary;
+}
+  }
+
+  /* Appliquer la couleur or et le gras pour le texte en mode sombre */
+  .dark body {
+    color: theme('colors.or');
     font-weight: bold;
   }
 }

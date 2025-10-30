@@ -17,7 +17,16 @@ import {
   Phone, 
   AlertCircle,
   FileText,
-  Download 
+  Download,
+  Car,
+  Trash2,
+  Shield,
+  BarChart3,
+  TrendingUp,
+  Clock,
+  CheckCircle,
+  XCircle,
+  Zap
 } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { toast } from "sonner";
@@ -63,6 +72,41 @@ const Settings = () => {
   const [email, setEmail] = useState("");
   const [phone, setPhone] = useState("");
   const [address, setAddress] = useState("");
+  
+  // Vehicle info
+  const [carBrand, setCarBrand] = useState("");
+  const [carModel, setCarModel] = useState("");
+  const [carYear, setCarYear] = useState("");
+  const [carColor, setCarColor] = useState("");
+  const [carPlate, setCarPlate] = useState("");
+  
+  // Contact form
+  const [contactSubject, setContactSubject] = useState("");
+  const [contactMessage, setContactMessage] = useState("");
+  
+  // Analytics
+  const [aiAnalysis, setAiAnalysis] = useState<string>("");
+  const [isAnalyzing, setIsAnalyzing] = useState(false);
+  
+  // Les données seront récupérées de Supabase
+  const [driverStats, setDriverStats] = useState({
+    totalConnections: 0,
+    totalRidesAccepted: 0,
+    totalRidesCompleted: 0,
+    totalRidesCancelled: 0,
+    acceptanceRate: 0,
+    completionRate: 0,
+    avgRating: 0,
+    totalEarnings: 0,
+    thisMonthRides: 0,
+    lastMonthRides: 0,
+    bestDay: "-",
+    peakHours: "-",
+    totalCompanies: 0,
+    driverRanking: 0,
+    totalDrivers: 0,
+    companiesStats: []
+  });
 
   useEffect(() => {
     if (user) {
@@ -88,6 +132,13 @@ const Settings = () => {
       const nameParts = fullName.split(' ');
       setFirstName(nameParts[0] || '');
       setLastName(nameParts.slice(1).join(' ') || '');
+      
+      // Populate vehicle form
+      setCarBrand(profileData.brand || "");
+      setCarModel(profileData.model || "");
+      setCarYear(profileData.year || "");
+      setCarColor(profileData.color || "");
+      setCarPlate(profileData.license_plate || "");
     }
   };
 
@@ -204,18 +255,138 @@ const Settings = () => {
     toast.info(`Téléchargement du document ${id}`);
   };
   
+  const handleSaveVehicle = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!user || !profile) return;
+
+    const { error } = await supabase
+      .from('profiles')
+      .update({
+        brand: carBrand,
+        model: carModel,
+        year: carYear,
+        color: carColor,
+        license_plate: carPlate,
+        accepted_vehicle_types: profile.accepted_vehicle_types || []
+      })
+      .eq('id', user.id);
+
+    if (error) {
+      toast.error("Erreur lors de l'enregistrement du véhicule");
+      console.error("Supabase error:", error);
+    } else {
+      toast.success("Informations du véhicule enregistrées avec succès");
+      fetchProfile(); // Refresh profile data
+    }
+  };
+  
+  const handleSendContactMessage = (e: React.FormEvent) => {
+    e.preventDefault();
+    toast.success("Message envoyé avec succès");
+    setContactSubject("");
+    setContactMessage("");
+  };
+  
+  const handleDeleteAccount = () => {
+    if (window.confirm("⚠️ ATTENTION : Cette action est irréversible ! Êtes-vous sûr de vouloir supprimer votre compte ?")) {
+      toast.error("Suppression du compte en cours...");
+      // Logique de suppression ici
+    }
+  };
+  
+  const generateAIAnalysis = async () => {
+    setIsAnalyzing(true);
+    
+    try {
+      // Simulate API call to OpenAI/ChatGPT
+      // In production, call your backend endpoint that connects to OpenAI API
+      await new Promise(resolve => setTimeout(resolve, 2000));
+      
+      const analysis = `## 📊 Analyse détaillée de votre performance
+
+**Performance Globale : Excellente** ⭐⭐⭐⭐⭐
+
+### � Classement
+- **Vous êtes classé ${driverStats.driverRanking}/${driverStats.totalDrivers}** parmi tous les chauffeurs
+- Top ${Math.round((driverStats.driverRanking / driverStats.totalDrivers) * 100)}% des meilleurs chauffeurs !
+
+### 🏢 Sociétés partenaires
+- **Vous travaillez avec ${driverStats.totalCompanies} sociétés**
+- Diversification excellente pour maximiser vos revenus
+
+### �🎯 Points forts identifiés :
+- **Taux d'acceptation de ${driverStats.acceptanceRate}%** - Très bon ! Vous êtes réactif aux demandes.
+- **Taux de complétion de ${driverStats.completionRate}%** - Excellent engagement envers vos clients.
+- **Note moyenne de ${driverStats.avgRating}/5** - Vos clients sont très satisfaits de votre service.
+
+### 📈 Tendances observées :
+- Vous avez effectué **${driverStats.totalRidesCompleted} courses** avec seulement ${driverStats.totalRidesCancelled} annulations.
+- Meilleure journée : **${driverStats.bestDay}** 
+- Heures de pointe : **${driverStats.peakHours}**
+
+### 🏢 Performance par société :
+${driverStats.companiesStats.map((company, index) => `
+${index + 1}. **${company.name}**
+   - Taux d'acceptation : ${company.acceptanceRate}%
+   - Courses effectuées : ${company.ridesCompleted}
+   - Gains générés : ${company.earnings}€`).join('\n')}
+
+### 💡 Recommandations personnalisées :
+
+1. **Optimisez vos partenariats**
+   - **${driverStats.companiesStats[0].name}** est votre meilleur partenaire (${driverStats.companiesStats[0].acceptanceRate}% acceptation)
+   - Augmentez votre disponibilité pour cette société pour maximiser vos gains
+
+2. **Améliorez avec les autres sociétés**
+   - **${driverStats.companiesStats[4].name}** : Taux d'acceptation à améliorer (${driverStats.companiesStats[4].acceptanceRate}%)
+   - Essayez d'accepter plus de courses pour renforcer votre partenariat
+
+3. **Réduisez les annulations**
+   - ${driverStats.totalRidesCancelled} courses annulées ce mois
+   - Astuce : Vérifiez la distance avant d'accepter pour éviter les refus tardifs
+
+4. **Maintenez votre excellente note**
+   - Votre note de ${driverStats.avgRating}/5 est exceptionnelle
+   - Continuez à offrir un service de qualité (ponctualité, propreté, courtoisie)
+
+5. **Montez dans le classement**
+   - Vous êtes #${driverStats.driverRanking}, objectif : Top 10
+   - Augmentez vos courses de 15-20% pour grimper de 3-5 places
+
+### 🚀 Plan d'action suggéré :
+- ✅ Priorisez les courses de **${driverStats.companiesStats[0].name}** (meilleur taux)
+- ✅ Acceptez plus rapidement pour améliorer votre classement
+- ✅ Connectez-vous plus pendant ${driverStats.peakHours} (heures de pointe)
+- ✅ Diversifiez encore plus : Cherchez 1-2 nouvelles sociétés partenaires
+
+**Votre potentiel de gains estimé si vous appliquez ces conseils : +30% (environ ${Math.round(driverStats.totalEarnings * 1.30)}€/mois)**`;
+
+      setAiAnalysis(analysis);
+      toast.success("Analyse IA générée avec succès !");
+    } catch (error) {
+      toast.error("Erreur lors de la génération de l'analyse");
+      console.error(error);
+    } finally {
+      setIsAnalyzing(false);
+    }
+  };
+  
   return (
     <div className="p-4 sm:p-6">
       <PageHeader title="settings" />
       
       <Tabs defaultValue="profile" className="w-full">
-        <TabsList className="grid w-full grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 mb-6 h-auto gap-2 bg-card p-2">
+        <TabsList className="grid w-full grid-cols-3 sm:grid-cols-4 lg:grid-cols-10 mb-6 h-auto gap-2 bg-card p-2">
           <TabsTrigger value="profile" className="text-xs sm:text-sm">Profil</TabsTrigger>
+          <TabsTrigger value="vehicle" className="text-xs sm:text-sm">Véhicule</TabsTrigger>
+          <TabsTrigger value="analytics" className="text-xs sm:text-sm">Analyse</TabsTrigger>
           <TabsTrigger value="map" className="text-xs sm:text-sm">Carte</TabsTrigger>
           <TabsTrigger value="notifications" className="text-xs sm:text-sm">Notifications</TabsTrigger>
           <TabsTrigger value="payment" className="text-xs sm:text-sm">Paiement</TabsTrigger>
           <TabsTrigger value="language" className="text-xs sm:text-sm">Langues</TabsTrigger>
           <TabsTrigger value="documents" className="text-xs sm:text-sm">Documents</TabsTrigger>
+          <TabsTrigger value="contact" className="text-xs sm:text-sm">Contact</TabsTrigger>
+          <TabsTrigger value="security" className="text-xs sm:text-sm">Sécurité</TabsTrigger>
         </TabsList>
         
         <TabsContent value="profile" className="bg-card text-card-foreground rounded-lg shadow p-4 md:p-6">
@@ -309,6 +480,262 @@ const Settings = () => {
               <Button type="submit" className="w-full">Enregistrer les modifications</Button>
             </div>
           </form>
+        </TabsContent>
+
+        <TabsContent value="analytics" className="bg-card text-card-foreground rounded-lg shadow p-4 md:p-6">
+          <div className="space-y-6">
+            <div className="flex items-center justify-between">
+              <h3 className="text-lg font-medium flex items-center">
+                <BarChart3 className="mr-2 h-5 w-5" />
+                Analyse du chauffeur
+              </h3>
+              <Button 
+                onClick={generateAIAnalysis}
+                disabled={isAnalyzing}
+                className="flex items-center gap-2"
+              >
+                {isAnalyzing ? (
+                  <>
+                    <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
+                    Analyse en cours...
+                  </>
+                ) : (
+                  <>
+                    <Zap className="h-4 w-4" />
+                    Générer analyse IA
+                  </>
+                )}
+              </Button>
+            </div>
+
+            {/* Statistiques clés */}
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+              <div className="bg-gradient-to-br from-blue-500 to-blue-600 text-white rounded-lg p-4">
+                <div className="flex items-center justify-between">
+                  <Clock className="h-8 w-8 opacity-80" />
+                  <span className="text-2xl font-bold">{driverStats.totalConnections}</span>
+                </div>
+                <p className="text-sm mt-2 opacity-90">Connexions totales</p>
+              </div>
+
+              <div className="bg-gradient-to-br from-green-500 to-green-600 text-white rounded-lg p-4">
+                <div className="flex items-center justify-between">
+                  <CheckCircle className="h-8 w-8 opacity-80" />
+                  <span className="text-2xl font-bold">{driverStats.totalRidesAccepted}</span>
+                </div>
+                <p className="text-sm mt-2 opacity-90">Courses acceptées</p>
+              </div>
+
+              <div className="bg-gradient-to-br from-purple-500 to-purple-600 text-white rounded-lg p-4">
+                <div className="flex items-center justify-between">
+                  <TrendingUp className="h-8 w-8 opacity-80" />
+                  <span className="text-2xl font-bold">{driverStats.totalRidesCompleted}</span>
+                </div>
+                <p className="text-sm mt-2 opacity-90">Courses effectuées</p>
+              </div>
+
+              <div className="bg-gradient-to-br from-red-500 to-red-600 text-white rounded-lg p-4">
+                <div className="flex items-center justify-between">
+                  <XCircle className="h-8 w-8 opacity-80" />
+                  <span className="text-2xl font-bold">{driverStats.totalRidesCancelled}</span>
+                </div>
+                <p className="text-sm mt-2 opacity-90">Courses annulées</p>
+              </div>
+            </div>
+
+            {/* Taux de performance */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="border rounded-lg p-4">
+                <h4 className="font-medium mb-3 flex items-center">
+                  <CheckCircle className="mr-2 h-4 w-4 text-green-600" />
+                  Taux d'acceptation
+                </h4>
+                <div className="flex items-end justify-between mb-2">
+                  <span className="text-3xl font-bold text-green-600">{driverStats.acceptanceRate}%</span>
+                  <span className="text-sm text-muted-foreground">{driverStats.totalRidesAccepted}/{driverStats.totalConnections * 0.7 | 0} demandes</span>
+                </div>
+                <div className="w-full bg-gray-200 rounded-full h-3">
+                  <div 
+                    className="bg-gradient-to-r from-green-500 to-green-600 h-3 rounded-full transition-all"
+                    style={{ width: `${driverStats.acceptanceRate}%` }}
+                  ></div>
+                </div>
+              </div>
+
+              <div className="border rounded-lg p-4">
+                <h4 className="font-medium mb-3 flex items-center">
+                  <TrendingUp className="mr-2 h-4 w-4 text-purple-600" />
+                  Taux de complétion
+                </h4>
+                <div className="flex items-end justify-between mb-2">
+                  <span className="text-3xl font-bold text-purple-600">{driverStats.completionRate}%</span>
+                  <span className="text-sm text-muted-foreground">{driverStats.totalRidesCompleted}/{driverStats.totalRidesAccepted} courses</span>
+                </div>
+                <div className="w-full bg-gray-200 rounded-full h-3">
+                  <div 
+                    className="bg-gradient-to-r from-purple-500 to-purple-600 h-3 rounded-full transition-all"
+                    style={{ width: `${driverStats.completionRate}%` }}
+                  ></div>
+                </div>
+              </div>
+            </div>
+
+            {/* Graphique des performances mensuelles */}
+            <div className="border rounded-lg p-4">
+              <h4 className="font-medium mb-4">Performance mensuelle</h4>
+              <div className="flex items-end justify-around h-48 gap-2">
+                <div className="flex flex-col items-center flex-1">
+                  <div className="w-full bg-gradient-to-t from-blue-500 to-blue-400 rounded-t transition-all hover:opacity-80" 
+                       style={{ height: `${(driverStats.lastMonthRides / 35) * 100}%` }}></div>
+                  <span className="text-xs mt-2 font-medium">{driverStats.lastMonthRides}</span>
+                  <span className="text-xs text-muted-foreground">Mois dernier</span>
+                </div>
+                <div className="flex flex-col items-center flex-1">
+                  <div className="w-full bg-gradient-to-t from-green-500 to-green-400 rounded-t transition-all hover:opacity-80" 
+                       style={{ height: `${(driverStats.thisMonthRides / 35) * 100}%` }}></div>
+                  <span className="text-xs mt-2 font-medium">{driverStats.thisMonthRides}</span>
+                  <span className="text-xs text-muted-foreground">Ce mois</span>
+                </div>
+                <div className="flex flex-col items-center flex-1">
+                  <div className="w-full bg-gradient-to-t from-purple-500 to-purple-400 rounded-t transition-all hover:opacity-80 opacity-30" 
+                       style={{ height: '85%' }}></div>
+                  <span className="text-xs mt-2 font-medium">30</span>
+                  <span className="text-xs text-muted-foreground">Objectif</span>
+                </div>
+              </div>
+            </div>
+
+            {/* Informations supplémentaires */}
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              <div className="border rounded-lg p-4 bg-amber-50">
+                <p className="text-sm text-muted-foreground mb-1">Meilleur jour</p>
+                <p className="text-xl font-bold text-amber-700">{driverStats.bestDay}</p>
+              </div>
+              <div className="border rounded-lg p-4 bg-blue-50">
+                <p className="text-sm text-muted-foreground mb-1">Heures de pointe</p>
+                <p className="text-xl font-bold text-blue-700">{driverStats.peakHours}</p>
+              </div>
+              <div className="border rounded-lg p-4 bg-green-50">
+                <p className="text-sm text-muted-foreground mb-1">Gains totaux</p>
+                <p className="text-xl font-bold text-green-700">{driverStats.totalEarnings}€</p>
+              </div>
+            </div>
+
+            {/* Classement et sociétés */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="border-2 border-primary/20 rounded-lg p-6 bg-gradient-to-br from-primary/5 to-primary/10">
+                <div className="flex items-center justify-between mb-4">
+                  <h4 className="font-semibold text-lg flex items-center">
+                    🏆 Votre classement
+                  </h4>
+                  <span className="text-3xl font-bold text-primary">#{driverStats.driverRanking}</span>
+                </div>
+                <p className="text-sm text-muted-foreground mb-2">
+                  Sur {driverStats.totalDrivers} chauffeurs actifs
+                </p>
+                <div className="w-full bg-gray-200 rounded-full h-2 mb-2">
+                  <div 
+                    className="bg-gradient-to-r from-amber-500 to-amber-600 h-2 rounded-full"
+                    style={{ width: `${100 - (driverStats.driverRanking / driverStats.totalDrivers * 100)}%` }}
+                  ></div>
+                </div>
+                <p className="text-xs text-primary font-medium">
+                  Top {Math.round((driverStats.driverRanking / driverStats.totalDrivers) * 100)}% des meilleurs chauffeurs
+                </p>
+              </div>
+
+              <div className="border-2 border-purple-200 rounded-lg p-6 bg-gradient-to-br from-purple-50 to-purple-100">
+                <div className="flex items-center justify-between mb-4">
+                  <h4 className="font-semibold text-lg flex items-center">
+                    🏢 Sociétés partenaires
+                  </h4>
+                  <span className="text-3xl font-bold text-purple-700">{driverStats.totalCompanies}</span>
+                </div>
+                <p className="text-sm text-muted-foreground mb-3">
+                  Diversification de vos revenus
+                </p>
+                <div className="flex items-center gap-2">
+                  <div className="flex-1 bg-purple-200 rounded-full h-2">
+                    <div 
+                      className="bg-gradient-to-r from-purple-500 to-purple-600 h-2 rounded-full"
+                      style={{ width: `${(driverStats.totalCompanies / 10) * 100}%` }}
+                    ></div>
+                  </div>
+                  <span className="text-xs text-purple-700 font-medium">
+                    {driverStats.totalCompanies}/10
+                  </span>
+                </div>
+              </div>
+            </div>
+
+            {/* Classement par société */}
+            <div className="border rounded-lg p-6">
+              <h4 className="font-semibold text-lg mb-4 flex items-center">
+                📊 Performance par société
+              </h4>
+              <div className="space-y-3">
+                {driverStats.companiesStats.map((company, index) => (
+                  <div key={index} className="border rounded-lg p-4 hover:bg-muted/50 transition-colors">
+                    <div className="flex items-center justify-between mb-2">
+                      <div className="flex items-center gap-3">
+                        <span className="flex items-center justify-center w-8 h-8 rounded-full bg-primary text-primary-foreground font-bold text-sm">
+                          {index + 1}
+                        </span>
+                        <div>
+                          <p className="font-medium">{company.name}</p>
+                          <p className="text-xs text-muted-foreground">
+                            {company.ridesCompleted} courses • {company.earnings}€
+                          </p>
+                        </div>
+                      </div>
+                      <div className="text-right">
+                        <p className="text-lg font-bold text-green-600">{company.acceptanceRate}%</p>
+                        <p className="text-xs text-muted-foreground">Acceptation</p>
+                      </div>
+                    </div>
+                    <div className="w-full bg-gray-200 rounded-full h-2">
+                      <div 
+                        className={`h-2 rounded-full transition-all ${
+                          company.acceptanceRate >= 90 ? 'bg-gradient-to-r from-green-500 to-green-600' :
+                          company.acceptanceRate >= 80 ? 'bg-gradient-to-r from-yellow-500 to-yellow-600' :
+                          'bg-gradient-to-r from-red-500 to-red-600'
+                        }`}
+                        style={{ width: `${company.acceptanceRate}%` }}
+                      ></div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+              <div className="mt-4 p-3 bg-blue-50 rounded-lg border border-blue-200">
+                <p className="text-xs text-blue-800">
+                  💡 <strong>Conseil :</strong> Priorisez les sociétés avec les meilleurs taux d'acceptation pour maximiser vos revenus.
+                </p>
+              </div>
+            </div>
+
+            {/* Analyse IA */}
+            {aiAnalysis && (
+              <div className="border-2 border-primary/20 rounded-lg p-6 bg-primary/5">
+                <div className="flex items-center gap-2 mb-4">
+                  <Zap className="h-5 w-5 text-primary" />
+                  <h4 className="font-semibold text-lg">Analyse IA - ChatGPT</h4>
+                </div>
+                <div className="prose prose-sm max-w-none">
+                  <div className="whitespace-pre-wrap text-sm">{aiAnalysis}</div>
+                </div>
+              </div>
+            )}
+
+            {!aiAnalysis && (
+              <div className="border-2 border-dashed rounded-lg p-8 text-center">
+                <Zap className="h-12 w-12 mx-auto text-muted-foreground mb-3" />
+                <p className="text-muted-foreground mb-4">
+                  Cliquez sur "Générer analyse IA" pour obtenir une analyse détaillée<br />
+                  de votre comportement et des conseils personnalisés
+                </p>
+              </div>
+            )}
+          </div>
         </TabsContent>
 
         <TabsContent value="map" className="bg-card text-card-foreground rounded-lg shadow p-4 md:p-6">
@@ -753,6 +1180,243 @@ const Settings = () => {
               <p className="text-sm text-amber-700 mt-2">
                 Veuillez vous assurer que tous les documents sont à jour et lisibles.
               </p>
+            </div>
+          </div>
+        </TabsContent>
+
+        <TabsContent value="vehicle" className="bg-card text-card-foreground rounded-lg shadow p-4 md:p-6">
+          <form onSubmit={handleSaveVehicle}>
+            <h3 className="text-lg font-medium mb-6 flex items-center">
+              <Car className="mr-2 h-5 w-5" />
+              Informations du véhicule
+            </h3>
+
+            <div className="space-y-4">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <Label htmlFor="carBrand">Marque</Label>
+                  <Input 
+                    id="carBrand" 
+                    value={carBrand} 
+                    onChange={(e) => setCarBrand(e.target.value)}
+                    placeholder="ex: Mercedes, BMW, Tesla"
+                  />
+                </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor="carModel">Modèle</Label>
+                  <Input 
+                    id="carModel" 
+                    value={carModel} 
+                    onChange={(e) => setCarModel(e.target.value)}
+                    placeholder="ex: Classe E, Série 5, Model S"
+                  />
+                </div>
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div className="space-y-2">
+                  <Label htmlFor="carYear">Année</Label>
+                  <Input 
+                    id="carYear" 
+                    type="number"
+                    value={carYear} 
+                    onChange={(e) => setCarYear(e.target.value)}
+                    placeholder="2023"
+                  />
+                </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor="carColor">Couleur</Label>
+                  <Input 
+                    id="carColor" 
+                    value={carColor} 
+                    onChange={(e) => setCarColor(e.target.value)}
+                    placeholder="Noir, Blanc, Gris..."
+                  />
+                </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor="carPlate">Plaque d'immatriculation</Label>
+                  <Input 
+                    id="carPlate" 
+                    value={carPlate} 
+                    onChange={(e) => setCarPlate(e.target.value)}
+                    placeholder="AB-123-CD"
+                  />
+                </div>
+              </div>
+
+              {/* Vehicle category + dynamic accepted types based on admin-assigned main category */}
+              <div className="border-t pt-6 mt-2">
+                <h4 className="text-md font-medium mb-4">Catégorie principale</h4>
+                <p className="mb-4">{profile?.vehicle_category || profile?.vehicle_type || 'Standard'}</p>
+
+                <h4 className="text-md font-medium mb-4">Catégories de courses que vous pouvez recevoir</h4>
+                <div className="space-y-3">
+                  {/* compute allowed types from profile.vehicle_category */}
+                  {(() => {
+                    const main = profile?.vehicle_category || profile?.vehicle_type || 'standard';
+                    const allowed: Record<string, string> = {
+                      minibus: 'Minibus',
+                      van: 'Van',
+                      berline: 'Berline',
+                      standard: 'Standard'
+                    };
+
+                    const order = ['standard','berline','van','minibus'];
+                    const mainIndex = order.indexOf(main.toLowerCase());
+                    const toShow = order.slice(0, mainIndex + 1).reverse(); // show from highest to lowest
+
+                    return toShow.map((key) => {
+                      const isMain = key === main.toLowerCase();
+                      const checked = (profile?.accepted_vehicle_types || []).includes(key) || isMain;
+                      return (
+                        <div key={key} className="flex items-center space-x-3">
+                          <Switch 
+                            id={`receive-${key}`} 
+                            checked={checked}
+                            onCheckedChange={(val: boolean) => {
+                              // update local profile state immediately
+                              const current = new Set(profile?.accepted_vehicle_types || []);
+                              if (val) current.add(key);
+                              else current.delete(key);
+                              const updated = Array.from(current);
+                              setProfile((p: any) => ({ ...p, accepted_vehicle_types: updated }));
+                            }}
+                            disabled={isMain} // main category forced
+                          />
+                          <Label htmlFor={`receive-${key}`} className="font-normal">{allowed[key]}</Label>
+                        </div>
+                      );
+                    });
+                  })()}
+                </div>
+
+                <p className="text-sm text-muted-foreground mt-4">
+                  L'administrateur définit votre catégorie principale. Cochez les catégories supplémentaires que vous acceptez de recevoir.
+                </p>
+              </div>
+
+              <div className="bg-muted/50 p-4 rounded-lg mt-4">
+                <p className="text-sm text-muted-foreground">
+                  Ces informations sont utilisées par le dispatch pour cibler les chauffeurs.
+                </p>
+              </div>
+
+              <Button type="submit" className="w-full">Enregistrer les informations</Button>
+            </div>
+          </form>
+        </TabsContent>
+
+        <TabsContent value="contact" className="bg-card text-card-foreground rounded-lg shadow p-4 md:p-6">
+          <form onSubmit={handleSendContactMessage}>
+            <h3 className="text-lg font-medium mb-6 flex items-center">
+              <Mail className="mr-2 h-5 w-5" />
+              Contacter le support
+            </h3>
+            
+            <div className="space-y-4">
+              <div className="space-y-2">
+                <Label htmlFor="contactSubject">Sujet</Label>
+                <Input 
+                  id="contactSubject" 
+                  value={contactSubject} 
+                  onChange={(e) => setContactSubject(e.target.value)}
+                  placeholder="Objet de votre message"
+                  required
+                />
+              </div>
+              
+              <div className="space-y-2">
+                <Label htmlFor="contactMessage">Message</Label>
+                <textarea
+                  id="contactMessage"
+                  value={contactMessage}
+                  onChange={(e) => setContactMessage(e.target.value)}
+                  placeholder="Décrivez votre demande ou problème..."
+                  required
+                  rows={8}
+                  className="w-full px-3 py-2 border rounded-md bg-background text-foreground resize-none"
+                />
+              </div>
+              
+              <div className="bg-blue-50 border border-blue-200 p-4 rounded-lg">
+                <div className="flex items-start gap-2">
+                  <AlertCircle className="h-5 w-5 text-blue-600 flex-shrink-0 mt-0.5" />
+                  <div>
+                    <p className="text-sm font-medium text-blue-900">
+                      Nous vous répondrons dans les 24 heures
+                    </p>
+                    <p className="text-sm text-blue-700 mt-1">
+                      Pour les urgences, appelez le : +33 1 23 45 67 89
+                    </p>
+                  </div>
+                </div>
+              </div>
+              
+              <Button type="submit" className="w-full">
+                <Mail className="mr-2 h-4 w-4" />
+                Envoyer le message
+              </Button>
+            </div>
+          </form>
+        </TabsContent>
+
+        <TabsContent value="security" className="bg-card text-card-foreground rounded-lg shadow p-4 md:p-6">
+          <div className="space-y-6">
+            <h3 className="text-lg font-medium mb-6 flex items-center">
+              <Shield className="mr-2 h-5 w-5" />
+              Sécurité du compte
+            </h3>
+            
+            <div className="space-y-4">
+              <div className="border rounded-lg p-4">
+                <h4 className="font-medium mb-2">Mot de passe</h4>
+                <p className="text-sm text-muted-foreground mb-4">
+                  Dernière modification : Il y a 2 mois
+                </p>
+                <Button variant="outline">Changer le mot de passe</Button>
+              </div>
+              
+              <div className="border rounded-lg p-4">
+                <h4 className="font-medium mb-2">Authentification à deux facteurs</h4>
+                <p className="text-sm text-muted-foreground mb-4">
+                  Ajoutez une couche de sécurité supplémentaire à votre compte
+                </p>
+                <Button variant="outline">Activer 2FA</Button>
+              </div>
+              
+              <div className="border rounded-lg p-4">
+                <h4 className="font-medium mb-2">Sessions actives</h4>
+                <p className="text-sm text-muted-foreground mb-4">
+                  Gérez les appareils connectés à votre compte
+                </p>
+                <Button variant="outline">Voir les sessions</Button>
+              </div>
+            </div>
+            
+            <div className="border-t pt-6 mt-8">
+              <div className="bg-destructive/10 border border-destructive/20 rounded-lg p-6">
+                <h4 className="font-semibold text-destructive mb-3 flex items-center">
+                  <AlertCircle className="mr-2 h-5 w-5" />
+                  Zone de danger
+                </h4>
+                
+                <p className="text-sm text-muted-foreground mb-4">
+                  Une fois que vous aurez supprimé votre compte, il n'y a pas de retour en arrière. 
+                  Toutes vos données seront définitivement supprimées.
+                </p>
+                
+                <Button 
+                  variant="destructive" 
+                  className="bg-destructive hover:bg-destructive/90"
+                  onClick={handleDeleteAccount}
+                >
+                  <Trash2 className="mr-2 h-4 w-4" />
+                  Supprimer mon compte
+                </Button>
+              </div>
             </div>
           </div>
         </TabsContent>
