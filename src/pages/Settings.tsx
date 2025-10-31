@@ -54,13 +54,14 @@ import {
 } from "@/components/ui/select";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/use-auth";
+import { useTheme } from "next-themes";
 
 const Settings = () => {
   const { t } = useLanguage();
   const { user } = useAuth();
+  const { theme, setTheme } = useTheme();
   const [profile, setProfile] = useState<any>(null);
   const [avatar, setAvatar] = useState("");
-  const [darkMode, setDarkMode] = useState(false);
   const [emailNotifications, setEmailNotifications] = useState(true);
   const [pushNotifications, setPushNotifications] = useState(true);
   const [showPaymentDialog, setShowPaymentDialog] = useState(false);
@@ -474,8 +475,8 @@ ${index + 1}. **${company.name}**
                 <MoonStar className="h-5 w-5 text-foreground" />
                 <span className="text-foreground">Mode sombre</span>
                 <Switch 
-                  checked={darkMode} 
-                  onCheckedChange={setDarkMode} 
+                  checked={theme === "dark"} 
+                  onCheckedChange={(checked) => setTheme(checked ? "dark" : "light")} 
                   className="ml-auto"
                 />
               </div>
