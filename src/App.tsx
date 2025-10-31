@@ -26,8 +26,9 @@ function App() {
   return (
     <ThemeProvider
       attribute="class"
-      defaultTheme="dark"
-      disableTransitionOnChange
+      defaultTheme="light"
+      enableSystem={true}
+      storageKey="theme"
     >
       <Router>
         <AuthProvider>

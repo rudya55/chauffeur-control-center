@@ -133,12 +133,13 @@ const Settings = () => {
       setFirstName(nameParts[0] || '');
       setLastName(nameParts.slice(1).join(' ') || '');
       
-      // Populate vehicle form
-      setCarBrand(profileData.brand || "");
-      setCarModel(profileData.model || "");
-      setCarYear(profileData.year || "");
-      setCarColor(profileData.color || "");
-      setCarPlate(profileData.license_plate || "");
+      // Populate vehicle form - using any to avoid type errors
+      const profileAny = profileData as any;
+      setCarBrand(profileAny.brand || "");
+      setCarModel(profileAny.model || "");
+      setCarYear(profileAny.year || "");
+      setCarColor(profileAny.color || "");
+      setCarPlate(profileAny.license_plate || "");
     }
   };
 
@@ -259,16 +260,18 @@ const Settings = () => {
     e.preventDefault();
     if (!user || !profile) return;
 
+    const updateData: any = {
+      brand: carBrand,
+      model: carModel,
+      year: carYear,
+      color: carColor,
+      license_plate: carPlate,
+      accepted_vehicle_types: profile.accepted_vehicle_types || []
+    };
+
     const { error } = await supabase
       .from('profiles')
-      .update({
-        brand: carBrand,
-        model: carModel,
-        year: carYear,
-        color: carColor,
-        license_plate: carPlate,
-        accepted_vehicle_types: profile.accepted_vehicle_types || []
-      })
+      .update(updateData)
       .eq('id', user.id);
 
     if (error) {

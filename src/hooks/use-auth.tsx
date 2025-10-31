@@ -60,9 +60,16 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
   };
 
   useEffect(() => {
+    // Timeout de sécurité pour éviter un chargement infini
+    const loadingTimeout = setTimeout(() => {
+      console.warn('Auth loading timeout - setting loading to false');
+      setLoading(false);
+    }, 5000); // 5 secondes maximum
+
     // Set up auth state listener FIRST
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       (event, session) => {
+        clearTimeout(loadingTimeout);
         setSession(session);
         setUser(session?.user ?? null);
         setLoading(false);
@@ -79,25 +86,35 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
     );
 
     // THEN check for existing session
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      setSession(session);
-      setUser(session?.user ?? null);
-      setLoading(false);
-      
-      if (session?.user) {
-        setTimeout(() => {
-          checkUserStatus(session.user.id);
-        }, 0);
-      } else {
-        // Rediriger vers la landing page si pas de session (laisser accès aux pages publiques)
-        const publicPaths = ['/welcome', '/auth', '/booking'] as const;
-        if (!publicPaths.includes(window.location.pathname as typeof publicPaths[number])) {
-          navigate('/welcome');
+    supabase.auth.getSession()
+      .then(({ data: { session } }) => {
+        clearTimeout(loadingTimeout);
+        setSession(session);
+        setUser(session?.user ?? null);
+        setLoading(false);
+        
+        if (session?.user) {
+          setTimeout(() => {
+            checkUserStatus(session.user.id);
+          }, 0);
+        } else {
+          // Rediriger vers la landing page si pas de session (laisser accès aux pages publiques)
+          const publicPaths = ['/welcome', '/auth', '/booking'] as const;
+          if (!publicPaths.includes(window.location.pathname as typeof publicPaths[number])) {
+            navigate('/welcome');
+          }
         }
-      }
-    });
+      })
+      .catch((error) => {
+        console.error('Error fetching session:', error);
+        clearTimeout(loadingTimeout);
+        setLoading(false);
+      });
 
-    return () => subscription.unsubscribe();
+    return () => {
+      clearTimeout(loadingTimeout);
+      subscription.unsubscribe();
+    };
   }, []);
 
   const signOut = async () => {

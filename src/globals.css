@@ -1,85 +1,58 @@
-
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
 @layer base {
   :root {
-    --background: 0 0% 100%; /* Fond blanc */
-    --foreground: 222.2 84% 4.9%; /* Texte bleu foncé par défaut */
-
+    --background: 0 0% 100%;
+    --foreground: 222.2 84% 4.9%;
     --card: 0 0% 100%;
     --card-foreground: 222.2 84% 4.9%;
-
     --popover: 0 0% 100%;
     --popover-foreground: 222.2 84% 4.9%;
-
     --primary: 222.2 47.4% 11.2%;
     --primary-foreground: 210 40% 98%;
-
     --secondary: 210 40% 96.1%;
     --secondary-foreground: 222.2 47.4% 11.2%;
-
     --muted: 210 40% 96.1%;
     --muted-foreground: 215.4 16.3% 46.9%;
-
     --accent: 210 40% 96.1%;
     --accent-foreground: 222.2 47.4% 11.2%;
-
     --destructive: 0 84.2% 60.2%;
     --destructive-foreground: 210 40% 98%;
-
     --border: 214.3 31.8% 91.4%;
     --input: 214.3 31.8% 91.4%;
     --ring: 222.2 84% 4.9%;
-
     --radius: 0.5rem;
   }
 
   .dark {
-    --background: 220 26% 14%; /* Correspond à #1a2332 */
-    --foreground: 43 74% 49%; /* Correspond à #d4af37 */
-
+    --background: 220 26% 14%;
+    --foreground: 43 74% 49%;
     --card: 220 26% 14%;
     --card-foreground: 43 74% 49%;
-
     --popover: 220 26% 14%;
     --popover-foreground: 43 74% 49%;
-
     --primary: 43 74% 49%;
     --primary-foreground: 220 26% 14%;
-
     --secondary: 220 26% 20%;
     --secondary-foreground: 43 74% 49%;
-
     --muted: 220 26% 20%;
     --muted-foreground: 43 74% 40%;
-
     --accent: 220 26% 20%;
     --accent-foreground: 43 74% 49%;
-
     --destructive: 0 63% 31%;
     --destructive-foreground: 43 74% 49%;
-
     --border: 220 26% 25%;
     --input: 220 26% 25%;
     --ring: 43 74% 49%;
   }
-}
 
-@layer base {
   * {
     @apply border-border;
   }
+  
   body {
     @apply bg-background text-foreground;
-  }
-}
-  }
-
-  /* Appliquer la couleur or et le gras pour le texte en mode sombre */
-  .dark body {
-    color: theme('colors.or');
-    font-weight: bold;
   }
 }
