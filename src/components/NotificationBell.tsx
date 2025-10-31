@@ -17,11 +17,8 @@ interface NotificationBellProps {
 
 const NotificationBell = ({ className = "" }: NotificationBellProps) => {
   const navigate = useNavigate();
-  const [notifications, setNotifications] = useState([
-    { id: 1, message: "Nouvelle réservation de Jean Dupont", route: "/reservations", time: "Il y a 5 min" },
-    { id: 2, message: "Course terminée pour Marie Lefevre", route: "/reservations", time: "Il y a 15 min" },
-    { id: 3, message: "Paiement reçu: 85.50€", route: "/accounting", time: "Il y a 1h" },
-  ]);
+  type NotificationItem = { id: number; message: string; route: string; time: string };
+  const [notifications, setNotifications] = useState<NotificationItem[]>([]);
   
   const handleNotificationClick = (route: string, notificationId: number) => {
     // Supprimer la notification cliquée

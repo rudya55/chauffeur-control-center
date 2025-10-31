@@ -3,11 +3,13 @@ import { cn } from '@/lib/utils';
 import { useTheme as useNextTheme } from 'next-themes';
 import { Menu, Plus, Minus, Navigation } from 'lucide-react';
 
-const GOOGLE_MAPS_API_KEY = import.meta.env.VITE_GOOGLE_MAPS_API_KEY || 'AIzaSyDINevIQHW3nmiz1Z1nYlkbOeH3XYSsTyc';
+const GOOGLE_MAPS_API_KEY = import.meta.env.VITE_GOOGLE_MAPS_API_KEY;
+const MAP_FEATURE_ENABLED = false; // Toggle back to true when Google Maps is ready
 
 declare global {
   interface Window {
     google: typeof google;
+    initMap: () => void;
   }
 }
 
@@ -28,12 +30,43 @@ const Map = ({
 }: MapProps) => {
   const mapRef = useRef<HTMLDivElement>(null);
   const mapInstanceRef = useRef<google.maps.Map | null>(null);
-  const markerRef = useRef<google.maps.marker.AdvancedMarkerElement | null>(null);
+  const markerRef = useRef<(google.maps.marker.AdvancedMarkerElement | google.maps.Marker) | null>(null);
   const polylineRef = useRef<google.maps.Polyline | null>(null);
   const { theme } = useNextTheme();
   const [isLoaded, setIsLoaded] = useState(false);
   const [currentPosition, setCurrentPosition] = useState<{ lat: number; lng: number } | null>(null);
   const [carIcon, setCarIcon] = useState('sedan'); // Default car type
+  const [mapError, setMapError] = useState<string | null>(null);
+
+  if (!MAP_FEATURE_ENABLED) {
+    return (
+      <div className={cn("h-full w-full overflow-hidden relative", className)}>
+        <div className="h-full w-full bg-muted flex flex-col items-center justify-center gap-2 text-center p-6">
+          <h2 className="text-lg font-semibold">Carte désactivée temporairement</h2>
+          <p className="text-sm text-muted-foreground max-w-sm">
+            L'intégration Google Maps est coupée pour les tests. Réactive-la en remettant
+            <code className="mx-1 rounded bg-muted px-1">MAP_FEATURE_ENABLED = true</code>
+            dans <code>src/components/Map.tsx</code> et en fournissant une clé API valide.
+          </p>
+        </div>
+      </div>
+    );
+  }
+
+  const isAdvancedMarkerElement = (marker: unknown): marker is google.maps.marker.AdvancedMarkerElement => {
+    return Boolean(marker && typeof marker === 'object' && 'content' in (marker as Record<string, unknown>));
+  };
+
+  const updateMarkerPosition = (
+    marker: google.maps.marker.AdvancedMarkerElement | google.maps.Marker,
+    position: google.maps.LatLngLiteral
+  ) => {
+    if (marker instanceof google.maps.marker.AdvancedMarkerElement) {
+      marker.position = position;
+    } else {
+      marker.setPosition(position);
+    }
+  };
 
   // Get car emoji based on car type
   const getCarEmoji = (carType: string) => {
@@ -121,27 +154,49 @@ const Map = ({
 
   // Load Google Maps API
   useEffect(() => {
-    const loadGoogleMapsScript = async () => {
+    const loadGoogleMapsScript = () => {
       if (window.google?.maps) {
         setIsLoaded(true);
         return;
       }
 
-      try {
-        // Utiliser l'importation dynamique de l'API JS Loader
-        const { Loader } = await import('@googlemaps/js-api-loader');
-        const loader = new Loader({
-          apiKey: GOOGLE_MAPS_API_KEY,
-          version: "weekly",
-          libraries: ["geometry", "marker"] // Ajout de la bibliothèque "marker"
-        });
-
-        await loader.load();
-        console.log('Google Maps API chargée avec succès via JS API Loader');
-        setIsLoaded(true);
-      } catch (error) {
-        console.error('Erreur de chargement Google Maps:', error);
+      if (document.querySelector('script[src*="maps.googleapis.com"]')) {
+        // Si le script est déjà en cours de chargement, on attend qu'il soit prêt
+        const interval = setInterval(() => {
+          if (window.google?.maps) {
+            setIsLoaded(true);
+            clearInterval(interval);
+          }
+        }, 100);
+        return;
       }
+
+      if (!GOOGLE_MAPS_API_KEY) {
+        const message = "La clé API Google Maps est manquante. Vérifiez votre fichier .env.";
+        console.error(message);
+        setMapError(message);
+        return;
+      }
+
+      // Créer le script tag pour charger Google Maps
+      const script = document.createElement('script');
+      script.src = `https://maps.googleapis.com/maps/api/js?key=${GOOGLE_MAPS_API_KEY}&libraries=geometry,marker&callback=initMap`;
+      script.async = true;
+      script.defer = true;
+      
+      script.onerror = (error) => {
+        const message = "Erreur de chargement Google Maps. Vérifiez la clé API et les restrictions Google Cloud.";
+        console.error(message, error);
+        setMapError(message);
+      };
+
+      window.initMap = () => {
+        console.log('Google Maps API chargée avec succès via callback');
+        setIsLoaded(true);
+        setMapError(null);
+      };
+
+      document.head.appendChild(script);
     };
 
     loadGoogleMapsScript();
@@ -149,7 +204,7 @@ const Map = ({
 
   // Initialize map
   useEffect(() => {
-    if (!isLoaded || !mapRef.current || mapInstanceRef.current) return;
+  if (mapError || !isLoaded || !mapRef.current || mapInstanceRef.current) return;
 
     const mapStyles = theme === 'dark' ? [
       { elementType: "geometry", stylers: [{ color: "#1a2332" }] }, // Fond de carte principal
@@ -179,34 +234,53 @@ const Map = ({
     // Use currentPosition if available, otherwise use center prop
     const initialCenter = currentPosition || center;
     
-    const map = new window.google.maps.Map(mapRef.current, {
-      center: initialCenter,
-      zoom,
-      styles: mapStyles,
-      disableDefaultUI: true,
-      zoomControl: false,
-      mapTypeControl: false,
-      scaleControl: false,
-      streetViewControl: false,
-      rotateControl: false,
-      fullscreenControl: false,
-      gestureHandling: 'greedy',
-      clickableIcons: false,
-    });
+    try {
+      const map = new window.google.maps.Map(mapRef.current, {
+        center: initialCenter,
+        zoom,
+        styles: mapStyles,
+        disableDefaultUI: true,
+        zoomControl: false,
+        mapTypeControl: false,
+        scaleControl: false,
+        streetViewControl: false,
+        rotateControl: false,
+        fullscreenControl: false,
+        gestureHandling: 'greedy',
+        clickableIcons: false,
+      });
 
-    mapInstanceRef.current = map;
+      mapInstanceRef.current = map;
 
-    // Utiliser AdvancedMarkerElement pour de meilleures performances
-    const markerElement = document.createElement('div');
-    markerElement.className = "text-4xl"; // Taille de l'emoji
-    markerElement.innerText = getCarEmoji(carIcon);
+      // Utiliser AdvancedMarkerElement quand disponible, sinon basculer sur Marker classique
+      if (window.google?.maps?.marker?.AdvancedMarkerElement) {
+        const markerElement = document.createElement('div');
+        markerElement.className = "text-4xl"; // Taille de l'emoji
+        markerElement.innerText = getCarEmoji(carIcon);
 
-    const marker = new window.google.maps.marker.AdvancedMarkerElement({
-      position: initialCenter,
-      map,
-      content: markerElement,
-    });
-    markerRef.current = marker;
+        const advancedMarker = new window.google.maps.marker.AdvancedMarkerElement({
+          position: initialCenter,
+          map,
+          content: markerElement,
+        });
+        markerRef.current = advancedMarker;
+      } else {
+        const fallbackMarker = new window.google.maps.Marker({
+          position: initialCenter,
+          map,
+          label: {
+            text: getCarEmoji(carIcon),
+            fontSize: '28px',
+          },
+        });
+        // Icône transparente pour n'afficher que l'emoji
+        fallbackMarker.setIcon({
+          path: window.google.maps.SymbolPath.CIRCLE,
+          scale: 0,
+        });
+
+        markerRef.current = fallbackMarker;
+      }
 
     // Handle route
     if (route && route.length > 1) {
@@ -224,7 +298,12 @@ const Map = ({
       route.forEach(point => bounds.extend(point));
       map.fitBounds(bounds);
     }
-  }, [isLoaded, currentPosition, theme]); // Dépendances mises à jour
+    } catch (error) {
+      const message = "Impossible d'initialiser Google Maps. Vérifiez la clé API et l'état du service.";
+      console.error(message, error);
+      setMapError(message);
+    }
+  }, [isLoaded, currentPosition, theme, mapError, carIcon, route]); // Dépendances mises à jour
 
   // Update map center when currentPosition changes
   useEffect(() => {
@@ -236,13 +315,22 @@ const Map = ({
   useEffect(() => {
     if (!markerRef.current || !isLoaded) return;
 
-    if (currentPosition) {
-      markerRef.current.position = currentPosition;
-    }
-    
-    const markerContent = markerRef.current.content as HTMLElement;
-    if (markerContent) {
-      markerContent.innerText = getCarEmoji(carIcon);
+    if (isAdvancedMarkerElement(markerRef.current)) {
+      if (currentPosition) {
+        updateMarkerPosition(markerRef.current, currentPosition);
+      }
+      const markerContent = markerRef.current.content as HTMLElement;
+      if (markerContent) {
+        markerContent.innerText = getCarEmoji(carIcon);
+      }
+    } else {
+      if (currentPosition) {
+        updateMarkerPosition(markerRef.current as google.maps.Marker, currentPosition);
+      }
+      markerRef.current.setLabel?.({
+        text: getCarEmoji(carIcon),
+        fontSize: '28px',
+      });
     }
   }, [currentPosition, carIcon, isLoaded]);
 
@@ -281,6 +369,11 @@ const Map = ({
   }, [theme]);
 
   const handleLocate = () => {
+    if (mapError) {
+      alert(mapError);
+      return;
+    }
+
     if (navigator.geolocation && mapInstanceRef.current && markerRef.current) {
       navigator.geolocation.getCurrentPosition(
         (position) => {
@@ -292,7 +385,7 @@ const Map = ({
           mapInstanceRef.current?.setCenter(userLocation);
           mapInstanceRef.current?.setZoom(16);
           if (markerRef.current) {
-            markerRef.current.position = userLocation;
+            updateMarkerPosition(markerRef.current, userLocation);
           }
         },
         (error) => {
@@ -304,6 +397,11 @@ const Map = ({
   };
 
   const handleZoomIn = () => {
+    if (mapError) {
+      alert(mapError);
+      return;
+    }
+
     if (mapInstanceRef.current) {
       const currentZoom = mapInstanceRef.current.getZoom() || 14;
       mapInstanceRef.current.setZoom(currentZoom + 1);
@@ -311,6 +409,11 @@ const Map = ({
   };
 
   const handleZoomOut = () => {
+    if (mapError) {
+      alert(mapError);
+      return;
+    }
+
     if (mapInstanceRef.current) {
       const currentZoom = mapInstanceRef.current.getZoom() || 14;
       mapInstanceRef.current.setZoom(currentZoom - 1);
@@ -329,6 +432,16 @@ const Map = ({
   return (
     <div className={cn("h-full w-full overflow-hidden relative", className)}>
       <div ref={mapRef} className="h-full w-full" />
+
+      {mapError && (
+        <div className="absolute inset-0 z-[1000] flex flex-col items-center justify-center bg-background/95 p-6 text-center">
+          <h2 className="text-lg font-semibold text-destructive mb-2">Erreur Google Maps</h2>
+          <p className="text-sm text-muted-foreground max-w-md">
+            {mapError}<br />
+            Vérifiez les restrictions de la clé sur Google Cloud (HTTP referrers et Android SHA-1) puis actualisez.
+          </p>
+        </div>
+      )}
       
       {/* Contrôles de zoom à droite - responsive */}
       <div className="absolute top-3 sm:top-4 right-3 sm:right-4 z-[1000] flex flex-col gap-1.5 sm:gap-2">
