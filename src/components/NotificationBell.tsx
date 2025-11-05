@@ -1,7 +1,6 @@
-
 import { Button } from "@/components/ui/button";
 import { Bell } from "lucide-react";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Badge } from "@/components/ui/badge";
 import { useNavigate } from "react-router-dom";
 import {
@@ -10,20 +9,114 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { supabase } from "@/integrations/supabase/client";
+import { useAuth } from "@/hooks/use-auth";
+import { toast } from "sonner";
 
 interface NotificationBellProps {
   className?: string;
 }
 
+interface Notification {
+  id: string;
+  message: string;
+  route: string;
+  time: string;
+  reservationId?: string;
+}
+
 const NotificationBell = ({ className = "" }: NotificationBellProps) => {
   const navigate = useNavigate();
-  const [notifications, setNotifications] = useState([
-    { id: 1, message: "Nouvelle réservation de Jean Dupont", route: "/reservations", time: "Il y a 5 min" },
-    { id: 2, message: "Course terminée pour Marie Lefevre", route: "/reservations", time: "Il y a 15 min" },
-    { id: 3, message: "Paiement reçu: 85.50€", route: "/accounting", time: "Il y a 1h" },
-  ]);
+  const { user } = useAuth();
+  const [notifications, setNotifications] = useState<Notification[]>([]);
   
-  const handleNotificationClick = (route: string, notificationId: number) => {
+  useEffect(() => {
+    if (!user) return;
+    
+    // Écouter les nouvelles réservations en temps réel
+    const channel = supabase
+      .channel('new-reservations-notifications')
+      .on(
+        'postgres_changes',
+        {
+          event: 'INSERT',
+          schema: 'public',
+          table: 'reservations',
+        },
+        (payload) => {
+          const reservation = payload.new as any;
+          console.log('📬 Nouvelle réservation détectée:', reservation);
+          
+          // Ajouter une notification
+          const newNotification: Notification = {
+            id: reservation.id,
+            message: `Nouvelle réservation: ${reservation.client_name}`,
+            route: "/reservations",
+            time: "À l'instant",
+            reservationId: reservation.id,
+          };
+          
+          setNotifications(prev => [newNotification, ...prev]);
+          
+          // Afficher un toast
+          toast.success('Nouvelle réservation !', {
+            description: `${reservation.client_name} - ${reservation.pickup_address}`,
+          });
+        }
+      )
+      .on(
+        'postgres_changes',
+        {
+          event: 'UPDATE',
+          schema: 'public',
+          table: 'reservations',
+        },
+        (payload) => {
+          const reservation = payload.new as any;
+          const oldReservation = payload.old as any;
+          
+          // Notifier uniquement si le statut change
+          if (reservation.status !== oldReservation.status) {
+            console.log('📝 Réservation mise à jour:', reservation);
+            
+            let message = '';
+            switch (reservation.status) {
+              case 'accepted':
+                message = `Course acceptée: ${reservation.client_name}`;
+                break;
+              case 'in_progress':
+                message = `Course en cours: ${reservation.client_name}`;
+                break;
+              case 'completed':
+                message = `Course terminée: ${reservation.client_name}`;
+                break;
+              case 'cancelled':
+                message = `Course annulée: ${reservation.client_name}`;
+                break;
+              default:
+                message = `Mise à jour: ${reservation.client_name}`;
+            }
+            
+            const newNotification: Notification = {
+              id: `${reservation.id}-${Date.now()}`,
+              message: message,
+              route: "/reservations",
+              time: "À l'instant",
+              reservationId: reservation.id,
+            };
+            
+            setNotifications(prev => [newNotification, ...prev]);
+          }
+        }
+      )
+      .subscribe();
+    
+    return () => {
+      supabase.removeChannel(channel);
+    };
+  }, [user]);
+
+  const handleNotificationClick = (route: string, notificationId: string) => {
     // Supprimer la notification cliquée
     setNotifications(prev => prev.filter(n => n.id !== notificationId));
     // Naviguer vers la page

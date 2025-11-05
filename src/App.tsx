@@ -21,8 +21,17 @@ import Landing from "@/pages/Landing";
 import NotFound from "@/pages/NotFound";
 import ClientBooking from "@/pages/ClientBooking";
 import PricingConfig from "@/pages/PricingConfig";
+import { NotificationPermissionPrompt } from "@/components/NotificationPermissionPrompt";
+import { setupForegroundMessageListener } from "@/services/firebaseNotifications";
+import { useEffect } from "react";
 
 function App() {
+  useEffect(() => {
+    // Initialiser l'écoute des messages Firebase en premier plan
+    setupForegroundMessageListener();
+    console.log('🔔 Firebase Messaging initialized');
+  }, []);
+
   return (
     <ThemeProvider
       attribute="class"
@@ -50,6 +59,7 @@ function App() {
                 <Route path="*" element={<NotFound />} />
               </Route>
             </Routes>
+            <NotificationPermissionPrompt />
             <Toaster position="top-center" />
           </LanguageProvider>
         </AuthProvider>
