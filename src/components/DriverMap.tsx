@@ -1,5 +1,4 @@
 import { useEffect, useRef, useState } from 'react';
-import { Loader } from '@googlemaps/js-api-loader';
 import { supabase } from '@/integrations/supabase/client';
 
 interface DriverMapProps {
@@ -22,12 +21,18 @@ const DriverMap = ({ driverId, className = "" }: DriverMapProps) => {
   useEffect(() => {
     const initMap = async () => {
       try {
-        const loader = new Loader({
-          apiKey: 'AIzaSyBPKoTQNaLRjl3qdbiwAHIVvjXWWqYL6MY',
-          version: 'weekly',
-        });
-
-        await loader.load();
+        // Charger le script Google Maps
+        if (!window.google) {
+          const script = document.createElement('script');
+          script.src = `https://maps.googleapis.com/maps/api/js?key=AIzaSyBPKoTQNaLRjl3qdbiwAHIVvjXWWqYL6MY`;
+          script.async = true;
+          script.defer = true;
+          document.head.appendChild(script);
+          
+          await new Promise((resolve) => {
+            script.onload = resolve;
+          });
+        }
 
         if (!mapRef.current) return;
 
@@ -87,10 +92,10 @@ const DriverMap = ({ driverId, className = "" }: DriverMapProps) => {
 
       if (error) throw error;
 
-      if (data && data.latitude && data.longitude) {
+      if (data && (data as any).latitude && (data as any).longitude) {
         updateMarkerPosition({
-          latitude: data.latitude,
-          longitude: data.longitude,
+          latitude: (data as any).latitude,
+          longitude: (data as any).longitude,
           updated_at: new Date().toISOString(),
         });
       }
