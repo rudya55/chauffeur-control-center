@@ -258,6 +258,9 @@ export type Database = {
           fcm_token: string | null
           full_name: string | null
           id: string
+          last_location_update: string | null
+          latitude: number | null
+          longitude: number | null
           status: string | null
           updated_at: string
         }
@@ -268,6 +271,9 @@ export type Database = {
           fcm_token?: string | null
           full_name?: string | null
           id: string
+          last_location_update?: string | null
+          latitude?: number | null
+          longitude?: number | null
           status?: string | null
           updated_at?: string
         }
@@ -278,6 +284,9 @@ export type Database = {
           fcm_token?: string | null
           full_name?: string | null
           id?: string
+          last_location_update?: string | null
+          latitude?: number | null
+          longitude?: number | null
           status?: string | null
           updated_at?: string
         }
