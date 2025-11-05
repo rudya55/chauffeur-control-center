@@ -1,0 +1,66 @@
+name: Upload APK to Lovable
+
+on:
+  workflow_dispatch: {}
+  release:
+    types: [published]
+
+jobs:
+  build-and-upload:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build web (Vite)
+        run: npm run build
+
+      - name: Sync Capacitor Android
+        run: npx cap sync android
+
+      - name: Setup JDK
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: '17'
+
+      - name: Build Android APK (debug)
+        working-directory: android
+        run: |
+          chmod +x ./gradlew
+          ./gradlew clean assembleDebug
+
+      - name: Upload APK to Lovable
+        env:
+          LOVABLE_TOKEN: ${{ secrets.LOVABLE_TOKEN }}
+          LOVABLE_APP_ID: ${{ secrets.LOVABLE_APP_ID }}
+          LOVABLE_ENDPOINT: ${{ secrets.LOVABLE_ENDPOINT }}
+        run: |
+          set -euo pipefail
+          APK_PATH=android/app/build/outputs/apk/debug/app-debug.apk
+          if [ ! -f "$APK_PATH" ]; then
+            echo "APK not found at $APK_PATH"
+            exit 1
+          fi
+          ENDPOINT=${LOVABLE_ENDPOINT:-https://api.lovable.app}
+          echo "Uploading $APK_PATH to $ENDPOINT/apps/$LOVABLE_APP_ID/uploads"
+          HTTP_RESPONSE=$(curl -sS -w "%{http_code}" -o /tmp/lovable-upload-response.json -X POST "$ENDPOINT/apps/$LOVABLE_APP_ID/uploads" \
+            -H "Authorization: Bearer $LOVABLE_TOKEN" \
+            -F "file=@$APK_PATH" \
+            -F "channel=beta" \
+            -F "notes=Automated upload from GitHub Actions on $GITHUB_REF")
+          cat /tmp/lovable-upload-response.json || true
+          if [ "$HTTP_RESPONSE" -ge 200 ] && [ "$HTTP_RESPONSE" -lt 300 ]; then
+            echo "Upload successful (HTTP $HTTP_RESPONSE)"
+          else
+            echo "Upload failed (HTTP $HTTP_RESPONSE)"
+            exit 1
+          fi
