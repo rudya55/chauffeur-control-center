@@ -21,6 +21,7 @@ import Landing from "@/pages/Landing";
 import NotFound from "@/pages/NotFound";
 import ClientBooking from "@/pages/ClientBooking";
 import PricingConfig from "@/pages/PricingConfig";
+import NotificationTest from "@/pages/NotificationTest";
 import { NotificationPermissionPrompt } from "@/components/NotificationPermissionPrompt";
 import { setupForegroundMessageListener } from "@/services/firebaseNotifications";
 import { useEffect } from "react";
@@ -55,6 +56,7 @@ function App() {
                 <Route path="settings" element={<Settings />} />
                 <Route path="admin" element={<Admin />} />
                 <Route path="pricing-config" element={<PricingConfig />} />
+                <Route path="notification-test" element={<NotificationTest />} />
                 <Route path="terms" element={<Terms />} />
                 <Route path="*" element={<NotFound />} />
               </Route>

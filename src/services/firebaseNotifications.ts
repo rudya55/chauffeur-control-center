@@ -3,7 +3,7 @@ import { messaging } from '@/integrations/firebase/config';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 
-const VAPID_KEY = import.meta.env.VITE_FIREBASE_VAPID_KEY;
+const VAPID_KEY = "BOlQMOQTwrvYPlwk5JPHdvx7bxugKve857bclQthPvfQrJwleK9gpstfDmXKhL59C-k5JNV00U9wHdtrT0kMJLk";
 
 /**
  * Demander la permission pour les notifications et enregistrer le token FCM

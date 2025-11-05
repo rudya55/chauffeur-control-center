@@ -4,14 +4,14 @@
 importScripts('https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js');
 importScripts('https://www.gstatic.com/firebasejs/10.7.1/firebase-messaging-compat.js');
 
-// Configuration Firebase (à remplacer par vos vraies valeurs)
+// Configuration Firebase
 firebase.initializeApp({
-  apiKey: "YOUR_API_KEY",
-  authDomain: "YOUR_AUTH_DOMAIN",
-  projectId: "YOUR_PROJECT_ID",
-  storageBucket: "YOUR_STORAGE_BUCKET",
-  messagingSenderId: "YOUR_MESSAGING_SENDER_ID",
-  appId: "YOUR_APP_ID"
+  apiKey: "AIzaSyDINevIQHW3nmiz1Z1nYlkbOeH3XYSsTyc",
+  authDomain: "vtc-dispatch-admin.firebaseapp.com",
+  projectId: "vtc-dispatch-admin",
+  storageBucket: "vtc-dispatch-admin.firebasestorage.app",
+  messagingSenderId: "900889515127",
+  appId: "1:900889515127:web:39d7d7a40db3f728242272"
 });
 
 const messaging = firebase.messaging();
