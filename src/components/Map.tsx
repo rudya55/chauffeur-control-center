@@ -4,7 +4,9 @@ import { useTheme as useNextTheme } from 'next-themes';
 import { Menu, Plus, Minus, Navigation } from 'lucide-react';
 
 const GOOGLE_MAPS_API_KEY = import.meta.env.VITE_GOOGLE_MAPS_API_KEY;
-const MAP_FEATURE_ENABLED = false; // Toggle back to true when Google Maps is ready
+const MAP_FEATURE_ENABLED = true; // Enabled: Google Maps will load when a valid API key is present
+
+// (MAP_FEATURE_ENABLED already declared above)
 
 declare global {
   interface Window {
@@ -45,7 +47,7 @@ const Map = ({
           <h2 className="text-lg font-semibold">Carte désactivée temporairement</h2>
           <p className="text-sm text-muted-foreground max-w-sm">
             L'intégration Google Maps est coupée pour les tests. Réactive-la en remettant
-            <code className="mx-1 rounded bg-muted px-1">MAP_FEATURE_ENABLED = true</code>
+            <code className="mx-1 rounded bg-muted px-1">MAP_FEATURE_ENABLED = false</code>
             dans <code>src/components/Map.tsx</code> et en fournissant une clé API valide.
           </p>
         </div>
