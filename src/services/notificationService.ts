@@ -79,7 +79,16 @@ const saveTokenToDatabase = async (token: string) => {
     const { data: { user } } = await supabase.auth.getUser();
     
     if (!user) {
-      console.warn('No authenticated user, cannot save FCM token');
+      console.warn('No authenticated user, saving token locally until login');
+      try {
+        // Save token locally and flush after login
+        if (typeof window !== 'undefined' && window.localStorage) {
+          window.localStorage.setItem('pending_fcm_token', token);
+          console.log('FCM token stored locally (pending login)');
+        }
+      } catch (e) {
+        console.error('Unable to store pending FCM token locally:', e);
+      }
       return;
     }
 
@@ -99,6 +108,35 @@ const saveTokenToDatabase = async (token: string) => {
     }
   } catch (error) {
     console.error('Error saving FCM token:', error);
+  }
+};
+
+// If an FCM token was stored locally while the user wasn't authenticated,
+// flush it to the database once a user is available.
+const flushPendingToken = async () => {
+  try {
+    if (typeof window === 'undefined' || !window.localStorage) return;
+    const pending = window.localStorage.getItem('pending_fcm_token');
+    if (!pending) return;
+
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) {
+      console.log('No user yet, will keep pending token');
+      return;
+    }
+
+    const { error } = await (supabase as any)
+      .from('fcm_tokens')
+      .upsert({ user_id: user.id, token: pending }, { onConflict: 'user_id' });
+
+    if (error) {
+      console.error('Error flushing pending FCM token to database:', error);
+    } else {
+      console.log('Pending FCM token flushed to database successfully');
+      window.localStorage.removeItem('pending_fcm_token');
+    }
+  } catch (err) {
+    console.error('Error in flushPendingToken:', err);
   }
 };
 
@@ -181,5 +219,18 @@ export const initializeNotifications = async () => {
   await initializePushNotifications();
   await initializeLocalNotifications();
   listenForNewReservations();
+  // Try to flush any pending token saved before login
+  try {
+    await flushPendingToken();
+    // Also listen for auth changes to flush when the user signs in
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
+      if (event === 'SIGNED_IN' && session?.user) {
+        await flushPendingToken();
+      }
+    });
+    // we do not unsubscribe here; the app lifecycle keeps this subscription
+  } catch (e) {
+    console.error('Error setting up pending token flush:', e);
+  }
   console.log('Notifications initialized');
 };
