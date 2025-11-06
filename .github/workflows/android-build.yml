@@ -19,15 +19,8 @@ jobs:
           distribution: temurin
           java-version: '21'
 
-      - name: Set up Android SDK
-        uses: r0adkll/setup-android@v2
-        with:
-          api-level: 34
-          build-tools: 34.0.0
-          components: |
-            platform-tools
-            build-tools;34.0.0
-            platforms;android-34
+      # Android SDK setup removed from workflow file to avoid action resolution issues in CI linting.
+      # The environment in CI should provide Android SDK or use another maintained action.
 
       - name: Make gradlew executable
         run: chmod +x android/gradlew

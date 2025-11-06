@@ -8,7 +8,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 import { Bell, Send, Users, User } from 'lucide-react';
 import { useAuth } from '@/hooks/use-auth';
-import { requestNotificationPermission, checkNotificationPermission, getCurrentFCMToken } from '@/services/firebaseNotifications';
+import { requestNotificationPermission, checkNotificationPermission, getCurrentFCMToken } from '@/services/firebaseNotifications2';
 
 export default function NotificationTest() {
   const { user } = useAuth();

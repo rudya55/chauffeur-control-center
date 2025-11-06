@@ -6,7 +6,7 @@ import { Menu, Plus, Minus, Navigation } from 'lucide-react';
 const GOOGLE_MAPS_API_KEY = import.meta.env.VITE_GOOGLE_MAPS_API_KEY;
 const MAP_FEATURE_ENABLED = true; // Enabled: Google Maps will load when a valid API key is present
 
-// (MAP_FEATURE_ENABLED already declared above)
+ 
 
 declare global {
   interface Window {
@@ -54,7 +54,7 @@ const Map = ({
       </div>
     );
   }
-
+  
   const isAdvancedMarkerElement = (marker: unknown): marker is google.maps.marker.AdvancedMarkerElement => {
     return Boolean(marker && typeof marker === 'object' && 'content' in (marker as Record<string, unknown>));
   };
