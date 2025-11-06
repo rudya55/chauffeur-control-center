@@ -24,7 +24,9 @@ const DriverMap = ({ driverId, className = "" }: DriverMapProps) => {
         // Charger le script Google Maps
         if (!window.google) {
           const script = document.createElement('script');
-          script.src = `https://maps.googleapis.com/maps/api/js?key=AIzaSyBPKoTQNaLRjl3qdbiwAHIVvjXWWqYL6MY`;
+          const key = import.meta.env.VITE_GOOGLE_MAPS_API_KEY;
+          if (!key) throw new Error('VITE_GOOGLE_MAPS_API_KEY manquante. Voir .env.example');
+          script.src = `https://maps.googleapis.com/maps/api/js?key=${key}`;
           script.async = true;
           script.defer = true;
           document.head.appendChild(script);

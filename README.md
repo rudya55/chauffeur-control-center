@@ -71,3 +71,15 @@ Yes, you can!
 To connect a domain, navigate to Project > Settings > Domains and click Connect Domain.
 
 Read more here: [Setting up a custom domain](https://docs.lovable.dev/tips-tricks/custom-domain#step-by-step-guide)
+
+## Environment variables & secrets
+
+Ne commitez jamais de clés privées (service account JSON, google-services.json, .env contenant des clés secrètes).
+
+- Utilisez le fichier `.env.example` comme référence pour les variables requises.
+- Créez un fichier local `.env` (ou stockez les variables dans votre CI) en copiant `.env.example` et en remplaçant les valeurs.
+- Les fichiers natifs comme `android/app/google-services.json` ne doivent pas être committés. Utilisez `google-services.json.template` et restaurez le fichier au moment du build (CI) depuis les secrets chiffrés.
+
+Exemple (GitHub Actions) : injecter `google-services.json` depuis un secret base64 dans l'étape de build et écrire le fichier avant `./gradlew assemble`.
+
+Voir `.env.example` pour la liste complète des variables à fournir.
