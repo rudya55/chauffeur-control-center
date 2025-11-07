@@ -1,7 +1,7 @@
 {
     "logs": [
         {
-            "outputFile": "com.vtcdispatch.app-mergeDebugResources-34:/values-vi/values-vi.xml",
+            "outputFile": "com.vtcdispatch.app-mergeDebugResources-33:/values-vi/values-vi.xml",
             "map": [
                 {
                     "source": "/home/codespace/.gradle/caches/8.11.1/transforms/5f51ed623ec66baebfa6a053fe8a8b2a/transformed/core-1.15.0/res/values-vi/values-vi.xml",

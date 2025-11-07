@@ -1,7 +1,7 @@
 {
     "logs": [
         {
-            "outputFile": "com.vtcdispatch.app-mergeDebugResources-34:/values-nb/values-nb.xml",
+            "outputFile": "com.vtcdispatch.app-mergeDebugResources-33:/values-nb/values-nb.xml",
             "map": [
                 {
                     "source": "/home/codespace/.gradle/caches/8.11.1/transforms/3897ee7a3a7e64eb47ff9b7bb8256b24/transformed/play-services-base-18.5.0/res/values-nb/values.xml",

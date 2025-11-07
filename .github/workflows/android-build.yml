@@ -2,6 +2,68 @@ name: Build Android APK
 
 on:
   workflow_dispatch: {}
+
+jobs:
+  build:
+    name: Build APK
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+
+      - name: Install npm dependencies
+        run: npm ci
+
+      - name: Build web assets
+        run: npm run build
+
+      - name: Setup Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: '17'
+
+      - name: Provide google-services.json from secret
+        if: ${{ secrets.GOOGLE_SERVICES_JSON_BASE64 != '' }}
+        run: |
+          echo 'Decoding GOOGLE_SERVICES_JSON_BASE64 to android/app/google-services.json'
+          mkdir -p android/app
+          echo "${{ secrets.GOOGLE_SERVICES_JSON_BASE64 }}" | base64 --decode > android/app/google-services.json
+
+      - name: Capacitor sync Android
+        run: npx cap sync android
+
+      - name: Build Android (Gradle)
+        working-directory: android
+        run: |
+          chmod +x ./gradlew
+          ./gradlew assembleRelease --no-daemon
+
+      - name: Upload APK artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: app-release-apks
+          path: |
+            android/app/build/outputs/**/*.apk
+
+      - name: Done message
+        run: echo "APK build finished. Download artifact from Actions UI."
+
+# Notes:
+# - Set the repository secret `GOOGLE_SERVICES_JSON_BASE64` to the base64-encoded contents of your
+#   `google-services.json` (this avoids committing the file). Example to create the secret value:
+#   `base64 -w0 android/app/google-services.json` (on macOS use `base64 -b0`).
+# - If you need signing, add the keystore as `ANDROID_KEYSTORE_BASE64`, plus `ANDROID_KEYSTORE_PASSWORD`,
+#   `ANDROID_KEY_ALIAS` and `ANDROID_KEY_PASSWORD`. Update `android/app/build.gradle` to reference
+#   these values or decode the keystore into the correct path before the Gradle step.name: Build Android APK
+
+on:
+  workflow_dispatch: {}
   push:
     branches: [ main ]
 

@@ -1,134 +1,150 @@
 [
     {
-        "merged": "com.vtcdispatch.app-debug-36:/mipmap-mdpi_ic_launcher_round.png.flat",
-        "source": "com.vtcdispatch.app-main-38:/mipmap-mdpi/ic_launcher_round.png"
+        "merged": "com.vtcdispatch.app-debug-35:/mipmap-anydpi-v26_ic_launcher_round.xml.flat",
+        "source": "com.vtcdispatch.app-main-37:/mipmap-anydpi-v26/ic_launcher_round.xml"
     },
     {
-        "merged": "com.vtcdispatch.app-debug-36:/drawable-port-xhdpi_splash.png.flat",
-        "source": "com.vtcdispatch.app-main-38:/drawable-port-xhdpi/splash.png"
+        "merged": "com.vtcdispatch.app-debug-35:/xml_file_paths.xml.flat",
+        "source": "com.vtcdispatch.app-main-37:/xml/file_paths.xml"
     },
     {
-        "merged": "com.vtcdispatch.app-debug-36:/mipmap-xhdpi_ic_launcher_round.png.flat",
-        "source": "com.vtcdispatch.app-main-38:/mipmap-xhdpi/ic_launcher_round.png"
+        "merged": "com.vtcdispatch.app-debug-35:/mipmap-mdpi_ic_launcher.png.flat",
+        "source": "com.vtcdispatch.app-main-37:/mipmap-mdpi/ic_launcher.png"
     },
     {
-        "merged": "com.vtcdispatch.app-debug-36:/drawable-land-xxxhdpi_splash.png.flat",
-        "source": "com.vtcdispatch.app-main-38:/drawable-land-xxxhdpi/splash.png"
+        "merged": "com.vtcdispatch.app-debug-35:/drawable-port-xhdpi_splash.png.flat",
+        "source": "com.vtcdispatch.app-main-37:/drawable-port-xhdpi/splash.png"
     },
     {
-        "merged": "com.vtcdispatch.app-debug-36:/mipmap-mdpi_ic_launcher_foreground.png.flat",
-        "source": "com.vtcdispatch.app-main-38:/mipmap-mdpi/ic_launcher_foreground.png"
+        "merged": "com.vtcdispatch.app-debug-35:/mipmap-xxxhdpi_ic_launcher_round.png.flat",
+        "source": "com.vtcdispatch.app-main-37:/mipmap-xxxhdpi/ic_launcher_round.png"
     },
     {
-        "merged": "com.vtcdispatch.app-debug-36:/mipmap-hdpi_ic_launcher_foreground.png.flat",
-        "source": "com.vtcdispatch.app-main-38:/mipmap-hdpi/ic_launcher_foreground.png"
+        "merged": "com.vtcdispatch.app-debug-35:/mipmap-xxxhdpi_ic_launcher_foreground.png.flat",
+        "source": "com.vtcdispatch.app-main-37:/mipmap-xxxhdpi/ic_launcher_foreground.png"
     },
     {
-        "merged": "com.vtcdispatch.app-debug-36:/mipmap-hdpi_ic_launcher.png.flat",
-        "source": "com.vtcdispatch.app-main-38:/mipmap-hdpi/ic_launcher.png"
+        "merged": "com.vtcdispatch.app-debug-35:/mipmap-xhdpi_ic_launcher_round.png.flat",
+        "source": "com.vtcdispatch.app-main-37:/mipmap-xhdpi/ic_launcher_round.png"
     },
     {
-        "merged": "com.vtcdispatch.app-debug-36:/drawable-port-xxhdpi_splash.png.flat",
-        "source": "com.vtcdispatch.app-main-38:/drawable-port-xxhdpi/splash.png"
+        "merged": "com.vtcdispatch.app-debug-35:/raw_chime.wav.flat",
+        "source": "com.vtcdispatch.app-main-37:/raw/chime.wav"
     },
     {
-        "merged": "com.vtcdispatch.app-debug-36:/mipmap-xhdpi_ic_launcher_foreground.png.flat",
-        "source": "com.vtcdispatch.app-main-38:/mipmap-xhdpi/ic_launcher_foreground.png"
+        "merged": "com.vtcdispatch.app-debug-35:/mipmap-xxhdpi_ic_launcher.png.flat",
+        "source": "com.vtcdispatch.app-main-37:/mipmap-xxhdpi/ic_launcher.png"
     },
     {
-        "merged": "com.vtcdispatch.app-debug-36:/drawable_ic_launcher_background.xml.flat",
-        "source": "com.vtcdispatch.app-main-38:/drawable/ic_launcher_background.xml"
+        "merged": "com.vtcdispatch.app-debug-35:/drawable_splash.png.flat",
+        "source": "com.vtcdispatch.app-main-37:/drawable/splash.png"
     },
     {
-        "merged": "com.vtcdispatch.app-debug-36:/drawable-land-xhdpi_splash.png.flat",
-        "source": "com.vtcdispatch.app-main-38:/drawable-land-xhdpi/splash.png"
+        "merged": "com.vtcdispatch.app-debug-35:/mipmap-hdpi_ic_launcher_foreground.png.flat",
+        "source": "com.vtcdispatch.app-main-37:/mipmap-hdpi/ic_launcher_foreground.png"
     },
     {
-        "merged": "com.vtcdispatch.app-debug-36:/mipmap-xxhdpi_ic_launcher.png.flat",
-        "source": "com.vtcdispatch.app-main-38:/mipmap-xxhdpi/ic_launcher.png"
+        "merged": "com.vtcdispatch.app-debug-35:/drawable-port-mdpi_splash.png.flat",
+        "source": "com.vtcdispatch.app-main-37:/drawable-port-mdpi/splash.png"
     },
     {
-        "merged": "com.vtcdispatch.app-debug-36:/drawable-port-xxxhdpi_splash.png.flat",
-        "source": "com.vtcdispatch.app-main-38:/drawable-port-xxxhdpi/splash.png"
+        "merged": "com.vtcdispatch.app-debug-35:/mipmap-xxhdpi_ic_launcher_round.png.flat",
+        "source": "com.vtcdispatch.app-main-37:/mipmap-xxhdpi/ic_launcher_round.png"
     },
     {
-        "merged": "com.vtcdispatch.app-debug-36:/xml_config.xml.flat",
-        "source": "com.vtcdispatch.app-main-38:/xml/config.xml"
+        "merged": "com.vtcdispatch.app-debug-35:/layout_activity_main.xml.flat",
+        "source": "com.vtcdispatch.app-main-37:/layout/activity_main.xml"
     },
     {
-        "merged": "com.vtcdispatch.app-debug-36:/mipmap-xxxhdpi_ic_launcher_round.png.flat",
-        "source": "com.vtcdispatch.app-main-38:/mipmap-xxxhdpi/ic_launcher_round.png"
+        "merged": "com.vtcdispatch.app-debug-35:/drawable-land-hdpi_splash.png.flat",
+        "source": "com.vtcdispatch.app-main-37:/drawable-land-hdpi/splash.png"
     },
     {
-        "merged": "com.vtcdispatch.app-debug-36:/mipmap-mdpi_ic_launcher.png.flat",
-        "source": "com.vtcdispatch.app-main-38:/mipmap-mdpi/ic_launcher.png"
+        "merged": "com.vtcdispatch.app-debug-35:/drawable-port-hdpi_splash.png.flat",
+        "source": "com.vtcdispatch.app-main-37:/drawable-port-hdpi/splash.png"
     },
     {
-        "merged": "com.vtcdispatch.app-debug-36:/mipmap-xxxhdpi_ic_launcher_foreground.png.flat",
-        "source": "com.vtcdispatch.app-main-38:/mipmap-xxxhdpi/ic_launcher_foreground.png"
+        "merged": "com.vtcdispatch.app-debug-35:/mipmap-xhdpi_ic_launcher.png.flat",
+        "source": "com.vtcdispatch.app-main-37:/mipmap-xhdpi/ic_launcher.png"
     },
     {
-        "merged": "com.vtcdispatch.app-debug-36:/mipmap-xxxhdpi_ic_launcher.png.flat",
-        "source": "com.vtcdispatch.app-main-38:/mipmap-xxxhdpi/ic_launcher.png"
+        "merged": "com.vtcdispatch.app-debug-35:/raw_alert1.wav.flat",
+        "source": "com.vtcdispatch.app-main-37:/raw/alert1.wav"
     },
     {
-        "merged": "com.vtcdispatch.app-debug-36:/drawable-land-hdpi_splash.png.flat",
-        "source": "com.vtcdispatch.app-main-38:/drawable-land-hdpi/splash.png"
+        "merged": "com.vtcdispatch.app-debug-35:/drawable-land-xhdpi_splash.png.flat",
+        "source": "com.vtcdispatch.app-main-37:/drawable-land-xhdpi/splash.png"
     },
     {
-        "merged": "com.vtcdispatch.app-debug-36:/mipmap-xxhdpi_ic_launcher_round.png.flat",
-        "source": "com.vtcdispatch.app-main-38:/mipmap-xxhdpi/ic_launcher_round.png"
+        "merged": "com.vtcdispatch.app-debug-35:/drawable-land-mdpi_splash.png.flat",
+        "source": "com.vtcdispatch.app-main-37:/drawable-land-mdpi/splash.png"
     },
     {
-        "merged": "com.vtcdispatch.app-debug-36:/mipmap-xxhdpi_ic_launcher_foreground.png.flat",
-        "source": "com.vtcdispatch.app-main-38:/mipmap-xxhdpi/ic_launcher_foreground.png"
+        "merged": "com.vtcdispatch.app-debug-35:/mipmap-xxhdpi_ic_launcher_foreground.png.flat",
+        "source": "com.vtcdispatch.app-main-37:/mipmap-xxhdpi/ic_launcher_foreground.png"
     },
     {
-        "merged": "com.vtcdispatch.app-debug-36:/mipmap-anydpi-v26_ic_launcher.xml.flat",
-        "source": "com.vtcdispatch.app-main-38:/mipmap-anydpi-v26/ic_launcher.xml"
+        "merged": "com.vtcdispatch.app-debug-35:/mipmap-hdpi_ic_launcher_round.png.flat",
+        "source": "com.vtcdispatch.app-main-37:/mipmap-hdpi/ic_launcher_round.png"
     },
     {
-        "merged": "com.vtcdispatch.app-debug-36:/mipmap-anydpi-v26_ic_launcher_round.xml.flat",
-        "source": "com.vtcdispatch.app-main-38:/mipmap-anydpi-v26/ic_launcher_round.xml"
+        "merged": "com.vtcdispatch.app-debug-35:/drawable-land-xxxhdpi_splash.png.flat",
+        "source": "com.vtcdispatch.app-main-37:/drawable-land-xxxhdpi/splash.png"
     },
     {
-        "merged": "com.vtcdispatch.app-debug-36:/drawable-port-mdpi_splash.png.flat",
-        "source": "com.vtcdispatch.app-main-38:/drawable-port-mdpi/splash.png"
+        "merged": "com.vtcdispatch.app-debug-35:/raw_notification_sound.wav.flat",
+        "source": "com.vtcdispatch.app-main-37:/raw/notification_sound.wav"
     },
     {
-        "merged": "com.vtcdispatch.app-debug-36:/drawable-land-mdpi_splash.png.flat",
-        "source": "com.vtcdispatch.app-main-38:/drawable-land-mdpi/splash.png"
+        "merged": "com.vtcdispatch.app-debug-35:/mipmap-anydpi-v26_ic_launcher.xml.flat",
+        "source": "com.vtcdispatch.app-main-37:/mipmap-anydpi-v26/ic_launcher.xml"
     },
     {
-        "merged": "com.vtcdispatch.app-debug-36:/xml_file_paths.xml.flat",
-        "source": "com.vtcdispatch.app-main-38:/xml/file_paths.xml"
+        "merged": "com.vtcdispatch.app-debug-35:/mipmap-hdpi_ic_launcher.png.flat",
+        "source": "com.vtcdispatch.app-main-37:/mipmap-hdpi/ic_launcher.png"
     },
     {
-        "merged": "com.vtcdispatch.app-debug-36:/layout_activity_main.xml.flat",
-        "source": "com.vtcdispatch.app-main-38:/layout/activity_main.xml"
-    },
-    {
-        "merged": "com.vtcdispatch.app-debug-36:/drawable-port-hdpi_splash.png.flat",
-        "source": "com.vtcdispatch.app-main-38:/drawable-port-hdpi/splash.png"
-    },
-    {
-        "merged": "com.vtcdispatch.app-debug-36:/drawable-anydpi-v24_ic_launcher_foreground.xml.flat",
+        "merged": "com.vtcdispatch.app-debug-35:/drawable-anydpi-v24_ic_launcher_foreground.xml.flat",
         "source": "com.vtcdispatch.app-pngs-31:/drawable-anydpi-v24/ic_launcher_foreground.xml"
     },
     {
-        "merged": "com.vtcdispatch.app-debug-36:/mipmap-xhdpi_ic_launcher.png.flat",
-        "source": "com.vtcdispatch.app-main-38:/mipmap-xhdpi/ic_launcher.png"
+        "merged": "com.vtcdispatch.app-debug-35:/drawable_ic_launcher_background.xml.flat",
+        "source": "com.vtcdispatch.app-main-37:/drawable/ic_launcher_background.xml"
     },
     {
-        "merged": "com.vtcdispatch.app-debug-36:/drawable-land-xxhdpi_splash.png.flat",
-        "source": "com.vtcdispatch.app-main-38:/drawable-land-xxhdpi/splash.png"
+        "merged": "com.vtcdispatch.app-debug-35:/mipmap-xxxhdpi_ic_launcher.png.flat",
+        "source": "com.vtcdispatch.app-main-37:/mipmap-xxxhdpi/ic_launcher.png"
     },
     {
-        "merged": "com.vtcdispatch.app-debug-36:/drawable_splash.png.flat",
-        "source": "com.vtcdispatch.app-main-38:/drawable/splash.png"
+        "merged": "com.vtcdispatch.app-debug-35:/mipmap-mdpi_ic_launcher_foreground.png.flat",
+        "source": "com.vtcdispatch.app-main-37:/mipmap-mdpi/ic_launcher_foreground.png"
     },
     {
-        "merged": "com.vtcdispatch.app-debug-36:/mipmap-hdpi_ic_launcher_round.png.flat",
-        "source": "com.vtcdispatch.app-main-38:/mipmap-hdpi/ic_launcher_round.png"
+        "merged": "com.vtcdispatch.app-debug-35:/drawable-port-xxhdpi_splash.png.flat",
+        "source": "com.vtcdispatch.app-main-37:/drawable-port-xxhdpi/splash.png"
+    },
+    {
+        "merged": "com.vtcdispatch.app-debug-35:/xml_config.xml.flat",
+        "source": "com.vtcdispatch.app-main-37:/xml/config.xml"
+    },
+    {
+        "merged": "com.vtcdispatch.app-debug-35:/mipmap-mdpi_ic_launcher_round.png.flat",
+        "source": "com.vtcdispatch.app-main-37:/mipmap-mdpi/ic_launcher_round.png"
+    },
+    {
+        "merged": "com.vtcdispatch.app-debug-35:/raw_alert2.wav.flat",
+        "source": "com.vtcdispatch.app-main-37:/raw/alert2.wav"
+    },
+    {
+        "merged": "com.vtcdispatch.app-debug-35:/drawable-land-xxhdpi_splash.png.flat",
+        "source": "com.vtcdispatch.app-main-37:/drawable-land-xxhdpi/splash.png"
+    },
+    {
+        "merged": "com.vtcdispatch.app-debug-35:/mipmap-xhdpi_ic_launcher_foreground.png.flat",
+        "source": "com.vtcdispatch.app-main-37:/mipmap-xhdpi/ic_launcher_foreground.png"
+    },
+    {
+        "merged": "com.vtcdispatch.app-debug-35:/drawable-port-xxxhdpi_splash.png.flat",
+        "source": "com.vtcdispatch.app-main-37:/drawable-port-xxxhdpi/splash.png"
     }
 ]

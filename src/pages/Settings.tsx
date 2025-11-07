@@ -227,6 +227,17 @@ const Settings = () => {
         try { localStorage.setItem('notification-sound', notificationSound || 'default'); } catch (e) {}
         toast.success('Préférences de notification mises à jour');
       }
+      // Ensure native channel exists for selected sound (best-effort)
+      try {
+        const ns = notificationSound || 'default';
+        // import the helper lazily to avoid circular import issues
+        const mod = await import('@/services/notificationService');
+        if (mod && typeof mod.ensureNotificationChannel === 'function') {
+          await mod.ensureNotificationChannel(ns);
+        }
+      } catch (e) {
+        console.warn('Could not ensure native notification channel:', e);
+      }
     })();
   };
   
@@ -896,23 +907,20 @@ ${index + 1}. **${company.name}**
                             <option value="alert2">Alerte 2</option>
                             <option value="chime">Carillon</option>
                           </select>
-                          <Button type="button" onClick={() => {
-                            // Tester la sonnerie immédiatement (utilise le mécanisme de play dans service)
+                          <Button type="button" onClick={async () => {
                             try {
-                              const s = notificationSound || 'default';
-                              const p = s === 'default' ? '/notification-sound.mp3' : `/sounds/${s}.mp3`;
-                              const a = new Audio(p);
-                              a.volume = 0.6;
-                              a.play().catch(() => {
-                                // fallback beep
+                              const mod = await import('@/services/firebaseNotifications');
+                              if (mod && typeof mod.playNotificationSound === 'function') {
+                                mod.playNotificationSound();
+                              } else {
+                                // fallback: simple beep
                                 const ctx = new (window.AudioContext || (window as any).webkitAudioContext)();
-                                const o = ctx.createOscillator();
-                                const g = ctx.createGain();
+                                const o = ctx.createOscillator(); const g = ctx.createGain();
                                 o.type = 'sine'; o.frequency.setValueAtTime(950, ctx.currentTime);
                                 g.gain.setValueAtTime(0.08, ctx.currentTime);
                                 o.connect(g); g.connect(ctx.destination); o.start();
-                                setTimeout(() => { o.stop(); try { ctx.close(); } catch(e){} }, 250);
-                              });
+                                setTimeout(() => { o.stop(); try { ctx.close(); } catch(e){} }, 300);
+                              }
                             } catch (e) { console.log('Test son erreur', e); }
                           }}>
                             Tester

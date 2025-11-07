@@ -15,3 +15,17 @@ export const supabase = createClient<Database>(SUPABASE_URL, SUPABASE_PUBLISHABL
     autoRefreshToken: true,
   }
 });
+
+/**
+ * Runtime helper to check whether VITE supabase env vars are present.
+ * Use this in UI flows to provide a clearer error message when the app
+ * wasn't configured with the correct Supabase project keys.
+ */
+export function isSupabaseConfigured(): boolean {
+  if (!SUPABASE_URL || !SUPABASE_PUBLISHABLE_KEY) {
+    // Helpful console output for debugging (do not leak secrets)
+    console.error('[supabase] missing VITE_SUPABASE_URL or VITE_SUPABASE_PUBLISHABLE_KEY');
+    return false;
+  }
+  return true;
+}

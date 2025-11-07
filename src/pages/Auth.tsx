@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { supabase } from "@/integrations/supabase/client";
+import { supabase, isSupabaseConfigured } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -48,6 +48,12 @@ const Auth = () => {
     e.preventDefault();
     setLoading(true);
 
+    if (!isSupabaseConfigured()) {
+      toast.error("Erreur de configuration: VITE_SUPABASE_URL ou VITE_SUPABASE_PUBLISHABLE_KEY manquant(e). Voir .env");
+      setLoading(false);
+      return;
+    }
+
     try {
       // Validate input
       const formData: LoginFormData = {
@@ -87,6 +93,12 @@ const Auth = () => {
   const handleSignup = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
+
+    if (!isSupabaseConfigured()) {
+      toast.error("Erreur de configuration: VITE_SUPABASE_URL ou VITE_SUPABASE_PUBLISHABLE_KEY manquant(e). Voir .env");
+      setLoading(false);
+      return;
+    }
 
     try {
       // Validate input
@@ -153,6 +165,12 @@ const Auth = () => {
   const handleResetPassword = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
+
+    if (!isSupabaseConfigured()) {
+      toast.error("Erreur de configuration: VITE_SUPABASE_URL ou VITE_SUPABASE_PUBLISHABLE_KEY manquant(e). Voir .env");
+      setLoading(false);
+      return;
+    }
 
     try {
       // Validate input
