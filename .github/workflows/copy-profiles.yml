@@ -1,0 +1,53 @@
+name: Copy Supabase table (profiles)
+
+on:
+  workflow_dispatch:
+    inputs:
+      dry:
+        description: 'Run in dry mode (no writes)'
+        required: false
+        default: 'true'
+      table:
+        description: 'Table to copy'
+        required: false
+        default: 'profiles'
+      batch:
+        description: 'Batch size for fetch/upsert'
+        required: false
+        default: '200'
+
+jobs:
+  copy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+
+      - name: Install dependencies
+        run: |
+          npm ci || (npm init -y && npm install @supabase/supabase-js minimist)
+
+      - name: Run copy script
+        env:
+          SOURCE_SUPABASE_URL: ${{ secrets.SOURCE_SUPABASE_URL }}
+          SOURCE_SUPABASE_KEY: ${{ secrets.SOURCE_SUPABASE_KEY }}
+          TARGET_SUPABASE_URL: ${{ secrets.TARGET_SUPABASE_URL }}
+          TARGET_SUPABASE_KEY: ${{ secrets.TARGET_SUPABASE_KEY }}
+        run: |
+          set -e
+          DRY=${{ github.event.inputs.dry }}
+          TABLE=${{ github.event.inputs.table }}
+          BATCH=${{ github.event.inputs.batch }}
+          ARGS=(--sourceUrl="$SOURCE_SUPABASE_URL" --sourceKey="$SOURCE_SUPABASE_KEY" --targetUrl="$TARGET_SUPABASE_URL" --targetKey="$TARGET_SUPABASE_KEY" --table="$TABLE" --batch="$BATCH")
+          if [[ "$DRY" == "true" || "$DRY" == "True" || "$DRY" == "1" ]]; then
+            ARGS+=(--dry)
+            echo "Running dry run"
+          else
+            echo "Running real copy"
+          fi
+          node scripts/copy_profiles.js "${ARGS[@]}"
