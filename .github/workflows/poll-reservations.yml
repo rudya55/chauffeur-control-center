@@ -1,0 +1,44 @@
+name: Poll Reservations and Notify Drivers
+
+on:
+  workflow_dispatch:
+    inputs:
+      dry:
+        description: 'Run in dry mode (no writes)'
+        required: false
+        default: 'true'
+      batch:
+        description: 'Batch size for polling'
+        required: false
+        default: '50'
+  schedule:
+    - cron: '*/5 * * * *' # every 5 minutes (adjust as needed)
+
+jobs:
+  poll-and-notify:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+
+      - name: Install dependencies
+        run: |
+          npm ci || (npm init -y && npm install @supabase/supabase-js minimist)
+
+      - name: Run poll & notify
+        env:
+          SOURCE_SUPABASE_URL: ${{ secrets.SOURCE_SUPABASE_URL }}
+          SOURCE_SUPABASE_KEY: ${{ secrets.SOURCE_SUPABASE_KEY }}
+          NOTIFY_FUNCTION_URL: ${{ secrets.NOTIFY_FUNCTION_URL }}
+          NOTIFY_FUNCTION_KEY: ${{ secrets.NOTIFY_FUNCTION_KEY }}
+        run: |
+          set -e
+          DRY=${{ github.event.inputs.dry || 'true' }}
+          BATCH=${{ github.event.inputs.batch || '50' }}
+          echo "Dry run: $DRY, batch: $BATCH"
+          node scripts/poll_and_notify.js --batch=$BATCH --dry=$DRY

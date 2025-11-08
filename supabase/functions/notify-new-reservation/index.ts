@@ -1,3 +1,4 @@
+// @ts-nocheck
 import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.76.1";
 
@@ -263,6 +264,19 @@ async function sendFCMNotification(
         body: body,
       },
       data: data,
+      android: {
+        notification: {
+          channel_id: "rides_channel",
+          sound: "notification_sound" // correspond au nom dans res/raw (sans extension)
+        }
+      },
+      apns: {
+        payload: {
+          aps: {
+            sound: "notification_sound.caf"
+          }
+        }
+      },
       webpush: {
         fcm_options: {
           link: '/reservations',

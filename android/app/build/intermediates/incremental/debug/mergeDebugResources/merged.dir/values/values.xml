@@ -353,15 +353,8 @@
     <string name="common_signin_button_text_long">Sign in with Google</string>
     <string name="custom_url_scheme">com.vtcdispatch.app</string>
     <string name="fcm_fallback_notification_channel_label">Miscellaneous</string>
-    <string name="firebase_database_url" translatable="false">https://vtc-dispatch-default-rtdb.europe-west1.firebasedatabase.app</string>
-    <string name="gcm_defaultSenderId" translatable="false">719709142823</string>
-    <string name="google_api_key" translatable="false">AIzaSyADbIfUsJTNzFMxRKe_DdpB97MfJwtgYWc</string>
-    <string name="google_app_id" translatable="false">1:719709142823:android:d983019f93d496aa4fb302</string>
-    <string name="google_crash_reporting_api_key" translatable="false">AIzaSyADbIfUsJTNzFMxRKe_DdpB97MfJwtgYWc</string>
-    <string name="google_storage_bucket" translatable="false">vtc-dispatch.firebasestorage.app</string>
     <string name="no_webview_text">This app requires a WebView to work</string>
     <string name="package_name">com.vtcdispatch.app</string>
-    <string name="project_id" translatable="false">vtc-dispatch</string>
     <string name="search_menu_title">Search</string>
     <string name="status_bar_notification_info_overflow">999+</string>
     <string name="title_activity_main">VTC Dispatch</string>

@@ -64,6 +64,7 @@ const Settings = () => {
   const [avatar, setAvatar] = useState("");
   const [emailNotifications, setEmailNotifications] = useState(true);
   const [pushNotifications, setPushNotifications] = useState(true);
+  const [notificationSound, setNotificationSound] = useState<string>('default');
   const [showPaymentDialog, setShowPaymentDialog] = useState(false);
   const [paymentMethod, setPaymentMethod] = useState("card");
   const [documentFile, setDocumentFile] = useState<File | null>(null);
@@ -141,6 +142,16 @@ const Settings = () => {
       setCarYear(profileAny.year || "");
       setCarColor(profileAny.color || "");
       setCarPlate(profileAny.license_plate || "");
+      // Notifications prefs
+      setPushNotifications(profileAny.push_notifications_enabled ?? true);
+      // notification_sound may not exist in DB yet (migration not applied)
+      const ns = profileAny.notification_sound || localStorage.getItem('notification-sound') || 'default';
+      setNotificationSound(ns);
+      try {
+        localStorage.setItem('notification-sound', ns);
+      } catch (e) {
+        // ignore
+      }
     }
   };
 
@@ -185,10 +196,49 @@ const Settings = () => {
       toast.success("Profil mis à jour avec succès");
     }
   };
-  
+
   const handleSaveNotifications = (e: React.FormEvent) => {
     e.preventDefault();
-    toast.success("Préférences de notification mises à jour");
+    if (!user) {
+      toast.error('Utilisateur non connecté');
+      return;
+    }
+
+    (async () => {
+      const { error } = await supabase
+        .from('profiles')
+        .update({
+          push_notifications_enabled: pushNotifications,
+          notification_sound: notificationSound
+        } as any)
+        .eq('id', user.id);
+
+      if (error) {
+        console.error('Erreur sauvegarde préférences notifications', error);
+        // Si la colonne n'existe pas (mauvaise migration), on sauvegarde localement pour que l'UX marche
+        try {
+          localStorage.setItem('push-notifications-enabled', JSON.stringify(pushNotifications));
+          localStorage.setItem('notification-sound', notificationSound || 'default');
+        } catch (e) {}
+
+        toast.error("Impossible d'enregistrer côté serveur. Les préférences sont sauvegardées localement. Exécutez la migration SQL pour activer la sauvegarde serveur.");
+        return;
+      } else {
+        try { localStorage.setItem('notification-sound', notificationSound || 'default'); } catch (e) {}
+        toast.success('Préférences de notification mises à jour');
+      }
+      // Ensure native channel exists for selected sound (best-effort)
+      try {
+        const ns = notificationSound || 'default';
+        // import the helper lazily to avoid circular import issues
+        const mod = await import('@/services/notificationService');
+        if (mod && typeof mod.ensureNotificationChannel === 'function') {
+          await mod.ensureNotificationChannel(ns);
+        }
+      } catch (e) {
+        console.warn('Could not ensure native notification channel:', e);
+      }
+    })();
   };
   
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -832,10 +882,50 @@ ${index + 1}. **${company.name}**
                     <AccordionContent className="space-y-4 pb-4">
                       <div className="flex items-center justify-between">
                         <div>
-                          <p className="font-medium">Nouvelles réservations</p>
-                          <p className="text-sm text-muted-foreground">Recevoir une notification pour chaque nouvelle réservation</p>
+                          <p className="font-medium">Activer les notifications push</p>
+                          <p className="text-sm text-muted-foreground">Autoriser l'application à vous envoyer des notifications push</p>
                         </div>
-                        <Switch defaultChecked />
+                        <Switch checked={pushNotifications} onCheckedChange={(val: boolean) => setPushNotifications(val)} />
+                      </div>
+
+                      <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-3">
+                        <div>
+                          <p className="font-medium">Sonnerie de notification</p>
+                          <p className="text-sm text-muted-foreground">Choisissez la sonnerie jouée pour une nouvelle course (en premier plan)</p>
+                        </div>
+                        <div className="flex items-center gap-3">
+                          <select
+                            value={notificationSound}
+                            onChange={(e) => {
+                              setNotificationSound(e.target.value);
+                              try { localStorage.setItem('notification-sound', e.target.value); } catch (err) {}
+                            }}
+                            className="bg-background border rounded px-3 py-2"
+                          >
+                            <option value="default">Défaut</option>
+                            <option value="alert1">Alerte 1</option>
+                            <option value="alert2">Alerte 2</option>
+                            <option value="chime">Carillon</option>
+                          </select>
+                          <Button type="button" onClick={async () => {
+                            try {
+                              const mod = await import('@/services/firebaseNotifications');
+                              if (mod && typeof mod.playNotificationSound === 'function') {
+                                mod.playNotificationSound();
+                              } else {
+                                // fallback: simple beep
+                                const ctx = new (window.AudioContext || (window as any).webkitAudioContext)();
+                                const o = ctx.createOscillator(); const g = ctx.createGain();
+                                o.type = 'sine'; o.frequency.setValueAtTime(950, ctx.currentTime);
+                                g.gain.setValueAtTime(0.08, ctx.currentTime);
+                                o.connect(g); g.connect(ctx.destination); o.start();
+                                setTimeout(() => { o.stop(); try { ctx.close(); } catch(e){} }, 300);
+                              }
+                            } catch (e) { console.log('Test son erreur', e); }
+                          }}>
+                            Tester
+                          </Button>
+                        </div>
                       </div>
                       
                       <div className="flex items-center justify-between">

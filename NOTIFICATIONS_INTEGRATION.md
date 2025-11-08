@@ -340,6 +340,71 @@ Doit afficher au moins un SW pour `/firebase-messaging-sw.js`.
 
 ---
 
+## 🔧 Configuration native (Android & iOS)
+
+Pour garantir la lecture de la sonnerie directement sur le téléphone (même quand l'app est en arrière-plan), il faut configurer les notifications natives :
+
+### Android (Capacitor)
+
+1. Le channel Android est créé automatiquement dans `android/app/src/main/java/com/vtcdispatch/app/MainActivity.java` (si vous utilisez Capacitor). Le channel `rides_channel` utilise la sonnerie par défaut du téléphone. Si vous voulez une sonnerie personnalisée :
+
+   - Ajoutez un fichier audio `notification_sound.mp3` dans `android/app/src/main/res/raw/`.
+   - Modifiez `createNotificationChannelIfNeeded()` pour utiliser :
+
+     ```java
+     Uri soundUri = Uri.parse("android.resource://" + getPackageName() + "/raw/notification_sound");
+     channel.setSound(soundUri, audioAttributes);
+     ```
+
+2. Dans le payload FCM envoyé depuis votre backend (edge function), incluez `sound` pour indiquer la sonnerie à jouer :
+
+```json
+{
+  "message": {
+    "token": "<FCM_TOKEN>",
+    "android": {
+      "notification": {
+        "title": "Nouvelle course",
+        "body": "Une course vous attend",
+        "sound": "notification_sound",
+        "channel_id": "rides_channel"
+      }
+    }
+  }
+}
+```
+
+> Note : `sound` sur Android doit correspondre au nom du fichier dans `res/raw` (sans extension).
+
+### iOS (Capacitor / Xcode)
+
+1. Ajoutez vos fichiers sonores (`notification_sound.caf` ou `.wav` / `.mp3`) dans le bundle iOS : `ios/App/App/PublicResources/` (ou via Xcode directement dans `Resources`).
+
+2. Assurez-vous que les sons sont inclus dans le target app. Pour un son personnalisé, utilisez la clé `sound` dans le payload APNs / FCM :
+
+```json
+{
+  "aps": {
+    "alert": { "title": "Nouvelle course", "body": "Une course vous attend" },
+    "sound": "notification_sound.caf"
+  },
+  "fcm_options": { "image": "..." }
+}
+```
+
+3. Si vous utilisez la librairie Capacitor Push Notifications, aucune modification de `AppDelegate` n'est strictement nécessaire pour jouer un son natif ; iOS jouera le son mentionné dans le payload si le fichier est présent dans le bundle.
+
+### Remarques
+- Les Service Workers (web) ne peuvent pas jouer de son quand la page est complètement fermée — c'est une limitation des navigateurs. La synthèse WebAudio implémentée assure le son en premier plan.
+- Pour les environnements natifs (Android/iOS) : la sonnerie background est gérée par l'OS via le payload `sound` et les ressources du bundle / `res/raw`.
+
+Si tu veux, je peux :
+- ajouter un exemple de payload FCM dans ton edge function `notify-new-reservation`
+- créer les instructions/pré-commit pour ajouter les fichiers sonores dans les projets Android/iOS
+
+
+---
+
 ## 🎉 Résultat Final
 
 Vos chauffeurs reçoivent maintenant des **notifications push instantanées** dès qu'une nouvelle course est créée ou assignée, que l'application soit ouverte ou en arrière-plan !

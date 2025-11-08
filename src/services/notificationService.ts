@@ -34,7 +34,14 @@ export const initializePushNotifications = async () => {
     // Écouter l'événement de registration (obtention du token FCM)
     PushNotifications.addListener('registration', async (token) => {
       console.log('Push registration success, token:', token.value);
-      await saveTokenToDatabase(token.value);
+      try {
+        // Try to save and ensure persistence (retry logic inside saveTokenToDatabase)
+        await saveTokenToDatabase(token.value);
+        // Attempt to flush any pending token (covers race conditions)
+        await flushPendingToken();
+      } catch (e) {
+        console.error('Error handling registration token:', e);
+      }
     });
 
     // Écouter les erreurs d'enregistrement
@@ -46,6 +53,9 @@ export const initializePushNotifications = async () => {
     PushNotifications.addListener('pushNotificationReceived', (notification) => {
       console.log('Push notification received (foreground):', notification);
       // Afficher une notification locale pour être visible même en foreground
+      const sound = (typeof window !== 'undefined' && window.localStorage) ? window.localStorage.getItem('notification-sound') : null;
+      const channelId = `rides_channel_${sound || 'default'}`;
+
       LocalNotifications.schedule({
         notifications: [
           {
@@ -53,7 +63,8 @@ export const initializePushNotifications = async () => {
             body: notification.body || '',
             id: Date.now(),
             schedule: { at: new Date(Date.now() + 100) },
-            sound: undefined,
+            // use channelId to control native sound on Android
+            channelId,
             attachments: undefined,
             actionTypeId: '',
             extra: notification.data,
@@ -75,13 +86,15 @@ export const initializePushNotifications = async () => {
 
 // Sauvegarder le token FCM dans Supabase
 const saveTokenToDatabase = async (token: string) => {
+  const maxAttempts = 3;
+  const delay = (ms: number) => new Promise((res) => setTimeout(res, ms));
+
   try {
     const { data: { user } } = await supabase.auth.getUser();
-    
+
     if (!user) {
       console.warn('No authenticated user, saving token locally until login');
       try {
-        // Save token locally and flush after login
         if (typeof window !== 'undefined' && window.localStorage) {
           window.localStorage.setItem('pending_fcm_token', token);
           console.log('FCM token stored locally (pending login)');
@@ -92,22 +105,58 @@ const saveTokenToDatabase = async (token: string) => {
       return;
     }
 
-    // Upsert: met à jour le token si l'utilisateur existe déjà, sinon crée
-    // Note: Cast temporaire en attendant la régénération des types après migration
-    const { error } = await (supabase as any)
-      .from('fcm_tokens')
-      .upsert(
-        { user_id: user.id, token },
-        { onConflict: 'user_id' }
-      );
+    // Attempt upsert with retries to handle transient network errors
+    for (let attempt = 1; attempt <= maxAttempts; attempt++) {
+      try {
+        const { error } = await (supabase as any)
+          .from('fcm_tokens')
+          .upsert({ user_id: user.id, token }, { onConflict: 'user_id' });
 
-    if (error) {
-      console.error('Error saving FCM token to database:', error);
-    } else {
-      console.log('FCM token saved successfully');
+        if (!error) {
+          console.log('FCM token saved successfully');
+          // If a pending token existed, remove it since we saved the token now
+          try {
+            if (typeof window !== 'undefined' && window.localStorage) {
+              const pending = window.localStorage.getItem('pending_fcm_token');
+              if (pending && pending === token) {
+                window.localStorage.removeItem('pending_fcm_token');
+                console.log('Removed pending_fcm_token from localStorage');
+              }
+            }
+          } catch (e) {
+            console.warn('Unable to remove pending_fcm_token from localStorage:', e);
+          }
+          return;
+        }
+
+        console.error(`Attempt ${attempt} - Error saving FCM token to database:`, error);
+        if (attempt < maxAttempts) await delay(2 ** attempt * 1000);
+      } catch (err) {
+        console.error(`Attempt ${attempt} - Unexpected error during token upsert:`, err);
+        if (attempt < maxAttempts) await delay(2 ** attempt * 1000);
+      }
+    }
+
+    // If we reach here, all attempts failed — persist locally as fallback
+    try {
+      if (typeof window !== 'undefined' && window.localStorage) {
+        window.localStorage.setItem('pending_fcm_token', token);
+        console.log('FCM token stored locally after retry failures');
+      }
+    } catch (e) {
+      console.error('Unable to store pending FCM token locally after retries:', e);
     }
   } catch (error) {
     console.error('Error saving FCM token:', error);
+    // On unexpected error, ensure token is stored locally so it won't be lost
+    try {
+      if (typeof window !== 'undefined' && window.localStorage) {
+        window.localStorage.setItem('pending_fcm_token', token);
+        console.log('FCM token stored locally due to unexpected error');
+      }
+    } catch (e) {
+      console.error('Unable to store pending FCM token locally after unexpected error:', e);
+    }
   }
 };
 
@@ -119,22 +168,9 @@ const flushPendingToken = async () => {
     const pending = window.localStorage.getItem('pending_fcm_token');
     if (!pending) return;
 
-    const { data: { user } } = await supabase.auth.getUser();
-    if (!user) {
-      console.log('No user yet, will keep pending token');
-      return;
-    }
-
-    const { error } = await (supabase as any)
-      .from('fcm_tokens')
-      .upsert({ user_id: user.id, token: pending }, { onConflict: 'user_id' });
-
-    if (error) {
-      console.error('Error flushing pending FCM token to database:', error);
-    } else {
-      console.log('Pending FCM token flushed to database successfully');
-      window.localStorage.removeItem('pending_fcm_token');
-    }
+    // Reuse saveTokenToDatabase which includes retry logic and removes the
+    // pending token from localStorage on success.
+    await saveTokenToDatabase(pending);
   } catch (err) {
     console.error('Error in flushPendingToken:', err);
   }
@@ -192,6 +228,9 @@ export const listenForNewReservations = () => {
         const reservation = payload.new as any;
 
         // Afficher notification locale
+        const sound = (typeof window !== 'undefined' && window.localStorage) ? window.localStorage.getItem('notification-sound') : null;
+        const channelId = `rides_channel_${sound || 'default'}`;
+
         LocalNotifications.schedule({
           notifications: [
             {
@@ -199,7 +238,7 @@ export const listenForNewReservations = () => {
               body: `${reservation.client_name} - ${reservation.pickup_address} → ${reservation.destination}`,
               id: Date.now(),
               schedule: { at: new Date(Date.now() + 100) },
-              sound: undefined,
+              channelId,
               attachments: undefined,
               actionTypeId: '',
               extra: { reservationId: reservation.id },
@@ -233,4 +272,28 @@ export const initializeNotifications = async () => {
     console.error('Error setting up pending token flush:', e);
   }
   console.log('Notifications initialized');
+};
+
+// Ensure a native notification channel exists for the given sound key.
+// This is safe to call repeatedly; on platforms that don't support channels
+// the call is a no-op.
+export const ensureNotificationChannel = async (soundKey: string) => {
+  try {
+    if (!Capacitor.isNativePlatform()) return;
+    const channelId = `rides_channel_${soundKey || 'default'}`;
+    const name = `Nouvelles courses ${soundKey && soundKey !== 'default' ? `- ${soundKey}` : ''}`;
+    // LocalNotifications.createChannel is available on native platforms
+    // sound field: on Android, use resource name (without extension) that exists in res/raw
+    const sound = soundKey === 'default' ? undefined : soundKey;
+    await LocalNotifications.createChannel({
+      id: channelId,
+      name,
+      importance: 4,
+      vibrationPattern: [0, 200, 100, 200],
+      sound,
+    } as any);
+  } catch (e) {
+    // Do not surface errors to user; log for debugging
+    console.warn('Unable to ensure notification channel:', e);
+  }
 };
